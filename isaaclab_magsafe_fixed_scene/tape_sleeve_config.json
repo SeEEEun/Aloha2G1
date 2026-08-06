@@ -1,0 +1,22 @@
+{
+  "distal_length_m": 0.020,
+  "effective_thickness_m": 0.0,
+  "distal_chamfer_m": 0.001,
+  "material": {
+    "static_friction": 0.75,
+    "dynamic_friction": 0.60,
+    "friction_combine_mode": "average"
+  },
+  "geometry_source": {
+    "finger_longitudinal_axis": "+X",
+    "gripper_closing_axis": "local Y toward gripper center",
+    "distal_tip_x_m": 0.069561665,
+    "finger_width_z_m": 0.01965619,
+    "finger_center_z_m": -0.001431745,
+    "finger_thickness_y_m": 0.00497883,
+    "inner_face_abs_y_m": 0.0229742,
+    "outer_face_abs_y_m": 0.01799537,
+    "source": "vertex bounds of the imported Stationary ALOHA gripper visual mesh over the distal region"
+  },
+  "debug_assumption": "No tape inflation; effective_thickness_m is 0 because cumulative tape thickness has not been measured."
+}

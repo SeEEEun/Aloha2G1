@@ -1,0 +1,22 @@
+#usda 1.0
+(
+    "Replay-only deactivation of the non-physical SupportFootProxy. No visual mesh, ring collider, mass, or robot opinions."
+)
+
+over "World"
+{
+    over "MagSafeScene"
+    {
+        over "Accessory"
+        {
+            over "Colliders"
+            {
+                over "SupportFootProxy" (
+                    active = false
+                )
+                {
+                }
+            }
+        }
+    }
+}

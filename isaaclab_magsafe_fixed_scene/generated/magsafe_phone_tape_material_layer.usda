@@ -1,0 +1,201 @@
+#usda 1.0
+
+def "World"
+{
+    def "ReplayPhysicsMaterials"
+    {
+        def Material "InsulatingTape" (
+            prepend apiSchemas = ["PhysicsMaterialAPI"]
+        )
+        {
+            float physics:dynamicFriction = 0.6
+            float physics:restitution = 0
+            float physics:staticFriction = 0.75
+        }
+
+        def Material "PhoneMatteRearApproximation" (
+            prepend apiSchemas = ["PhysicsMaterialAPI"]
+        )
+        {
+            float physics:dynamicFriction = 0.45
+            float physics:restitution = 0
+            float physics:staticFriction = 0.55
+        }
+
+        def Material "PhoneGlassUnbound" (
+            prepend apiSchemas = ["PhysicsMaterialAPI"]
+        )
+        {
+            float physics:dynamicFriction = 0.25
+            float physics:restitution = 0
+            float physics:staticFriction = 0.35
+        }
+    }
+
+    over "MagSafeScene"
+    {
+        over "Phone"
+        {
+            over "Colliders"
+            {
+                over "Main" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    rel material:binding:physics = </World/ReplayPhysicsMaterials/PhoneMatteRearApproximation>
+                }
+            }
+        }
+    }
+
+    over "StationaryALOHA"
+    {
+        over "Asset"
+        {
+            over "Geometry"
+            {
+                over "tabletop_link"
+                {
+                    over "follower_left_base_link"
+                    {
+                        over "follower_left_link_1"
+                        {
+                            over "follower_left_link_2"
+                            {
+                                over "follower_left_link_3"
+                                {
+                                    over "follower_left_link_4"
+                                    {
+                                        over "follower_left_link_5"
+                                        {
+                                            over "follower_left_link_6"
+                                            {
+                                                over "follower_left_carriage_right"
+                                                {
+                                                    over "follower_left_gripper_right_pad_upper" (
+                                                        prepend apiSchemas = ["MaterialBindingAPI"]
+                                                    )
+                                                    {
+                                                        rel material:binding:physics = </World/ReplayPhysicsMaterials/InsulatingTape>
+                                                    }
+
+                                                    over "follower_left_gripper_right_pad_lower" (
+                                                        prepend apiSchemas = ["MaterialBindingAPI"]
+                                                    )
+                                                    {
+                                                        rel material:binding:physics = </World/ReplayPhysicsMaterials/InsulatingTape>
+                                                    }
+
+                                                    over "follower_left_gripper_right_tip" (
+                                                        prepend apiSchemas = ["MaterialBindingAPI"]
+                                                    )
+                                                    {
+                                                        rel material:binding:physics = </World/ReplayPhysicsMaterials/InsulatingTape>
+                                                    }
+                                                }
+
+                                                over "follower_left_carriage_left"
+                                                {
+                                                    over "follower_left_gripper_left_pad_upper" (
+                                                        prepend apiSchemas = ["MaterialBindingAPI"]
+                                                    )
+                                                    {
+                                                        rel material:binding:physics = </World/ReplayPhysicsMaterials/InsulatingTape>
+                                                    }
+
+                                                    over "follower_left_gripper_left_pad_lower" (
+                                                        prepend apiSchemas = ["MaterialBindingAPI"]
+                                                    )
+                                                    {
+                                                        rel material:binding:physics = </World/ReplayPhysicsMaterials/InsulatingTape>
+                                                    }
+
+                                                    over "follower_left_gripper_left_tip" (
+                                                        prepend apiSchemas = ["MaterialBindingAPI"]
+                                                    )
+                                                    {
+                                                        rel material:binding:physics = </World/ReplayPhysicsMaterials/InsulatingTape>
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    over "follower_right_base_link"
+                    {
+                        over "follower_right_link_1"
+                        {
+                            over "follower_right_link_2"
+                            {
+                                over "follower_right_link_3"
+                                {
+                                    over "follower_right_link_4"
+                                    {
+                                        over "follower_right_link_5"
+                                        {
+                                            over "follower_right_link_6"
+                                            {
+                                                over "follower_right_carriage_right"
+                                                {
+                                                    over "follower_right_gripper_right_pad_upper" (
+                                                        prepend apiSchemas = ["MaterialBindingAPI"]
+                                                    )
+                                                    {
+                                                        rel material:binding:physics = </World/ReplayPhysicsMaterials/InsulatingTape>
+                                                    }
+
+                                                    over "follower_right_gripper_right_pad_lower" (
+                                                        prepend apiSchemas = ["MaterialBindingAPI"]
+                                                    )
+                                                    {
+                                                        rel material:binding:physics = </World/ReplayPhysicsMaterials/InsulatingTape>
+                                                    }
+
+                                                    over "follower_right_gripper_right_tip" (
+                                                        prepend apiSchemas = ["MaterialBindingAPI"]
+                                                    )
+                                                    {
+                                                        rel material:binding:physics = </World/ReplayPhysicsMaterials/InsulatingTape>
+                                                    }
+                                                }
+
+                                                over "follower_right_carriage_left"
+                                                {
+                                                    over "follower_right_gripper_left_pad_upper" (
+                                                        prepend apiSchemas = ["MaterialBindingAPI"]
+                                                    )
+                                                    {
+                                                        rel material:binding:physics = </World/ReplayPhysicsMaterials/InsulatingTape>
+                                                    }
+
+                                                    over "follower_right_gripper_left_pad_lower" (
+                                                        prepend apiSchemas = ["MaterialBindingAPI"]
+                                                    )
+                                                    {
+                                                        rel material:binding:physics = </World/ReplayPhysicsMaterials/InsulatingTape>
+                                                    }
+
+                                                    over "follower_right_gripper_left_tip" (
+                                                        prepend apiSchemas = ["MaterialBindingAPI"]
+                                                    )
+                                                    {
+                                                        rel material:binding:physics = </World/ReplayPhysicsMaterials/InsulatingTape>
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+

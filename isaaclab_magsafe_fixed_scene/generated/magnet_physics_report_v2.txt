@@ -1,0 +1,148 @@
+MAGSAFE MAGNET PHYSICS REPORT
+parameter_status: DEBUG_INITIAL_GUESS (not measured)
+Isaac Sim: 6.0.1 pip
+Isaac Lab: 3.0.0-beta2.patch1 family
+external wrench API: RigidObject.instantaneous_wrench_composer.set_forces_and_torques_index(is_global=True)
+joint API: pxr.UsdPhysics.FixedJoint (accessory-phone); force_soft_lock (phone-charger, full portrait rotation)
+dynamic: phone mass=0.177 kg gravity=on CCD=on contact-report=on; accessory mass=0.04 kg gravity=on CCD=on contact-report=on
+static: table and charger retain collision proxies and have no RigidBodyAPI
+model: with v_rel=target-source, F=smoothstep(1-d/R)*(kp*position_error+kd*v_rel), T=smoothstep*(kpR*normal_rotation_vector+kdR*omega_rel), clamped. This is algebraically the requested negative damping against source-minus-target velocity.
+parameters: {
+  "metadata": {
+    "version": 2,
+    "parameter_status": "DEBUG_INITIAL_GUESS",
+    "seed": 42,
+    "magnetic_pairs": [
+      [
+        "/MagSafeScene/Accessory/Frames/MagneticCenter",
+        "/MagSafeScene/Phone/Frames/MagSafeCenter"
+      ],
+      [
+        "/MagSafeScene/Phone/Frames/MagSafeCenter",
+        "/MagSafeScene/Charger/Frames/PhoneTargetCenter"
+      ]
+    ]
+  },
+  "accessory_phone": {
+    "attachment_mode": "breakable_joint",
+    "initial_state": "ATTACHED",
+    "capture_radius_m": 0.035,
+    "attach_distance_m": 0.004,
+    "attach_angle_deg": 12.0,
+    "attach_linear_speed_mps": 0.08,
+    "attach_angular_speed_rps": 0.8,
+    "kp_position": 30.0,
+    "kd_position": 2.5,
+    "kp_orientation": 0.22,
+    "kd_orientation": 0.015,
+    "max_force_n": 4.0,
+    "max_torque_nm": 0.2,
+    "break_force_n": 2.0,
+    "break_torque_nm": 0.08,
+    "cooldown_s": 0.4,
+    "allow_reattach": false
+  },
+  "phone_charger": {
+    "attachment_mode": "force_soft_lock",
+    "orientation_mode": "full_target_rotation",
+    "initial_state": "DETACHED",
+    "capture_radius_m": 0.045,
+    "attach_distance_m": 0.005,
+    "attach_angle_deg": 5.0,
+    "attach_linear_speed_mps": 0.1,
+    "attach_angular_speed_rps": 1.0,
+    "kp_position": 500.0,
+    "kd_position": 10.0,
+    "kp_orientation": 1.5,
+    "kd_orientation": 0.08,
+    "max_force_n": 10.0,
+    "max_torque_nm": 0.55,
+    "break_force_n": 8.0,
+    "break_torque_nm": 0.45,
+    "cooldown_s": 0.4,
+    "allow_reattach": true
+  },
+  "accessory": {
+    "mass_kg": 0.04,
+    "mass_status": "USER_PROVIDED",
+    "support_foot_proxy_size_xyz_m": [
+      0.04,
+      0.016,
+      0.003
+    ],
+    "support_foot_proxy_center_local_xyz_m": [
+      0.0,
+      0.03,
+      -0.03362
+    ]
+  },
+  "charger_target": {
+    "surface_clearance_m": 0.0005,
+    "target_rotation_wxyz": [
+      -0.7010573846,
+      0.0922959556,
+      0.7010573846,
+      -0.0922959556
+    ],
+    "target_body_x_axis_world": [
+      0.0,
+      0.2588190451,
+      0.9659258263
+    ],
+    "target_body_y_axis_world": [
+      0.0,
+      0.9659258263,
+      -0.2588190451
+    ],
+    "target_body_z_axis_world": [
+      -1.0,
+      0.0,
+      0.0
+    ]
+  },
+  "initial_assembly": {
+    "lean_degrees_about_world_x": -1.0
+  },
+  "safety": {
+    "max_phone_acceleration_mps2": 45.0,
+    "max_accessory_acceleration_mps2": 70.0,
+    "penetration_limit_m": 0.001,
+    "enable_ccd": true
+  },
+  "logging": {
+    "console_period_s": 0.25,
+    "csv_period_s": 0.008333333333333333
+  }
+}
+tests: {
+  "initial_stability": {
+    "pass": true,
+    "duration_s": 3.0
+  },
+  "accessory_detach": {
+    "pass": true,
+    "states": [
+      "ATTACHED",
+      "COOLDOWN"
+    ],
+    "detach_force_n": 2.1
+  },
+  "charger_snap": {
+    "pass": true,
+    "states": [
+      "ATTRACTING",
+      "ATTACHED"
+    ]
+  },
+  "outside_capture": {
+    "pass": true,
+    "force_n": 0.0
+  },
+  "wrong_orientation": {
+    "pass": true,
+    "state": "DETACHED"
+  }
+}
+measured_v2_runtime: initial_stability=3.2s stable; initial charger force=0N; portrait snap attach=0.058333s; final center error=0.003444m; final full orientation error=0.755deg; NaN/Inf=0.
+limitations: electromagnetic fields are not solved; break thresholds remain DEBUG_INITIAL_GUESS; support-foot contact force is presently inferred from static equilibrium rather than read from a filtered contact-force sensor.
+final_status: MAGNET_PHYSICS_OK

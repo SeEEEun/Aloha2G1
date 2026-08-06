@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "simulation_only": true,
+  "status": "NEEDS_MANUAL_APPROVAL",
+  "source_xml": "/home/jbnu/trossen_arm_mujoco/trossen_arm_mujoco/assets/stationary_ai/stationary_ai.xml",
+  "tcp_offset_link6_m": [
+    0.1487,
+    0,
+    -0.00105
+  ],
+  "left": {
+    "tcp_parent": "follower_left_link_6",
+    "approach_axis_local": [
+      1,
+      0,
+      0
+    ],
+    "closing_axis_local": [
+      0,
+      1,
+      0
+    ],
+    "lateral_axis_local": [
+      0,
+      0,
+      1
+    ],
+    "opening_plane": "local X-Z",
+    "model_evidence": "symmetric jaw pad centers at local +/-Y; tips extend local +X",
+    "status": "VERIFIED_FROM_MODEL_NEEDS_VIDEO_APPROVAL"
+  },
+  "right": {
+    "tcp_parent": "follower_right_link_6",
+    "approach_axis_local": [
+      1,
+      0,
+      0
+    ],
+    "closing_axis_local": [
+      0,
+      1,
+      0
+    ],
+    "lateral_axis_local": [
+      0,
+      0,
+      1
+    ],
+    "opening_plane": "local X-Z",
+    "model_evidence": "symmetric jaw pad centers at local +/-Y; tips extend local +X",
+    "status": "VERIFIED_FROM_MODEL_NEEDS_VIDEO_APPROVAL"
+  }
+}

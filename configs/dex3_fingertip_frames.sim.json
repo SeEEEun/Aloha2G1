@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "status": "VERIFIED_FROM_ACTIVE_COLLISION_GEOMETRY_FOR_SIMULATION",
+  "simulation_only": true,
+  "authoritative_for_real_robot": false,
+  "active_model": "/home/jbnu/mujoco_menagerie/unitree_g1/g1_with_hands.xml",
+  "fingertips": {
+    "left_A": {
+      "digit_chain": "thumb",
+      "joint_names": [
+        "left_hand_thumb_0_joint",
+        "left_hand_thumb_1_joint",
+        "left_hand_thumb_2_joint"
+      ],
+      "distal_link": "left_hand_thumb_2_link",
+      "fingertip_frame": "left_A_tip_collision_pad_center",
+      "source_geom": "active collision mesh geom_id=61",
+      "local_position_xyz_m": [
+        0.006681383091650914,
+        -0.029792676574194786,
+        6.585596875417019e-06
+      ],
+      "wrist_local_position_xyz_m": [
+        0.13339530613155237,
+        -0.0481171404231734,
+        6.585596875406663e-06
+      ],
+      "local_normal": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "flexion_direction_joint_axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "pad_half_extent_m": [
+        0.001999569398233049,
+        0.02477659790900315,
+        0.012999936436933448
+      ],
+      "mapping_evidence": "photo A physical position matches thumb collision chain in active mirrored geometry"
+    },
+    "left_B": {
+      "digit_chain": "index",
+      "joint_names": [
+        "left_hand_index_0_joint",
+        "left_hand_index_1_joint"
+      ],
+      "distal_link": "left_hand_index_1_link",
+      "fingertip_frame": "left_B_tip_collision_pad_center",
+      "source_geom": "active collision mesh geom_id=69",
+      "local_position_xyz_m": [
+        0.05021218895371525,
+        0.001228833713269696,
+        -2.9845193230669556e-05
+      ],
+      "wrist_local_position_xyz_m": [
+        0.2152121889537156,
+        0.005828833713269692,
+        0.028470154806769368
+      ],
+      "local_normal": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "flexion_direction_joint_axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "pad_half_extent_m": [
+        0.0019929339114063555,
+        0.0041744962284203475,
+        0.008544835208552908
+      ],
+      "mapping_evidence": "photo B physical position matches index collision chain in active mirrored geometry"
+    },
+    "left_C": {
+      "digit_chain": "middle",
+      "joint_names": [
+        "left_hand_middle_0_joint",
+        "left_hand_middle_1_joint"
+      ],
+      "distal_link": "left_hand_middle_1_link",
+      "fingertip_frame": "left_C_tip_collision_pad_center",
+      "source_geom": "active collision mesh geom_id=65",
+      "local_position_xyz_m": [
+        0.05021218895371525,
+        0.001228833713269696,
+        -2.9845193230669556e-05
+      ],
+      "wrist_local_position_xyz_m": [
+        0.21521218895371563,
+        0.005828833713269685,
+        -0.028529845193230707
+      ],
+      "local_normal": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "flexion_direction_joint_axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "pad_half_extent_m": [
+        0.0019929339114063555,
+        0.0041744962284203475,
+        0.008544835208552908
+      ],
+      "mapping_evidence": "photo C physical position matches middle collision chain in active mirrored geometry"
+    },
+    "right_A": {
+      "digit_chain": "index",
+      "joint_names": [
+        "right_hand_index_0_joint",
+        "right_hand_index_1_joint"
+      ],
+      "distal_link": "right_hand_index_1_link",
+      "fingertip_frame": "right_A_tip_collision_pad_center",
+      "source_geom": "active collision mesh geom_id=99",
+      "local_position_xyz_m": [
+        0.05021218895371525,
+        -0.001228833713269696,
+        2.984519323066765e-05
+      ],
+      "wrist_local_position_xyz_m": [
+        0.21521218895371555,
+        -0.005828833713269747,
+        0.02852984519323071
+      ],
+      "local_normal": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "flexion_direction_joint_axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "pad_half_extent_m": [
+        0.0019929339114063555,
+        0.0041744962284203475,
+        0.008544835208552908
+      ],
+      "mapping_evidence": "photo A physical position matches index collision chain in active mirrored geometry"
+    },
+    "right_B": {
+      "digit_chain": "thumb",
+      "joint_names": [
+        "right_hand_thumb_0_joint",
+        "right_hand_thumb_1_joint",
+        "right_hand_thumb_2_joint"
+      ],
+      "distal_link": "right_hand_thumb_2_link",
+      "fingertip_frame": "right_B_tip_collision_pad_center",
+      "source_geom": "active collision mesh geom_id=91",
+      "local_position_xyz_m": [
+        0.006681383091650914,
+        0.029792676574194786,
+        -6.585596875417019e-06
+      ],
+      "wrist_local_position_xyz_m": [
+        0.13339530613155237,
+        0.048117140423173416,
+        -6.585596875425745e-06
+      ],
+      "local_normal": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "flexion_direction_joint_axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "pad_half_extent_m": [
+        0.001999569398233049,
+        0.02477659790900315,
+        0.012999936436933448
+      ],
+      "mapping_evidence": "photo B physical position matches thumb collision chain in active mirrored geometry"
+    },
+    "right_C": {
+      "digit_chain": "middle",
+      "joint_names": [
+        "right_hand_middle_0_joint",
+        "right_hand_middle_1_joint"
+      ],
+      "distal_link": "right_hand_middle_1_link",
+      "fingertip_frame": "right_C_tip_collision_pad_center",
+      "source_geom": "active collision mesh geom_id=95",
+      "local_position_xyz_m": [
+        0.05021218895371525,
+        -0.001228833713269696,
+        2.984519323066765e-05
+      ],
+      "wrist_local_position_xyz_m": [
+        0.21521218895371558,
+        -0.00582883371326974,
+        -0.028470154806769364
+      ],
+      "local_normal": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "flexion_direction_joint_axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "pad_half_extent_m": [
+        0.0019929339114063555,
+        0.0041744962284203475,
+        0.008544835208552908
+      ],
+      "mapping_evidence": "photo C physical position matches middle collision chain in active mirrored geometry"
+    }
+  }
+}

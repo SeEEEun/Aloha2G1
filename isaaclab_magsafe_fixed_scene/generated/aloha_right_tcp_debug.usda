@@ -1,0 +1,182 @@
+#usda 1.0
+(
+    defaultPrim = "World"
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "World"
+{
+    def Xform "MagSafeScene" (
+        prepend references = @/home/jbnu/aloha_g1_dataset/isaaclab_magsafe_fixed_scene/generated/magsafe_magnetic_scene_v2.usda@
+    )
+    {
+        over "Phone"
+        {
+            bool physics:kinematicEnabled = 1
+        }
+
+        over "Accessory"
+        {
+            bool physics:kinematicEnabled = 1
+        }
+    }
+
+    def Xform "StationaryALOHA" (
+        customData = {
+            bool preview_control_applied = 0
+            string preview_pose_source = "/home/jbnu/aloha_g1_dataset/isaaclab_magsafe_fixed_scene/magsafe_robot_preview_config.json"
+        }
+    )
+    {
+        quatd xformOp:orient = (0.7071067812, 0, 0, 0.7071067812)
+        double3 xformOp:translate = (0.4175, 0.36, 0.756)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient"]
+
+        def Xform "Asset" (
+            prepend references = @/home/jbnu/robot_assets/stationary_aloha/usd_imported/stationary_aloha_imported.usd@
+        )
+        {
+            over "Geometry"
+            {
+                over "tabletop_link" (
+                    delete apiSchemas = ["PhysicsArticulationRootAPI"]
+                )
+                {
+                    over "tabletop_link" (
+                        active = false
+                    )
+                    {
+                    }
+
+                    over "tabletop" (
+                        active = false
+                    )
+                    {
+                    }
+
+                    over "frame_link" (
+                        active = false
+                    )
+                    {
+                    }
+
+                    over "cam_high_mount_link" (
+                        active = false
+                    )
+                    {
+                    }
+
+                    over "cam_low_mount_link" (
+                        active = false
+                    )
+                    {
+                    }
+
+                    over "cam_high_color_frame" (
+                        active = false
+                    )
+                    {
+                    }
+
+                    over "cam_low_color_frame" (
+                        active = false
+                    )
+                    {
+                    }
+
+                    over "Box_1" (
+                        active = false
+                    )
+                    {
+                    }
+
+                    over "Box_2" (
+                        active = false
+                    )
+                    {
+                    }
+
+                    over "Box_3" (
+                        active = false
+                    )
+                    {
+                    }
+
+                    over "Box_4" (
+                        active = false
+                    )
+                    {
+                    }
+
+                    over "Box_5" (
+                        active = false
+                    )
+                    {
+                    }
+
+                    over "Box_6" (
+                        active = false
+                    )
+                    {
+                    }
+
+                    over "Box_7" (
+                        active = false
+                    )
+                    {
+                    }
+
+                    over "Box_8" (
+                        active = false
+                    )
+                    {
+                    }
+
+                    over "Box_9" (
+                        active = false
+                    )
+                    {
+                    }
+
+                    over "Box_10" (
+                        active = false
+                    )
+                    {
+                    }
+
+                    over "Box_11" (
+                        active = false
+                    )
+                    {
+                    }
+
+                    over "Box_12" (
+                        active = false
+                    )
+                    {
+                    }
+
+                    over "Box" (
+                        active = false
+                    )
+                    {
+                    }
+
+                    def PhysicsFixedJoint "ReplayWorldFixedJoint" (
+                        prepend apiSchemas = ["PhysicsArticulationRootAPI", "PhysxArticulationAPI"]
+                    )
+                    {
+                        rel physics:body1 = </World/StationaryALOHA/Asset/Geometry/tabletop_link>
+                        bool physics:collisionEnabled = 0
+                        point3f physics:localPos0 = (0.4175, 0.36, 0.756)
+                        point3f physics:localPos1 = (0, 0, 0)
+                        quatf physics:localRot0 = (0.70710677, 0, 0, 0.70710677)
+                        quatf physics:localRot1 = (1, 0, 0, 0)
+                    }
+                }
+            }
+        }
+    }
+}
+

@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "units": "meters",
+  "coordinate_frame": {
+    "world_origin": "floor point directly below the table top front-left corner",
+    "table_surface_origin_world": [
+      0.0,
+      0.0,
+      0.795
+    ],
+    "x_axis": "table left to right",
+    "y_axis": "table front/operator side to back/charger side",
+    "z_axis": "up"
+  },
+  "table": {
+    "size_x": 0.835,
+    "size_y": 0.72,
+    "surface_height": 0.795,
+    "top_thickness": 0.045,
+    "edge_rail_width": 0.025,
+    "leg_size_x": 0.045,
+    "leg_size_y": 0.045,
+    "hole_pitch": 0.025,
+    "hole_radius": 0.00155,
+    "hole_margin": 0.02,
+    "notes": "Top thickness, frame rail width, leg size, and optical-hole pitch are visual estimates from the supplied photographs and are isolated here for easy revision."
+  },
+  "phone": {
+    "bottom_left_xy": [
+      0.45,
+      0.255
+    ],
+    "bottom_right_xy": [
+      0.6,
+      0.255
+    ],
+    "size_landscape_xyz": [
+      0.1496,
+      0.00795,
+      0.0715
+    ],
+    "mass_kg": 0.177,
+    "corner_radius": 0.0105,
+    "screen_faces": "-Y",
+    "back_faces": "+Y",
+    "body_color_rgb": [
+      0.43,
+      0.5,
+      0.3
+    ],
+    "notes": "G1 measured provisional layout: phone initial pose is 0.150 m from the table front/operator edge. X position, dimensions, orientation, and height convention are unchanged."
+  },
+  "accessory": {
+    "product_name": "Daiso MagSafe2-compatible stand pop finger, black",
+    "product_number": "1062886",
+    "main_outer_diameter": 0.055,
+    "main_inner_diameter": 0.045,
+    "main_depth": 0.0035,
+    "main_gap_degrees": 36.0,
+    "support_outer_diameter": 0.048,
+    "support_inner_diameter": 0.038,
+    "support_depth": 0.0032,
+    "support_center_offset_from_main_xyz": [
+      0.0,
+      0.03,
+      -0.0332
+    ],
+    "phone_back_clearance": 0.0007,
+    "notes": "Main ring diameters are measured. Support-ring diameters, thicknesses, and open-stand offset are visual estimates from the supplied photographs."
+  },
+  "charger": {
+    "center_xy": [
+      0.42,
+      0.52
+    ],
+    "base_size_xy": [
+      0.105,
+      0.105
+    ],
+    "base_height": 0.024,
+    "total_height": 0.16,
+    "pad_diameter": 0.059,
+    "pad_thickness": 0.008,
+    "pad_tilt_degrees_up": 15.0,
+    "pad_center_y_offset": 0.01,
+    "support_rod_width": 0.01,
+    "support_rod_depth": 0.006,
+    "mount_plate": {
+      "enabled": true,
+      "size_xyz": [
+        0.24,
+        0.105,
+        0.012
+      ],
+      "corner_radius": 0.012,
+      "notes": "The black rectangular plate visible in the photographs is included as an estimated visual fixture and can be disabled."
+    },
+    "notes": "G1 measured provisional layout: charger center is 0.210 m from the table front/operator edge. X position, dimensions, orientation, and height convention are unchanged."
+  },
+  "asset_overrides": {
+    "phone_usd": "",
+    "accessory_usd": "",
+    "charger_usd": "",
+    "notes": "After RealityScan/Blender/Isaac conversion, place cleaned USD paths here. The fixed scene keeps the exact transforms and collision proxies while replacing only the parametric visual model."
+  },
+  "render": {
+    "camera_eye": [
+      1.1,
+      -0.82,
+      1.34
+    ],
+    "camera_target": [
+      0.42,
+      0.36,
+      0.86
+    ],
+    "dome_intensity": 1250.0,
+    "key_light_intensity": 2600.0,
+    "fill_light_intensity": 1200.0
+  }
+}

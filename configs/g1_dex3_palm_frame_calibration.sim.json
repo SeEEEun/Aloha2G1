@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "simulation_only": true,
+  "authoritative_for_real_robot": false,
+  "source_xml": "/home/jbnu/mujoco_menagerie/unitree_g1/g1_with_hands.xml",
+  "axes_basis": "Existing repository kinematics in retarget_episode49_relative_bimanual_neutral_pinch_to_g1.py; XML palm visual/collision geom transform.",
+  "left": {
+    "parent_body": "left_wrist_yaw_link",
+    "palm_geom_name": "left_hand_palm_link",
+    "geom_local_position_m": [
+      0.0415,
+      0.003,
+      0
+    ],
+    "geom_local_quaternion_wxyz": [
+      1,
+      0,
+      0,
+      0
+    ],
+    "origin": "wrist body origin; palm proxy at geom local position",
+    "tool_forward_axis_local": [
+      1,
+      0,
+      0
+    ],
+    "lateral_axis_local": [
+      0,
+      1,
+      0
+    ],
+    "palm_normal_axis_local": [
+      0,
+      0,
+      1
+    ]
+  },
+  "right": {
+    "parent_body": "right_wrist_yaw_link",
+    "palm_geom_name": "right_hand_palm_link",
+    "geom_local_position_m": [
+      0.0415,
+      -0.003,
+      0
+    ],
+    "geom_local_quaternion_wxyz": [
+      1,
+      0,
+      0,
+      0
+    ],
+    "origin": "wrist body origin; palm proxy at geom local position",
+    "tool_forward_axis_local": [
+      1,
+      0,
+      0
+    ],
+    "lateral_axis_local": [
+      0,
+      1,
+      0
+    ],
+    "palm_normal_axis_local": [
+      0,
+      0,
+      1
+    ]
+  }
+}

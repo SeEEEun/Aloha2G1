@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "parameter_status": "DEBUG_INITIAL_GUESS",
+    "seed": 42,
+    "attachment_modes_supported": ["breakable_joint", "force_soft_lock"]
+  },
+  "accessory_phone": {
+    "attachment_mode": "breakable_joint",
+    "initial_state": "ATTACHED",
+    "capture_radius_m": 0.035,
+    "attach_distance_m": 0.004,
+    "attach_angle_deg": 12.0,
+    "attach_linear_speed_mps": 0.08,
+    "attach_angular_speed_rps": 0.8,
+    "kp_position": 35.0,
+    "kd_position": 2.5,
+    "kp_orientation": 0.25,
+    "kd_orientation": 0.015,
+    "max_force_n": 8.0,
+    "max_torque_nm": 0.35,
+    "break_force_n": 5.0,
+    "break_torque_nm": 0.25,
+    "cooldown_s": 0.4,
+    "allow_reattach": false
+  },
+  "phone_charger": {
+    "attachment_mode": "force_soft_lock",
+    "initial_state": "DETACHED",
+    "capture_radius_m": 0.045,
+    "attach_distance_m": 0.005,
+    "attach_angle_deg": 15.0,
+    "attach_linear_speed_mps": 0.10,
+    "attach_angular_speed_rps": 1.0,
+    "kp_position": 500.0,
+    "kd_position": 10.0,
+    "kp_orientation": 1.0,
+    "kd_orientation": 0.05,
+    "max_force_n": 10.0,
+    "max_torque_nm": 0.45,
+    "break_force_n": 8.0,
+    "break_torque_nm": 0.4,
+    "cooldown_s": 0.4,
+    "allow_reattach": true
+  },
+  "accessory": {
+    "mass_kg": 0.025,
+    "mass_status": "DEBUG_INITIAL_GUESS"
+  },
+  "safety": {
+    "max_phone_acceleration_mps2": 45.0,
+    "max_accessory_acceleration_mps2": 80.0,
+    "penetration_limit_m": 0.002,
+    "enable_ccd": true
+  },
+  "logging": {
+    "console_period_s": 0.25,
+    "csv_period_s": 0.008333333333333333
+  }
+}

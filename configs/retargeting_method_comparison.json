@@ -1,0 +1,28 @@
+{
+  "protocol_version": "retargeting_method_comparison_v1",
+  "status": "proposed_current_frozen",
+  "methods": [
+    "relative_temporal_proposed",
+    "relative_framewise",
+    "relative_no_workspace_scale"
+  ],
+  "unavailable_method": {
+    "absolute_temporal": "No validated absolute ALOHA-to-G1 frame mapping exists"
+  },
+  "shared": {
+    "source_action": "/home/jbnu/aloha_g1_dataset/evaluation/smolvla_episode49_temporal_consensus/episode_000049_temporal_consensus.npz",
+    "frames": 990,
+    "fps": 30.0,
+    "g1_xml": "/home/jbnu/mujoco_menagerie/unitree_g1/g1_with_hands.xml",
+    "dex3_phase_csv": "/home/jbnu/aloha_g1_dataset/outputs/magsafe_gripper_phases.csv",
+    "primitive_config": "/home/jbnu/aloha_g1_dataset/configs/dex3_magsafe_grasp_primitives.sim.json",
+    "isaac_controller": "/home/jbnu/aloha_g1_dataset/isaaclab_magsafe_fixed_scene/replay_g1_arm_dex3_offline.py",
+    "camera": "fixed front azimuth=90 elevation=-8 distance=1.15",
+    "manual_per_method_tuning": false
+  },
+  "warnings": [
+    "PLACEHOLDER DEX3",
+    "FULL-HAND COLLISION RESULT IS DIAGNOSTIC ONLY",
+    "REAL G1 SAFETY NOT_PERFORMED"
+  ]
+}

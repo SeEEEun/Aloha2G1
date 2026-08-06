@@ -1,0 +1,308 @@
+#usda 1.0
+(
+    defaultPrim = "MagSafeScene"
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "MagSafeScene" (
+    customData = {
+        dictionary magsafe = {
+            string class = "magsafe_magnetic_scene"
+            string fixed_source = "magsafe_fixed_scene.usda"
+            string parameter_status = "DEBUG_INITIAL_GUESS"
+            bool robot_included = 0
+        }
+    }
+    prepend references = @magsafe_fixed_scene.usda@
+)
+{
+    over "Phone" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysxRigidBodyAPI", "PhysxContactReportAPI"]
+    )
+    {
+        bool physics:kinematicEnabled = 0
+        float physics:mass = 0.177
+        bool physics:rigidBodyEnabled = 1
+        custom float physxContactReport:threshold = 0
+        custom bool physxRigidBody:disableGravity = 0
+        custom bool physxRigidBody:enableCCD = 1
+        custom float physxRigidBody:maxAngularVelocity = 25
+        custom float physxRigidBody:maxLinearVelocity = 8
+        quatd xformOp:orient = (0.9999619230641713, -0.008726535498373935, -0, -0)
+        double3 xformOp:translate = (0.525, 0.2556239235301329, 0.830744555101841)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient"]
+
+        over "Colliders"
+        {
+            over "Main" (
+                prepend apiSchemas = ["PhysicsMeshCollisionAPI", "PhysxCollisionAPI"]
+            )
+            {
+                uniform token physics:approximation = "convexHull"
+                custom float physxCollision:contactOffset = 0.001
+                custom float physxCollision:restOffset = 0
+            }
+        }
+    }
+
+    over "Accessory" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysxRigidBodyAPI", "PhysxContactReportAPI"]
+    )
+    {
+        bool physics:kinematicEnabled = 0
+        float physics:mass = 0.04
+        bool physics:rigidBodyEnabled = 1
+        custom float physxContactReport:threshold = 0
+        custom bool physxRigidBody:disableGravity = 0
+        custom bool physxRigidBody:enableCCD = 1
+        custom float physxRigidBody:maxAngularVelocity = 25
+        custom float physxRigidBody:maxLinearVelocity = 8
+        quatd xformOp:orient = (0.9999619230641713, -0.008726535498373935, -0, -0)
+        double3 xformOp:translate = (0.525, 0.26204794497151274, 0.8306324233904814)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient"]
+
+        over "Colliders"
+        {
+            over "SupportRing"
+            {
+                over "Segment_00" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    bool physics:collisionEnabled = 0
+                }
+
+                over "Segment_01" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    bool physics:collisionEnabled = 0
+                }
+
+                over "Segment_02" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    bool physics:collisionEnabled = 0
+                }
+
+                over "Segment_03" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    bool physics:collisionEnabled = 0
+                }
+
+                over "Segment_04" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    bool physics:collisionEnabled = 0
+                }
+
+                over "Segment_05" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    bool physics:collisionEnabled = 0
+                }
+
+                over "Segment_06" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    bool physics:collisionEnabled = 0
+                }
+
+                over "Segment_07" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    bool physics:collisionEnabled = 0
+                }
+
+                over "Segment_08" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    bool physics:collisionEnabled = 0
+                }
+
+                over "Segment_09" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    bool physics:collisionEnabled = 0
+                }
+
+                over "Segment_10" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    bool physics:collisionEnabled = 0
+                }
+
+                over "Segment_11" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    bool physics:collisionEnabled = 0
+                }
+            }
+
+            def Cube "SupportFootProxy" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+                customData = {
+                    dictionary magsafe = {
+                        string class = "accessory_support_contact_proxy"
+                        string magnetic_material = "non_magnetic"
+                    }
+                }
+            )
+            {
+                bool physics:collisionEnabled = 1
+                double size = 2
+                float3 xformOp:scale = (0.02, 0.008, 0.0015)
+                double3 xformOp:translate = (0, 0.03, -0.03362)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+        }
+
+        over "Frames"
+        {
+            over "MagneticCenter" (
+                customData = {
+                    dictionary magsafe = {
+                        string magnetic_material = "magnetic_ring"
+                    }
+                }
+            )
+            {
+            }
+        }
+    }
+
+    over "Charger" (
+        customData = {
+            dictionary magsafe = {
+                string magnetic_material = "non_magnetic"
+            }
+        }
+    )
+    {
+        over "Colliders"
+        {
+            over "Pad" (
+                prepend apiSchemas = ["PhysxCollisionAPI"]
+            )
+            {
+                custom float physxCollision:contactOffset = 0.001
+                custom float physxCollision:restOffset = 0
+            }
+
+            over "Base" (
+                customData = {
+                    dictionary magsafe = {
+                        string magnetic_material = "non_magnetic"
+                    }
+                }
+            )
+            {
+            }
+        }
+
+        over "Visuals"
+        {
+            over "Base" (
+                customData = {
+                    dictionary magsafe = {
+                        string magnetic_material = "non_magnetic"
+                    }
+                }
+            )
+            {
+            }
+
+            over "Support_0" (
+                customData = {
+                    dictionary magsafe = {
+                        string magnetic_material = "non_magnetic"
+                    }
+                }
+            )
+            {
+            }
+
+            over "Support_1" (
+                customData = {
+                    dictionary magsafe = {
+                        string magnetic_material = "non_magnetic"
+                    }
+                }
+            )
+            {
+            }
+        }
+
+        over "Frames"
+        {
+            over "PhoneTargetCenter" (
+                customData = {
+                    dictionary magsafe = {
+                        string magnetic_material = "magnetic_target_only"
+                        string target_orientation = "portrait_full_rotation"
+                    }
+                }
+            )
+            {
+                quatd xformOp:orient = (-0.7010573846, 0.0922959556, 0.7010573846, -0.0922959556)
+                double3 xformOp:translate = (0, 0.005363556086855466, 0.13274751952255126)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient"]
+            }
+        }
+    }
+
+    def "MagneticJoints"
+    {
+        def PhysicsFixedJoint "AccessoryPhone" (
+            customData = {
+                dictionary magsafe = {
+                    string mode = "breakable_joint"
+                }
+            }
+        )
+        {
+            rel physics:body0 = </MagSafeScene/Phone>
+            rel physics:body1 = </MagSafeScene/Accessory>
+            float physics:breakForce = 2
+            float physics:breakTorque = 0.08
+            bool physics:collisionEnabled = 0
+            point3f physics:localPos0 = (0, 0.004175, 0)
+            point3f physics:localPos1 = (0, -0.00175, 0)
+            quatf physics:localRot0 = (1, 0, 0, 0)
+            quatf physics:localRot1 = (1, 0, 0, 0)
+        }
+    }
+
+    over "Table" (
+        customData = {
+            dictionary magsafe = {
+                string magnetic_material = "non_magnetic"
+            }
+        }
+    )
+    {
+    }
+
+    over "ChargerMountPlate" (
+        customData = {
+            dictionary magsafe = {
+                string magnetic_material = "non_magnetic"
+            }
+        }
+    )
+    {
+    }
+}
+

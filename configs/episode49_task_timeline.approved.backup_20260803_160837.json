@@ -1,0 +1,47 @@
+{
+  "schema_version": 2,
+  "status": "DRAFT_NEEDS_MANUAL_APPROVAL",
+  "allowed_labels": [
+    "task_start",
+    "accessory_pregrasp",
+    "accessory_grasp",
+    "accessory_remove",
+    "accessory_release",
+    "phone_pregrasp",
+    "phone_grasp",
+    "phone_move",
+    "phone_place",
+    "phone_release",
+    "task_end",
+    "unknown"
+  ],
+  "events": [],
+  "dataset_episode": 49,
+  "frame0": {
+    "approved_task_stage": "INITIAL_POSTURE",
+    "approved_semantic_event": null,
+    "object_contact": "NOT_EVALUATED",
+    "semantic_confidence": "UNASSIGNED"
+  },
+  "allowed_events": [
+    "task_start",
+    "left_phone_approach_start",
+    "left_phone_grasp_start",
+    "phone_lift_start",
+    "phone_rotation_to_portrait_start",
+    "phone_portrait_reached",
+    "right_accessory_approach_start",
+    "right_accessory_grasp_start",
+    "accessory_detachment_start",
+    "accessory_removed",
+    "accessory_release_start",
+    "accessory_release_complete",
+    "phone_move_to_charger_start",
+    "phone_charger_alignment_start",
+    "phone_charger_attachment_complete",
+    "left_phone_release_start",
+    "left_phone_release_complete",
+    "task_end",
+    "unknown"
+  ]
+}

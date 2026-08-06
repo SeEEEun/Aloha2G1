@@ -1,0 +1,105 @@
+{
+  "schema_version": 3,
+  "status": "DRAFT_WAITING_FOR_USER",
+  "dataset_episode": 49,
+  "fps": 30.0,
+  "frame_range": [
+    0,
+    989
+  ],
+  "events": [
+    {
+      "event": "left_phone_grasp_start",
+      "frame": 176,
+      "timestamp": 5.866666666666666,
+      "source": "manual_video_review",
+      "confidence": "USER_CONFIRMED",
+      "automatic_phase_used_as_evidence": false,
+      "note": ""
+    },
+    {
+      "event": "phone_rotation_to_portrait_start",
+      "frame": 200,
+      "timestamp": 6.666666666666667,
+      "source": "manual_video_review",
+      "confidence": "USER_CONFIRMED",
+      "automatic_phase_used_as_evidence": false,
+      "note": ""
+    },
+    {
+      "event": "phone_portrait_reached",
+      "frame": 223,
+      "timestamp": 7.433333333333334,
+      "source": "manual_video_review",
+      "confidence": "USER_CONFIRMED",
+      "automatic_phase_used_as_evidence": false,
+      "note": ""
+    },
+    {
+      "event": "right_accessory_grasp_start",
+      "frame": 326,
+      "timestamp": 10.866666666666667,
+      "source": "manual_video_review",
+      "confidence": "USER_CONFIRMED",
+      "automatic_phase_used_as_evidence": false,
+      "note": ""
+    },
+    {
+      "event": "accessory_detachment_start",
+      "frame": 329,
+      "timestamp": 10.966666666666667,
+      "source": "manual_video_review",
+      "confidence": "USER_CONFIRMED",
+      "automatic_phase_used_as_evidence": false,
+      "note": ""
+    },
+    {
+      "event": "accessory_removed",
+      "frame": 341,
+      "timestamp": 11.366666666666667,
+      "source": "manual_video_review",
+      "confidence": "USER_CONFIRMED",
+      "automatic_phase_used_as_evidence": false,
+      "note": ""
+    },
+    {
+      "event": "right_accessory_release_complete",
+      "frame": 646,
+      "timestamp": 21.533333333333335,
+      "source": "manual_video_review",
+      "confidence": "USER_CONFIRMED",
+      "automatic_phase_used_as_evidence": false,
+      "note": ""
+    },
+    {
+      "event": "phone_move_to_charger_start",
+      "frame": 380,
+      "timestamp": 12.666666666666666,
+      "source": "manual_video_review",
+      "confidence": "USER_CONFIRMED",
+      "automatic_phase_used_as_evidence": false,
+      "note": ""
+    },
+    {
+      "event": "phone_charger_attachment_complete",
+      "frame": 530,
+      "timestamp": 17.666666666666668,
+      "source": "manual_video_review",
+      "confidence": "USER_CONFIRMED",
+      "automatic_phase_used_as_evidence": false,
+      "note": ""
+    },
+    {
+      "event": "left_phone_release_complete",
+      "frame": 586,
+      "timestamp": 19.533333333333335,
+      "source": "manual_video_review",
+      "confidence": "USER_CONFIRMED",
+      "automatic_phase_used_as_evidence": false,
+      "note": ""
+    }
+  ],
+  "unknown_events": [],
+  "automatic_events_saved": false,
+  "updated_at": "2026-08-03T07:08:34.555407+00:00"
+}

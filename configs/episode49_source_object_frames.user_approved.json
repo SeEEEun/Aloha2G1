@@ -1,0 +1,144 @@
+{
+  "status": "RECOVERED_FROM_USER_APPROVED_ORIGINAL_PROJECT_SCENE",
+  "camera_fitting_used": false,
+  "T_source_scene_from_phone": [
+    [
+      1.0,
+      0.0,
+      0.0,
+      0.525
+    ],
+    [
+      0.0,
+      1.0,
+      0.0,
+      0.255
+    ],
+    [
+      0.0,
+      0.0,
+      1.0,
+      0.83075
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "T_source_scene_from_accessory": [
+    [
+      1.0,
+      0.0,
+      0.0,
+      0.525
+    ],
+    [
+      0.0,
+      1.0,
+      0.0,
+      0.26142499999999996
+    ],
+    [
+      0.0,
+      0.0,
+      1.0,
+      0.83075
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "T_source_scene_from_charger_root": [
+    [
+      1.0,
+      0.0,
+      0.0,
+      0.42
+    ],
+    [
+      0.0,
+      1.0,
+      0.0,
+      0.52
+    ],
+    [
+      0.0,
+      0.0,
+      1.0,
+      0.807
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "T_source_scene_from_charger_pad": [
+    [
+      1.0,
+      0.0,
+      0.0,
+      0.42
+    ],
+    [
+      0.0,
+      0.2588189780700533,
+      -0.9659258442503612,
+      0.525846518946957
+    ],
+    [
+      0.0,
+      0.9659258442503612,
+      0.2588189780700533,
+      0.9396181100184133
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "charger_pad_face_center": [
+    0.42,
+    0.525846518946957,
+    0.9396181100184133
+  ],
+  "charger_pad_outward_normal": [
+    0.0,
+    -0.9659258442503612,
+    0.2588189780700533
+  ],
+  "axis_conventions": {
+    "world_origin": "floor point directly below the table top front-left corner",
+    "table_surface_origin_world": [
+      0.0,
+      0.0,
+      0.795
+    ],
+    "x_axis": "table left to right",
+    "y_axis": "table front/operator side to back/charger side",
+    "z_axis": "up"
+  },
+  "provenance": {
+    "declaration": "/home/jbnu/aloha_g1_dataset/configs/episode49_source_scene.user_approved.json",
+    "layout": "/home/jbnu/aloha_g1_dataset/configs/episode49_source_scene_layout.json",
+    "builder": "/home/jbnu/aloha_g1_dataset/isaaclab_magsafe_fixed_scene/magsafe_scene_builder.py",
+    "hashes": {
+      "/home/jbnu/aloha_g1_dataset/configs/episode49_source_scene.user_approved.json": "7502fedb252b98dc000a6adf03a306b4fe83a99a571ab65abfa262c1a68f8c3b",
+      "/home/jbnu/aloha_g1_dataset/configs/episode49_source_scene_layout.json": "7a9b47b304fcbc51c0e8925a34106b764b02ca47b48abb6e151c2399409ccab4",
+      "/home/jbnu/aloha_g1_dataset/isaaclab_magsafe_fixed_scene/magsafe_scene_builder.py": "d9302ee2d0a65cf5121bbac92c498a11190fd916487f96a9fbbfdb93b6651728",
+      "/home/jbnu/aloha_g1_dataset/outputs/episode49_source_scene/generated/source_table_optical.usda": "e138bc56452349d24ed3e089faee537da59d4a44026ddeb56758a8effbd916ca",
+      "/home/jbnu/aloha_g1_dataset/outputs/episode49_source_scene/generated/source_phone_landscape.usda": "e77009121d802b5870faf52c50c7d94e9de4a94fa9e9c5f7431d6bd472227ee0",
+      "/home/jbnu/aloha_g1_dataset/outputs/episode49_source_scene/generated/source_accessory.usda": "391dcd7e05db39476e2f0765571bb7243090eb022967ef90eb91bd01498cee89",
+      "/home/jbnu/aloha_g1_dataset/outputs/episode49_source_scene/generated/source_charger_stand.usda": "e58f065237350caa8554395b6c1e6102f829c7d3fe0b1802474b12dc11a107e9",
+      "/home/jbnu/aloha_g1_dataset/outputs/episode49_source_scene/generated/source_magsafe_fixed_scene.usda": "063790e7b7ea24134a10de0457a328e9a5d79dbea22330c49eb2550e2fc1ba54"
+    }
+  }
+}

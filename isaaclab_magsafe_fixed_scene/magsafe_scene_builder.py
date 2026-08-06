@@ -1,0 +1,1106 @@
+"""Build a fixed-layout MagSafe debug scene as modular OpenUSD assets.
+
+Run this module through Isaac Lab / Isaac Sim Python. It authors:
+
+- table_optical.usda
+- phone_landscape.usda
+- magsafe_poppinger_1062886.usda
+- charger_stand.usda
+- magsafe_fixed_scene.usda
+
+The generated composite scene is intentionally robot-free. All object poses are
+read from ``scene_layout.json``. Visual meshes and collision proxies are kept
+separate so RealityScan-derived USD visuals can replace the parametric visuals
+without changing the fixed placement or future physics layout.
+"""
+
+from __future__ import annotations
+
+import json
+import math
+from pathlib import Path
+from typing import Any, Iterable, Sequence
+
+from pxr import Gf, Sdf, Usd, UsdGeom, UsdPhysics, UsdShade, Vt
+
+
+Vec3 = tuple[float, float, float]
+Color3 = tuple[float, float, float]
+
+
+def load_layout(path: str | Path) -> dict[str, Any]:
+    layout_path = Path(path).expanduser().resolve()
+    with layout_path.open("r", encoding="utf-8") as stream:
+        layout = json.load(stream)
+    if layout.get("units") != "meters":
+        raise ValueError("scene_layout.json must use meters.")
+    return layout
+
+
+def _new_stage(path: Path, default_prim_name: str) -> tuple[Usd.Stage, Usd.Prim]:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if path.exists():
+        path.unlink()
+    stage = Usd.Stage.CreateNew(str(path))
+    UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
+    UsdGeom.SetStageMetersPerUnit(stage, 1.0)
+    root = UsdGeom.Xform.Define(stage, f"/{default_prim_name}").GetPrim()
+    stage.SetDefaultPrim(root)
+    root.SetCustomDataByKey("magsafe:asset_version", 1)
+    return stage, root
+
+
+def _as_quatf(quat: Gf.Quatd | Gf.Quatf) -> Gf.Quatf:
+    imag = quat.GetImaginary()
+    return Gf.Quatf(float(quat.GetReal()), Gf.Vec3f(float(imag[0]), float(imag[1]), float(imag[2])))
+
+
+def _rotation_from_to(source: Sequence[float], target: Sequence[float]) -> Gf.Quatf:
+    src = Gf.Vec3d(float(source[0]), float(source[1]), float(source[2]))
+    dst = Gf.Vec3d(float(target[0]), float(target[1]), float(target[2]))
+    if src.GetLength() < 1e-12 or dst.GetLength() < 1e-12:
+        raise ValueError("Cannot construct a rotation from a zero-length vector.")
+    src.Normalize()
+    dst.Normalize()
+    return _as_quatf(Gf.Rotation(src, dst).GetQuat())
+
+
+def _set_xform(
+    prim: Usd.Prim,
+    translation: Sequence[float] | None = None,
+    orientation: Gf.Quatf | None = None,
+    scale: Sequence[float] | None = None,
+) -> None:
+    xformable = UsdGeom.Xformable(prim)
+    xformable.ClearXformOpOrder()
+    if translation is not None:
+        xformable.AddTranslateOp(UsdGeom.XformOp.PrecisionDouble).Set(Gf.Vec3d(*map(float, translation)))
+    if orientation is not None:
+        xformable.AddOrientOp(UsdGeom.XformOp.PrecisionFloat).Set(orientation)
+    if scale is not None:
+        xformable.AddScaleOp(UsdGeom.XformOp.PrecisionFloat).Set(Gf.Vec3f(*map(float, scale)))
+
+
+def _make_material(
+    stage: Usd.Stage,
+    path: str,
+    diffuse: Color3,
+    *,
+    metallic: float = 0.0,
+    roughness: float = 0.5,
+    opacity: float = 1.0,
+    emissive: Color3 = (0.0, 0.0, 0.0),
+) -> UsdShade.Material:
+    material = UsdShade.Material.Define(stage, path)
+    shader = UsdShade.Shader.Define(stage, f"{path}/PreviewSurface")
+    shader.CreateIdAttr("UsdPreviewSurface")
+    shader.CreateInput("diffuseColor", Sdf.ValueTypeNames.Color3f).Set(Gf.Vec3f(*map(float, diffuse)))
+    shader.CreateInput("metallic", Sdf.ValueTypeNames.Float).Set(float(metallic))
+    shader.CreateInput("roughness", Sdf.ValueTypeNames.Float).Set(float(roughness))
+    shader.CreateInput("opacity", Sdf.ValueTypeNames.Float).Set(float(opacity))
+    shader.CreateInput("emissiveColor", Sdf.ValueTypeNames.Color3f).Set(Gf.Vec3f(*map(float, emissive)))
+    material.CreateSurfaceOutput().ConnectToSource(shader.ConnectableAPI(), "surface")
+    return material
+
+
+def _bind_material(prim: Usd.Prim, material: UsdShade.Material) -> None:
+    UsdShade.MaterialBindingAPI.Apply(prim).Bind(material)
+
+
+def _tag(prim: Usd.Prim, class_name: str, **custom: Any) -> None:
+    prim.SetCustomDataByKey("magsafe:class", class_name)
+    for key, value in custom.items():
+        prim.SetCustomDataByKey(f"magsafe:{key}", json.dumps(value) if isinstance(value, (list, tuple, dict)) else value)
+
+
+def _apply_static_collision(prim: Usd.Prim, *, invisible: bool = False) -> None:
+    UsdPhysics.CollisionAPI.Apply(prim)
+    if invisible:
+        imageable = UsdGeom.Imageable(prim)
+        imageable.MakeInvisible()
+        imageable.CreatePurposeAttr().Set(UsdGeom.Tokens.guide)
+
+
+def _create_cube(
+    stage: Usd.Stage,
+    path: str,
+    size: Sequence[float],
+    translation: Sequence[float],
+    material: UsdShade.Material | None = None,
+    *,
+    orientation: Gf.Quatf | None = None,
+    collision: bool = False,
+    visible: bool = True,
+    class_name: str | None = None,
+) -> Usd.Prim:
+    cube = UsdGeom.Cube.Define(stage, path)
+    cube.CreateSizeAttr(2.0)
+    prim = cube.GetPrim()
+    _set_xform(
+        prim,
+        translation=translation,
+        orientation=orientation,
+        scale=(float(size[0]) / 2.0, float(size[1]) / 2.0, float(size[2]) / 2.0),
+    )
+    if material is not None:
+        _bind_material(prim, material)
+    if collision:
+        _apply_static_collision(prim, invisible=not visible)
+    elif not visible:
+        UsdGeom.Imageable(prim).MakeInvisible()
+    if class_name:
+        _tag(prim, class_name)
+    return prim
+
+
+def _create_cylinder(
+    stage: Usd.Stage,
+    path: str,
+    radius: float,
+    height: float,
+    translation: Sequence[float],
+    material: UsdShade.Material | None = None,
+    *,
+    axis: str = "Z",
+    orientation: Gf.Quatf | None = None,
+    collision: bool = False,
+    visible: bool = True,
+    class_name: str | None = None,
+) -> Usd.Prim:
+    cyl = UsdGeom.Cylinder.Define(stage, path)
+    cyl.CreateRadiusAttr(float(radius))
+    cyl.CreateHeightAttr(float(height))
+    cyl.CreateAxisAttr(axis.upper())
+    prim = cyl.GetPrim()
+    _set_xform(prim, translation=translation, orientation=orientation)
+    if material is not None:
+        _bind_material(prim, material)
+    if collision:
+        _apply_static_collision(prim, invisible=not visible)
+    elif not visible:
+        UsdGeom.Imageable(prim).MakeInvisible()
+    if class_name:
+        _tag(prim, class_name)
+    return prim
+
+
+def _create_sphere(
+    stage: Usd.Stage,
+    path: str,
+    radius: float,
+    translation: Sequence[float],
+    material: UsdShade.Material,
+) -> Usd.Prim:
+    sphere = UsdGeom.Sphere.Define(stage, path)
+    sphere.CreateRadiusAttr(float(radius))
+    prim = sphere.GetPrim()
+    _set_xform(prim, translation=translation)
+    _bind_material(prim, material)
+    return prim
+
+
+def _create_rounded_prism_mesh(
+    stage: Usd.Stage,
+    path: str,
+    size_x: float,
+    depth_y: float,
+    size_z: float,
+    radius: float,
+    translation: Sequence[float],
+    material: UsdShade.Material | None,
+    *,
+    orientation: Gf.Quatf | None = None,
+    segments_per_corner: int = 8,
+    collision: bool = False,
+    visible: bool = True,
+    class_name: str | None = None,
+) -> Usd.Prim:
+    """Create a rounded-rectangle prism centered at the local origin.
+
+    The rounded rectangle lies in the X-Z plane and is extruded along Y.
+    """
+
+    if min(size_x, size_z, depth_y) <= 0.0:
+        raise ValueError("Rounded-prism dimensions must be positive.")
+    radius = max(0.0, min(float(radius), size_x / 2.0, size_z / 2.0))
+    half_x, half_z, half_y = size_x / 2.0, size_z / 2.0, depth_y / 2.0
+    centers = [
+        (half_x - radius, half_z - radius, 0.0),
+        (-half_x + radius, half_z - radius, 90.0),
+        (-half_x + radius, -half_z + radius, 180.0),
+        (half_x - radius, -half_z + radius, 270.0),
+    ]
+    perimeter: list[tuple[float, float]] = []
+    for cx, cz, start_deg in centers:
+        for index in range(segments_per_corner + 1):
+            theta = math.radians(start_deg + 90.0 * index / segments_per_corner)
+            perimeter.append((cx + radius * math.cos(theta), cz + radius * math.sin(theta)))
+
+    # Remove duplicate corner samples introduced by adjacent arcs.
+    cleaned: list[tuple[float, float]] = []
+    for point in perimeter:
+        if not cleaned or abs(point[0] - cleaned[-1][0]) > 1e-10 or abs(point[1] - cleaned[-1][1]) > 1e-10:
+            cleaned.append(point)
+    perimeter = cleaned
+    n = len(perimeter)
+
+    points: list[Gf.Vec3f] = []
+    for y in (-half_y, half_y):
+        points.extend(Gf.Vec3f(float(x), float(y), float(z)) for x, z in perimeter)
+
+    counts: list[int] = [n, n]
+    indices: list[int] = list(reversed(range(n))) + list(range(n, 2 * n))
+    for i in range(n):
+        j = (i + 1) % n
+        counts.append(4)
+        indices.extend([i, j, n + j, n + i])
+
+    mesh = UsdGeom.Mesh.Define(stage, path)
+    mesh.CreatePointsAttr(Vt.Vec3fArray(points))
+    mesh.CreateFaceVertexCountsAttr(Vt.IntArray(counts))
+    mesh.CreateFaceVertexIndicesAttr(Vt.IntArray(indices))
+    mesh.CreateSubdivisionSchemeAttr(UsdGeom.Tokens.none)
+    mesh.CreateDoubleSidedAttr(False)
+    mesh.CreateExtentAttr(
+        Vt.Vec3fArray(
+            [
+                Gf.Vec3f(-half_x, -half_y, -half_z),
+                Gf.Vec3f(half_x, half_y, half_z),
+            ]
+        )
+    )
+    prim = mesh.GetPrim()
+    _set_xform(prim, translation=translation, orientation=orientation)
+    if material is not None:
+        _bind_material(prim, material)
+    if collision:
+        _apply_static_collision(prim, invisible=not visible)
+    elif not visible:
+        UsdGeom.Imageable(prim).MakeInvisible()
+    if class_name:
+        _tag(prim, class_name)
+    return prim
+
+
+def _ring_vertices(
+    outer_radius: float,
+    inner_radius: float,
+    depth: float,
+    axis: str,
+    start_angle: float,
+    end_angle: float,
+    segments: int,
+) -> tuple[list[Gf.Vec3f], list[int], list[int], list[Gf.Vec3f]]:
+    axis = axis.upper()
+    if axis not in {"Y", "Z"}:
+        raise ValueError("Ring axis must be 'Y' or 'Z'.")
+    angles = [start_angle + (end_angle - start_angle) * i / segments for i in range(segments + 1)]
+    half_d = depth / 2.0
+    points: list[Gf.Vec3f] = []
+
+    def point(radius: float, angle: float, side: float) -> Gf.Vec3f:
+        c, s = math.cos(angle), math.sin(angle)
+        if axis == "Y":
+            return Gf.Vec3f(float(radius * c), float(side), float(radius * s))
+        return Gf.Vec3f(float(radius * c), float(radius * s), float(side))
+
+    # Vertex order per side: outer arc then inner arc.
+    for side in (-half_d, half_d):
+        points.extend(point(outer_radius, a, side) for a in angles)
+        points.extend(point(inner_radius, a, side) for a in angles)
+
+    side_stride = 2 * (segments + 1)
+    outer0 = 0
+    inner0 = segments + 1
+    outer1 = side_stride
+    inner1 = side_stride + segments + 1
+
+    counts: list[int] = []
+    indices: list[int] = []
+    for i in range(segments):
+        # Negative side face.
+        counts.append(4)
+        indices.extend([outer0 + i + 1, outer0 + i, inner0 + i, inner0 + i + 1])
+        # Positive side face.
+        counts.append(4)
+        indices.extend([outer1 + i, outer1 + i + 1, inner1 + i + 1, inner1 + i])
+        # Outer wall.
+        counts.append(4)
+        indices.extend([outer0 + i, outer0 + i + 1, outer1 + i + 1, outer1 + i])
+        # Inner wall.
+        counts.append(4)
+        indices.extend([inner0 + i + 1, inner0 + i, inner1 + i, inner1 + i + 1])
+
+    # End caps for an open ring segment.
+    if abs((end_angle - start_angle) - 2.0 * math.pi) > 1e-5:
+        counts.extend([4, 4])
+        indices.extend([outer0, outer1, inner1, inner0])
+        indices.extend(
+            [
+                outer0 + segments,
+                inner0 + segments,
+                inner1 + segments,
+                outer1 + segments,
+            ]
+        )
+
+    max_r = outer_radius
+    if axis == "Y":
+        extent = [Gf.Vec3f(-max_r, -half_d, -max_r), Gf.Vec3f(max_r, half_d, max_r)]
+    else:
+        extent = [Gf.Vec3f(-max_r, -max_r, -half_d), Gf.Vec3f(max_r, max_r, half_d)]
+    return points, counts, indices, extent
+
+
+def _create_ring_mesh(
+    stage: Usd.Stage,
+    path: str,
+    outer_radius: float,
+    inner_radius: float,
+    depth: float,
+    translation: Sequence[float],
+    material: UsdShade.Material,
+    *,
+    axis: str = "Y",
+    orientation: Gf.Quatf | None = None,
+    gap_degrees: float = 0.0,
+    gap_center_degrees: float = -90.0,
+    segments: int = 72,
+    class_name: str | None = None,
+) -> Usd.Prim:
+    if not (outer_radius > inner_radius > 0.0):
+        raise ValueError("Ring radii must satisfy outer > inner > 0.")
+    if gap_degrees <= 0.0:
+        start, end = 0.0, 2.0 * math.pi
+    else:
+        half_gap = math.radians(gap_degrees) / 2.0
+        gap_center = math.radians(gap_center_degrees)
+        start = gap_center + half_gap
+        end = gap_center + 2.0 * math.pi - half_gap
+    points, counts, indices, extent = _ring_vertices(
+        outer_radius,
+        inner_radius,
+        depth,
+        axis,
+        start,
+        end,
+        segments,
+    )
+    mesh = UsdGeom.Mesh.Define(stage, path)
+    mesh.CreatePointsAttr(Vt.Vec3fArray(points))
+    mesh.CreateFaceVertexCountsAttr(Vt.IntArray(counts))
+    mesh.CreateFaceVertexIndicesAttr(Vt.IntArray(indices))
+    mesh.CreateSubdivisionSchemeAttr(UsdGeom.Tokens.none)
+    mesh.CreateDoubleSidedAttr(False)
+    mesh.CreateExtentAttr(Vt.Vec3fArray(extent))
+    prim = mesh.GetPrim()
+    _set_xform(prim, translation=translation, orientation=orientation)
+    _bind_material(prim, material)
+    if class_name:
+        _tag(prim, class_name)
+    return prim
+
+
+def _create_ring_collision_segments(
+    stage: Usd.Stage,
+    root_path: str,
+    outer_radius: float,
+    inner_radius: float,
+    depth: float,
+    *,
+    axis: str,
+    gap_degrees: float = 0.0,
+    gap_center_degrees: float = -90.0,
+    segment_count: int = 12,
+    translation: Sequence[float] = (0.0, 0.0, 0.0),
+) -> None:
+    """Approximate a ring with convex box colliders."""
+
+    center_radius = (outer_radius + inner_radius) / 2.0
+    radial_width = outer_radius - inner_radius
+    total_span = 360.0 - max(0.0, gap_degrees)
+    start_deg = gap_center_degrees + gap_degrees / 2.0
+    segment_span = total_span / segment_count
+    tangential_length = 2.0 * center_radius * math.sin(math.radians(segment_span) / 2.0) * 1.06
+
+    for i in range(segment_count):
+        angle_deg = start_deg + (i + 0.5) * segment_span
+        angle = math.radians(angle_deg)
+        c, s = math.cos(angle), math.sin(angle)
+        if axis.upper() == "Y":
+            local_translation = (center_radius * c, 0.0, center_radius * s)
+            # Local box X is tangential, Y is depth, Z is radial.
+            rot = _as_quatf(Gf.Rotation(Gf.Vec3d(0.0, 1.0, 0.0), angle_deg).GetQuat())
+            size = (tangential_length, depth, radial_width)
+        elif axis.upper() == "Z":
+            local_translation = (center_radius * c, center_radius * s, 0.0)
+            rot = _as_quatf(Gf.Rotation(Gf.Vec3d(0.0, 0.0, 1.0), angle_deg + 90.0).GetQuat())
+            size = (tangential_length, radial_width, depth)
+        else:
+            raise ValueError("Ring collision axis must be Y or Z.")
+        world_translation = (
+            float(translation[0]) + local_translation[0],
+            float(translation[1]) + local_translation[1],
+            float(translation[2]) + local_translation[2],
+        )
+        _create_cube(
+            stage,
+            f"{root_path}/Segment_{i:02d}",
+            size,
+            world_translation,
+            material=None,
+            orientation=rot,
+            collision=True,
+            visible=False,
+            class_name="accessory_collision_proxy",
+        )
+
+
+def _create_oriented_box_between(
+    stage: Usd.Stage,
+    path: str,
+    p0: Sequence[float],
+    p1: Sequence[float],
+    width_x: float,
+    depth_y: float,
+    material: UsdShade.Material,
+    *,
+    collision: bool = False,
+    visible: bool = True,
+    class_name: str | None = None,
+) -> Usd.Prim:
+    p0v = Gf.Vec3d(*map(float, p0))
+    p1v = Gf.Vec3d(*map(float, p1))
+    direction = p1v - p0v
+    length = direction.GetLength()
+    if length < 1e-9:
+        raise ValueError("Oriented box endpoints must differ.")
+    midpoint = (p0v + p1v) * 0.5
+    orientation = _rotation_from_to((0.0, 0.0, 1.0), direction)
+    return _create_cube(
+        stage,
+        path,
+        (width_x, depth_y, float(length)),
+        midpoint,
+        material,
+        orientation=orientation,
+        collision=collision,
+        visible=visible,
+        class_name=class_name,
+    )
+
+
+def _create_frame(stage: Usd.Stage, path: str, translation: Sequence[float], **custom: Any) -> Usd.Prim:
+    frame = UsdGeom.Xform.Define(stage, path).GetPrim()
+    _set_xform(frame, translation=translation)
+    _tag(frame, "reference_frame", **custom)
+    return frame
+
+
+def _hide_composed_prim(stage: Usd.Stage, prim_path: str) -> None:
+    prim = stage.OverridePrim(prim_path)
+    UsdGeom.Imageable(prim).MakeInvisible()
+
+
+def _create_override_reference(
+    stage: Usd.Stage,
+    prim_path: str,
+    usd_path: str,
+    translation: Sequence[float] = (0.0, 0.0, 0.0),
+) -> bool:
+    if not usd_path:
+        return False
+    resolved = Path(usd_path).expanduser().resolve()
+    if not resolved.exists():
+        raise FileNotFoundError(f"Asset override does not exist: {resolved}")
+    xform = UsdGeom.Xform.Define(stage, prim_path)
+    xform.GetPrim().GetReferences().AddReference(str(resolved))
+    _set_xform(xform.GetPrim(), translation=translation)
+    return True
+
+
+def build_table_asset(layout: dict[str, Any], output_path: Path) -> Path:
+    table = layout["table"]
+    stage, root = _new_stage(output_path, "OpticalTable")
+    _tag(root, "table", fixed=True)
+
+    mats_root = "/OpticalTable/Materials"
+    aluminum = _make_material(stage, f"{mats_root}/Aluminum", (0.52, 0.54, 0.55), metallic=0.72, roughness=0.30)
+    edge_black = _make_material(stage, f"{mats_root}/BlackFrame", (0.025, 0.028, 0.030), metallic=0.62, roughness=0.27)
+    hole_mat = _make_material(stage, f"{mats_root}/HoleDark", (0.015, 0.017, 0.019), metallic=0.25, roughness=0.38)
+
+    sx, sy = float(table["size_x"]), float(table["size_y"])
+    surface_h = float(table["surface_height"])
+    top_t = float(table["top_thickness"])
+    rail_w = float(table["edge_rail_width"])
+    leg_x, leg_y = float(table["leg_size_x"]), float(table["leg_size_y"])
+
+    _create_cube(
+        stage,
+        "/OpticalTable/Visuals/Top",
+        (sx, sy, top_t),
+        (sx / 2.0, sy / 2.0, surface_h - top_t / 2.0),
+        aluminum,
+        class_name="table_top_visual",
+    )
+    _create_cube(
+        stage,
+        "/OpticalTable/Colliders/Top",
+        (sx, sy, top_t),
+        (sx / 2.0, sy / 2.0, surface_h - top_t / 2.0),
+        material=None,
+        collision=True,
+        visible=False,
+        class_name="table_top_collider",
+    )
+
+    rail_h = top_t + 0.020
+    rail_z = surface_h - top_t / 2.0
+    rail_specs = [
+        ("Front", (sx, rail_w, rail_h), (sx / 2.0, -rail_w / 2.0, rail_z)),
+        ("Back", (sx, rail_w, rail_h), (sx / 2.0, sy + rail_w / 2.0, rail_z)),
+        ("Left", (rail_w, sy, rail_h), (-rail_w / 2.0, sy / 2.0, rail_z)),
+        ("Right", (rail_w, sy, rail_h), (sx + rail_w / 2.0, sy / 2.0, rail_z)),
+    ]
+    for name, size, pos in rail_specs:
+        _create_cube(stage, f"/OpticalTable/Visuals/Frame{name}", size, pos, edge_black, class_name="table_frame_visual")
+
+    leg_height = surface_h - top_t
+    leg_z = leg_height / 2.0
+    inset = rail_w * 0.9
+    leg_centers = [
+        (inset, inset, leg_z),
+        (sx - inset, inset, leg_z),
+        (inset, sy - inset, leg_z),
+        (sx - inset, sy - inset, leg_z),
+    ]
+    for index, pos in enumerate(leg_centers):
+        _create_cube(
+            stage,
+            f"/OpticalTable/Visuals/Leg_{index}",
+            (leg_x, leg_y, leg_height),
+            pos,
+            edge_black,
+            class_name="table_leg_visual",
+        )
+        _create_cube(
+            stage,
+            f"/OpticalTable/Colliders/Leg_{index}",
+            (leg_x, leg_y, leg_height),
+            pos,
+            material=None,
+            collision=True,
+            visible=False,
+            class_name="table_leg_collider",
+        )
+
+    # Efficient visual-only optical-hole pattern using a USD point instancer.
+    prototype = UsdGeom.Cylinder.Define(stage, "/OpticalTable/HolePattern/Prototype")
+    prototype.CreateRadiusAttr(float(table["hole_radius"]))
+    prototype.CreateHeightAttr(0.0007)
+    prototype.CreateAxisAttr("Z")
+    _bind_material(prototype.GetPrim(), hole_mat)
+    _tag(prototype.GetPrim(), "table_hole_prototype")
+
+    pitch = float(table["hole_pitch"])
+    margin = float(table["hole_margin"])
+    positions: list[Gf.Vec3f] = []
+    x = margin
+    while x <= sx - margin + 1e-9:
+        y = margin
+        while y <= sy - margin + 1e-9:
+            positions.append(Gf.Vec3f(float(x), float(y), float(surface_h + 0.00015)))
+            y += pitch
+        x += pitch
+    instancer = UsdGeom.PointInstancer.Define(stage, "/OpticalTable/HolePattern/Instances")
+    instancer.CreatePrototypesRel().SetTargets([prototype.GetPath()])
+    instancer.CreateProtoIndicesAttr(Vt.IntArray([0] * len(positions)))
+    instancer.CreatePositionsAttr(Vt.Vec3fArray(positions))
+    _tag(instancer.GetPrim(), "table_hole_pattern", instance_count=len(positions))
+
+    _create_frame(stage, "/OpticalTable/Frames/TableSurfaceFrontLeft", (0.0, 0.0, surface_h), frame_convention="+X right, +Y back, +Z up")
+    _create_frame(stage, "/OpticalTable/Frames/TableCenter", (sx / 2.0, sy / 2.0, surface_h))
+
+    stage.GetRootLayer().Save()
+    return output_path
+
+
+def build_phone_asset(layout: dict[str, Any], output_path: Path) -> Path:
+    phone = layout["phone"]
+    stage, root = _new_stage(output_path, "Phone")
+    _tag(root, "phone", mass_kg=float(phone["mass_kg"]), dynamic_candidate=True)
+
+    mats_root = "/Phone/Materials"
+    body = _make_material(stage, f"{mats_root}/Body", tuple(phone["body_color_rgb"]), metallic=0.48, roughness=0.29)
+    edge = _make_material(stage, f"{mats_root}/MetalEdge", (0.58, 0.48, 0.33), metallic=0.72, roughness=0.18)
+    screen = _make_material(stage, f"{mats_root}/ScreenGlass", (0.008, 0.010, 0.013), metallic=0.05, roughness=0.08)
+    lens = _make_material(stage, f"{mats_root}/CameraLens", (0.004, 0.006, 0.008), metallic=0.12, roughness=0.04)
+    flash = _make_material(stage, f"{mats_root}/Flash", (0.92, 0.90, 0.77), metallic=0.0, roughness=0.20)
+
+    sx, sy, sz = map(float, phone["size_landscape_xyz"])
+    radius = float(phone["corner_radius"])
+
+    # Body and slim metallic edge layer.
+    _create_rounded_prism_mesh(
+        stage,
+        "/Phone/Visuals/MetalFrame",
+        sx,
+        sy,
+        sz,
+        radius,
+        (0.0, 0.0, 0.0),
+        edge,
+        class_name="phone_frame_visual",
+    )
+    _create_rounded_prism_mesh(
+        stage,
+        "/Phone/Visuals/BodyInset",
+        sx - 0.0022,
+        sy + 0.0002,
+        sz - 0.0022,
+        max(0.001, radius - 0.0011),
+        (0.0, 0.0, 0.0),
+        body,
+        class_name="phone_body_visual",
+    )
+    # The screen faces -Y.
+    _create_rounded_prism_mesh(
+        stage,
+        "/Phone/Visuals/Screen",
+        sx - 0.0040,
+        0.00055,
+        sz - 0.0040,
+        max(0.001, radius - 0.0020),
+        (0.0, -sy / 2.0 - 0.00028, 0.0),
+        screen,
+        class_name="phone_screen_visual",
+    )
+
+    # Two-camera cluster on the +Y back face, matching the supplied landscape photos.
+    camera_x = sx / 2.0 - 0.020
+    for index, z in enumerate((0.0155, -0.0155)):
+        _create_cylinder(
+            stage,
+            f"/Phone/Visuals/Camera_{index}",
+            0.0075,
+            0.0022,
+            (camera_x, sy / 2.0 + 0.0011, z),
+            lens,
+            axis="Y",
+            class_name="phone_camera_visual",
+        )
+    _create_cylinder(
+        stage,
+        "/Phone/Visuals/Flash",
+        0.0032,
+        0.0014,
+        (camera_x - 0.015, sy / 2.0 + 0.0008, 0.0),
+        flash,
+        axis="Y",
+        class_name="phone_flash_visual",
+    )
+
+    _create_rounded_prism_mesh(
+        stage,
+        "/Phone/Colliders/Main",
+        sx,
+        sy,
+        sz,
+        radius,
+        (0.0, 0.0, 0.0),
+        material=None,
+        collision=True,
+        visible=False,
+        class_name="phone_collider",
+    )
+
+    _create_frame(stage, "/Phone/Frames/Center", (0.0, 0.0, 0.0))
+    _create_frame(stage, "/Phone/Frames/ScreenCenter", (0.0, -sy / 2.0, 0.0), normal_axis="-Y")
+    _create_frame(stage, "/Phone/Frames/BackCenter", (0.0, sy / 2.0, 0.0), normal_axis="+Y")
+    _create_frame(stage, "/Phone/Frames/MagSafeCenter", (0.0, sy / 2.0 + 0.0002, 0.0), normal_axis="+Y")
+    _create_frame(stage, "/Phone/Frames/BottomEdgeCenter", (0.0, 0.0, -sz / 2.0))
+
+    stage.GetRootLayer().Save()
+    return output_path
+
+
+def build_accessory_asset(layout: dict[str, Any], output_path: Path) -> Path:
+    acc = layout["accessory"]
+    stage, root = _new_stage(output_path, "MagSafeAccessory")
+    _tag(
+        root,
+        "magsafe_accessory",
+        product_name=acc["product_name"],
+        product_number=acc["product_number"],
+        dynamic_candidate=True,
+    )
+
+    black = _make_material(stage, "/MagSafeAccessory/Materials/BlackMetal", (0.012, 0.013, 0.015), metallic=0.58, roughness=0.34)
+    hinge_mat = _make_material(stage, "/MagSafeAccessory/Materials/Hinge", (0.035, 0.037, 0.041), metallic=0.70, roughness=0.24)
+
+    main_outer = float(acc["main_outer_diameter"]) / 2.0
+    main_inner = float(acc["main_inner_diameter"]) / 2.0
+    main_depth = float(acc["main_depth"])
+    main_gap = float(acc["main_gap_degrees"])
+
+    _create_ring_mesh(
+        stage,
+        "/MagSafeAccessory/Visuals/MainCRing",
+        main_outer,
+        main_inner,
+        main_depth,
+        (0.0, 0.0, 0.0),
+        black,
+        axis="Y",
+        gap_degrees=main_gap,
+        gap_center_degrees=-90.0,
+        class_name="accessory_main_ring_visual",
+    )
+
+    support_offset = tuple(map(float, acc["support_center_offset_from_main_xyz"]))
+    support_outer = float(acc["support_outer_diameter"]) / 2.0
+    support_inner = float(acc["support_inner_diameter"]) / 2.0
+    support_depth = float(acc["support_depth"])
+    _create_ring_mesh(
+        stage,
+        "/MagSafeAccessory/Visuals/SupportRing",
+        support_outer,
+        support_inner,
+        support_depth,
+        support_offset,
+        black,
+        axis="Z",
+        class_name="accessory_support_ring_visual",
+    )
+
+    hinge_z = -main_outer + 0.0035
+    _create_cylinder(
+        stage,
+        "/MagSafeAccessory/Visuals/Hinge",
+        radius=0.0032,
+        height=0.011,
+        translation=(0.0, 0.0015, hinge_z),
+        material=hinge_mat,
+        axis="X",
+        class_name="accessory_hinge_visual",
+    )
+
+    _create_ring_collision_segments(
+        stage,
+        "/MagSafeAccessory/Colliders/MainRing",
+        main_outer,
+        main_inner,
+        main_depth,
+        axis="Y",
+        gap_degrees=main_gap,
+        gap_center_degrees=-90.0,
+        segment_count=12,
+    )
+    _create_ring_collision_segments(
+        stage,
+        "/MagSafeAccessory/Colliders/SupportRing",
+        support_outer,
+        support_inner,
+        support_depth,
+        axis="Z",
+        gap_degrees=0.0,
+        segment_count=12,
+        translation=support_offset,
+    )
+
+    _create_frame(stage, "/MagSafeAccessory/Frames/MagneticCenter", (0.0, -main_depth / 2.0, 0.0), normal_axis="-Y")
+    _create_frame(stage, "/MagSafeAccessory/Frames/GraspCenter", (0.0, 0.0, 0.0))
+    _create_frame(stage, "/MagSafeAccessory/Frames/Hinge", (0.0, 0.0015, hinge_z))
+
+    stage.GetRootLayer().Save()
+    return output_path
+
+
+def build_charger_asset(layout: dict[str, Any], output_path: Path) -> Path:
+    charger = layout["charger"]
+    stage, root = _new_stage(output_path, "ChargerStand")
+    _tag(root, "magsafe_charger", fixed=True)
+
+    white = _make_material(stage, "/ChargerStand/Materials/WhitePlastic", (0.91, 0.92, 0.93), metallic=0.0, roughness=0.24)
+    face = _make_material(stage, "/ChargerStand/Materials/PadFace", (0.96, 0.97, 0.98), metallic=0.0, roughness=0.18)
+    stem = _make_material(stage, "/ChargerStand/Materials/StemMetal", (0.26, 0.28, 0.30), metallic=0.82, roughness=0.20)
+    led = _make_material(
+        stage,
+        "/ChargerStand/Materials/StatusLED",
+        (0.05, 0.55, 0.18),
+        metallic=0.0,
+        roughness=0.24,
+        emissive=(0.04, 0.95, 0.22),
+    )
+
+    base_x, base_y = map(float, charger["base_size_xy"])
+    base_h = float(charger["base_height"])
+    total_h = float(charger["total_height"])
+    pad_r = float(charger["pad_diameter"]) / 2.0
+    pad_t = float(charger["pad_thickness"])
+    tilt = math.radians(float(charger["pad_tilt_degrees_up"]))
+    pad_normal = Gf.Vec3d(0.0, -math.cos(tilt), math.sin(tilt))
+    pad_orientation = _rotation_from_to((0.0, 0.0, 1.0), pad_normal)
+
+    # The measured 105 x 105 mm footprint is represented by a round base, as in the product image.
+    base_radius = min(base_x, base_y) / 2.0
+    _create_cylinder(
+        stage,
+        "/ChargerStand/Visuals/Base",
+        base_radius,
+        base_h,
+        (0.0, 0.0, base_h / 2.0),
+        white,
+        axis="Z",
+        class_name="charger_base_visual",
+    )
+    _create_cylinder(
+        stage,
+        "/ChargerStand/Colliders/Base",
+        base_radius,
+        base_h,
+        (0.0, 0.0, base_h / 2.0),
+        material=None,
+        axis="Z",
+        collision=True,
+        visible=False,
+        class_name="charger_base_collider",
+    )
+
+    # Pad center chosen so its top edge reaches the user-measured total height.
+    pad_center_z = total_h - pad_r * math.cos(tilt)
+    pad_center_y = float(charger["pad_center_y_offset"])
+    pad_center = (0.0, pad_center_y, pad_center_z)
+
+    rod_width = float(charger["support_rod_width"])
+    rod_depth = float(charger["support_rod_depth"])
+    lower = (0.0, 0.010, base_h + 0.004)
+    upper = (0.0, pad_center_y + 0.003, pad_center_z - pad_r * 0.58)
+    for index, x_off in enumerate((-0.0065, 0.0065)):
+        p0 = (x_off, lower[1], lower[2])
+        p1 = (x_off, upper[1], upper[2])
+        _create_oriented_box_between(
+            stage,
+            f"/ChargerStand/Visuals/Support_{index}",
+            p0,
+            p1,
+            rod_width * 0.60,
+            rod_depth,
+            stem,
+            class_name="charger_support_visual",
+        )
+        _create_oriented_box_between(
+            stage,
+            f"/ChargerStand/Colliders/Support_{index}",
+            p0,
+            p1,
+            rod_width * 0.60,
+            rod_depth,
+            material=stem,
+            collision=True,
+            visible=False,
+            class_name="charger_support_collider",
+        )
+
+    _create_cylinder(
+        stage,
+        "/ChargerStand/Visuals/PadBody",
+        pad_r,
+        pad_t,
+        pad_center,
+        white,
+        axis="Z",
+        orientation=pad_orientation,
+        class_name="charger_pad_visual",
+    )
+    face_center = (
+        pad_center[0] + float(pad_normal[0]) * (pad_t / 2.0 + 0.0003),
+        pad_center[1] + float(pad_normal[1]) * (pad_t / 2.0 + 0.0003),
+        pad_center[2] + float(pad_normal[2]) * (pad_t / 2.0 + 0.0003),
+    )
+    _create_cylinder(
+        stage,
+        "/ChargerStand/Visuals/PadFace",
+        pad_r - 0.0012,
+        0.0006,
+        face_center,
+        face,
+        axis="Z",
+        orientation=pad_orientation,
+        class_name="charger_pad_face_visual",
+    )
+    _create_cylinder(
+        stage,
+        "/ChargerStand/Colliders/Pad",
+        pad_r,
+        pad_t,
+        pad_center,
+        material=None,
+        axis="Z",
+        orientation=pad_orientation,
+        collision=True,
+        visible=False,
+        class_name="charger_pad_collider",
+    )
+
+    # Small front status LED.
+    _create_rounded_prism_mesh(
+        stage,
+        "/ChargerStand/Visuals/StatusLED",
+        0.012,
+        0.0012,
+        0.0045,
+        0.0020,
+        (0.0, -base_radius - 0.0007, base_h * 0.48),
+        led,
+        class_name="charger_status_led",
+    )
+
+    _create_frame(stage, "/ChargerStand/Frames/BaseCenter", (0.0, 0.0, 0.0))
+    _create_frame(
+        stage,
+        "/ChargerStand/Frames/PadCenter",
+        pad_center,
+        normal_xyz=[float(pad_normal[0]), float(pad_normal[1]), float(pad_normal[2])],
+    )
+    _create_frame(stage, "/ChargerStand/Frames/PhoneTargetCenter", face_center, normal_axis="pad +Z after rotation")
+
+    stage.GetRootLayer().Save()
+    return output_path
+
+
+def _add_relative_reference(stage: Usd.Stage, prim_path: str, asset_name: str, translation: Sequence[float]) -> Usd.Prim:
+    xform = UsdGeom.Xform.Define(stage, prim_path)
+    xform.GetPrim().GetReferences().AddReference(asset_name)
+    _set_xform(xform.GetPrim(), translation=translation)
+    return xform.GetPrim()
+
+
+def build_composite_scene(
+    layout: dict[str, Any],
+    output_path: Path,
+    table_asset: Path,
+    phone_asset: Path,
+    accessory_asset: Path,
+    charger_asset: Path,
+) -> Path:
+    stage, root = _new_stage(output_path, "MagSafeScene")
+    _tag(root, "magsafe_fixed_scene", fixed_layout=True, robot_included=False)
+
+    table = layout["table"]
+    phone = layout["phone"]
+    acc = layout["accessory"]
+    charger = layout["charger"]
+    overrides = layout.get("asset_overrides", {})
+
+    table_surface_z = float(table["surface_height"])
+    _add_relative_reference(stage, "/MagSafeScene/Table", table_asset.name, (0.0, 0.0, 0.0))
+
+    # Phone midpoint follows the measured lower-edge endpoints; exact phone length is retained.
+    lower_left = phone["bottom_left_xy"]
+    lower_right = phone["bottom_right_xy"]
+    phone_center_x = 0.5 * (float(lower_left[0]) + float(lower_right[0]))
+    phone_center_y = 0.5 * (float(lower_left[1]) + float(lower_right[1]))
+    phone_sx, phone_sy, phone_sz = map(float, phone["size_landscape_xyz"])
+    phone_center = (phone_center_x, phone_center_y, table_surface_z + phone_sz / 2.0)
+
+    phone_prim = _add_relative_reference(stage, "/MagSafeScene/Phone", phone_asset.name, phone_center)
+    phone_prim.SetCustomDataByKey("magsafe:screen_faces", "-Y")
+    if overrides.get("phone_usd"):
+        _hide_composed_prim(stage, "/MagSafeScene/Phone/Visuals")
+        _create_override_reference(stage, "/MagSafeScene/Phone/VisualOverride", overrides["phone_usd"])
+
+    accessory_y = (
+        phone_center_y
+        + phone_sy / 2.0
+        + float(acc["phone_back_clearance"])
+        + float(acc["main_depth"]) / 2.0
+    )
+    accessory_center = (phone_center_x, accessory_y, phone_center[2])
+    _add_relative_reference(stage, "/MagSafeScene/Accessory", accessory_asset.name, accessory_center)
+    if overrides.get("accessory_usd"):
+        _hide_composed_prim(stage, "/MagSafeScene/Accessory/Visuals")
+        _create_override_reference(stage, "/MagSafeScene/Accessory/VisualOverride", overrides["accessory_usd"])
+
+    mount = charger["mount_plate"]
+    plate_h = 0.0
+    if bool(mount["enabled"]):
+        plate_size = tuple(map(float, mount["size_xyz"]))
+        plate_h = plate_size[2]
+        rubber = _make_material(stage, "/MagSafeScene/Materials/MountPlate", (0.035, 0.036, 0.040), metallic=0.05, roughness=0.48)
+        _create_rounded_prism_mesh(
+            stage,
+            "/MagSafeScene/ChargerMountPlate/Visual",
+            plate_size[0],
+            plate_size[1],
+            plate_size[2],
+            float(mount["corner_radius"]),
+            (float(charger["center_xy"][0]), float(charger["center_xy"][1]), table_surface_z + plate_h / 2.0),
+            rubber,
+            class_name="charger_mount_plate_visual",
+        )
+        _create_rounded_prism_mesh(
+            stage,
+            "/MagSafeScene/ChargerMountPlate/Collider",
+            plate_size[0],
+            plate_size[1],
+            plate_size[2],
+            float(mount["corner_radius"]),
+            (float(charger["center_xy"][0]), float(charger["center_xy"][1]), table_surface_z + plate_h / 2.0),
+            material=None,
+            collision=True,
+            visible=False,
+            class_name="charger_mount_plate_collider",
+        )
+
+    charger_origin = (
+        float(charger["center_xy"][0]),
+        float(charger["center_xy"][1]),
+        table_surface_z + plate_h,
+    )
+    _add_relative_reference(stage, "/MagSafeScene/Charger", charger_asset.name, charger_origin)
+    if overrides.get("charger_usd"):
+        _hide_composed_prim(stage, "/MagSafeScene/Charger/Visuals")
+        _create_override_reference(stage, "/MagSafeScene/Charger/VisualOverride", overrides["charger_usd"])
+
+    # Scene-level task frames for later retargeting, reward terms, and camera annotations.
+    _create_frame(stage, "/MagSafeScene/Frames/TableSurfaceOrigin", (0.0, 0.0, table_surface_z), convention="+X right, +Y back, +Z up")
+    _create_frame(stage, "/MagSafeScene/Frames/PhoneInitialCenter", phone_center)
+    _create_frame(stage, "/MagSafeScene/Frames/AccessoryInitialCenter", accessory_center)
+    _create_frame(stage, "/MagSafeScene/Frames/ChargerBaseCenter", charger_origin)
+
+    stage.GetRootLayer().Save()
+    return output_path
+
+
+def build_all_assets(layout_path: str | Path, output_dir: str | Path) -> dict[str, Path]:
+    layout = load_layout(layout_path)
+    output = Path(output_dir).expanduser().resolve()
+    output.mkdir(parents=True, exist_ok=True)
+
+    paths = {
+        "table": output / "table_optical.usda",
+        "phone": output / "phone_landscape.usda",
+        "accessory": output / "magsafe_poppinger_1062886.usda",
+        "charger": output / "charger_stand.usda",
+        "scene": output / "magsafe_fixed_scene.usda",
+    }
+    build_table_asset(layout, paths["table"])
+    build_phone_asset(layout, paths["phone"])
+    build_accessory_asset(layout, paths["accessory"])
+    build_charger_asset(layout, paths["charger"])
+    build_composite_scene(
+        layout,
+        paths["scene"],
+        paths["table"],
+        paths["phone"],
+        paths["accessory"],
+        paths["charger"],
+    )
+    return paths
+
+
+if __name__ == "__main__":
+    raise SystemExit(
+        "Run preview_magsafe_scene.py through Isaac Lab. It builds these assets before opening the viewer."
+    )

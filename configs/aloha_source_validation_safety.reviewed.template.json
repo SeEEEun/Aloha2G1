@@ -1,0 +1,20 @@
+{
+  "status": "HUMAN_REVIEW_REQUIRED",
+  "hardware_replay_allowed": false,
+  "reviewed_by": null,
+  "reviewed_at": null,
+  "candidate_source": "configs/aloha_source_validation_safety.candidate.json",
+  "warning": "Copy to reviewed.json only after qualified human and equipment-owner review. P99.9 and demonstration maxima are not safety limits.",
+  "arm_position_range": null,
+  "gripper_position_range": null,
+  "max_command_step": null,
+  "max_velocity": null,
+  "max_acceleration": null,
+  "max_start_position_error": null,
+  "max_tracking_error": null,
+  "tracking_error_duration": null,
+  "state_timeout": null,
+  "control_loop_overrun_threshold": null,
+  "consecutive_overrun_limit": null,
+  "approval_notes": null
+}

@@ -1,0 +1,265 @@
+#usda 1.0
+
+def "World"
+{
+    def "ReplayPhysicsMaterials"
+    {
+        def Material "InsulatingTape" (
+            prepend apiSchemas = ["PhysicsMaterialAPI", "PhysxMaterialAPI"]
+        )
+        {
+            float physics:dynamicFriction = 0.6
+            float physics:restitution = 0
+            float physics:staticFriction = 0.75
+            uniform token physxMaterial:frictionCombineMode = "average"
+        }
+    }
+
+    def "ReplayVisualMaterials"
+    {
+        def Material "BlackInsulatingTape"
+        {
+            token outputs:surface.connect = </World/ReplayVisualMaterials/BlackInsulatingTape/PreviewSurface.outputs:surface>
+
+            def Shader "PreviewSurface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (0.008, 0.008, 0.008)
+                float inputs:metallic = 0
+                float inputs:opacity = 1
+                float inputs:roughness = 0.58
+                token outputs:surface
+            }
+        }
+    }
+
+    def "StationaryALOHA"
+    {
+        def "Asset"
+        {
+            def "Geometry"
+            {
+                def "tabletop_link"
+                {
+                    def "follower_left_base_link"
+                    {
+                        def "follower_left_link_1"
+                        {
+                            def "follower_left_link_2"
+                            {
+                                def "follower_left_link_3"
+                                {
+                                    def "follower_left_link_4"
+                                    {
+                                        def "follower_left_link_5"
+                                        {
+                                            def "follower_left_link_6"
+                                            {
+                                                def "follower_left_carriage_left"
+                                                {
+                                                    def Mesh "follower_left_gripper_left_tape_sleeve_20mm" (
+                                                        prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "PhysxCollisionAPI", "MaterialBindingAPI"]
+                                                    )
+                                                    {
+                                                        uniform bool doubleSided = 0
+                                                        int[] faceVertexCounts = [6, 6, 4, 4, 4, 4, 4, 4]
+                                                        int[] faceVertexIndices = [0, 1, 2, 3, 4, 5, 11, 10, 9, 8, 7, 6, 0, 1, 7, 6, 1, 2, 8, 7, 2, 3, 9, 8, 3, 4, 10, 9, 4, 5, 11, 10, 5, 0, 6, 11]
+                                                        rel material:binding:physics = </World/ReplayPhysicsMaterials/InsulatingTape>
+                                                        uniform token physics:approximation = "convexHull"
+                                                        bool physics:collisionEnabled = 1
+                                                        float physxCollision:contactOffset = 0.0005
+                                                        float physxCollision:restOffset = 0
+                                                        point3f[] points = [(0.049561664, -0.0229742, -0.01125984), (0.068561666, -0.0229742, -0.01125984), (0.06956167, -0.0229742, -0.01025984), (0.06956167, -0.0229742, 0.00739635), (0.068561666, -0.0229742, 0.00839635), (0.049561664, -0.0229742, 0.00839635), (0.049561664, -0.01799537, -0.01125984), (0.068561666, -0.01799537, -0.01125984), (0.06956167, -0.01799537, -0.01025984), (0.06956167, -0.01799537, 0.00739635), (0.068561666, -0.01799537, 0.00839635), (0.049561664, -0.01799537, 0.00839635)]
+                                                        color3f[] primvars:displayColor = [(0.01, 0.01, 0.01)]
+                                                        rel material:binding = </World/ReplayVisualMaterials/BlackInsulatingTape>
+                                                        float[] primvars:displayOpacity = [1]
+                                                        uniform token subdivisionScheme = "none"
+                                                        token visibility = "inherited"
+                                                    }
+
+                                                    over "follower_left_gripper_left_pad_upper" (
+                                                        prepend apiSchemas = ["PhysicsCollisionAPI"]
+                                                    )
+                                                    {
+                                                        bool physics:collisionEnabled = 0
+                                                    }
+
+                                                    over "follower_left_gripper_left_pad_lower" (
+                                                        prepend apiSchemas = ["PhysicsCollisionAPI"]
+                                                    )
+                                                    {
+                                                        bool physics:collisionEnabled = 0
+                                                    }
+
+                                                    over "follower_left_gripper_left_tip" (
+                                                        prepend apiSchemas = ["PhysicsCollisionAPI"]
+                                                    )
+                                                    {
+                                                        bool physics:collisionEnabled = 0
+                                                    }
+                                                }
+
+                                                def "follower_left_carriage_right"
+                                                {
+                                                    def Mesh "follower_left_gripper_right_tape_sleeve_20mm" (
+                                                        prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "PhysxCollisionAPI", "MaterialBindingAPI"]
+                                                    )
+                                                    {
+                                                        uniform bool doubleSided = 0
+                                                        int[] faceVertexCounts = [6, 6, 4, 4, 4, 4, 4, 4]
+                                                        int[] faceVertexIndices = [0, 1, 2, 3, 4, 5, 11, 10, 9, 8, 7, 6, 0, 1, 7, 6, 1, 2, 8, 7, 2, 3, 9, 8, 3, 4, 10, 9, 4, 5, 11, 10, 5, 0, 6, 11]
+                                                        rel material:binding:physics = </World/ReplayPhysicsMaterials/InsulatingTape>
+                                                        uniform token physics:approximation = "convexHull"
+                                                        bool physics:collisionEnabled = 1
+                                                        float physxCollision:contactOffset = 0.0005
+                                                        float physxCollision:restOffset = 0
+                                                        point3f[] points = [(0.049561664, 0.01799537, -0.01125984), (0.068561666, 0.01799537, -0.01125984), (0.06956167, 0.01799537, -0.01025984), (0.06956167, 0.01799537, 0.00739635), (0.068561666, 0.01799537, 0.00839635), (0.049561664, 0.01799537, 0.00839635), (0.049561664, 0.0229742, -0.01125984), (0.068561666, 0.0229742, -0.01125984), (0.06956167, 0.0229742, -0.01025984), (0.06956167, 0.0229742, 0.00739635), (0.068561666, 0.0229742, 0.00839635), (0.049561664, 0.0229742, 0.00839635)]
+                                                        color3f[] primvars:displayColor = [(0.01, 0.01, 0.01)]
+                                                        rel material:binding = </World/ReplayVisualMaterials/BlackInsulatingTape>
+                                                        float[] primvars:displayOpacity = [1]
+                                                        uniform token subdivisionScheme = "none"
+                                                        token visibility = "inherited"
+                                                    }
+
+                                                    over "follower_left_gripper_right_pad_upper" (
+                                                        prepend apiSchemas = ["PhysicsCollisionAPI"]
+                                                    )
+                                                    {
+                                                        bool physics:collisionEnabled = 0
+                                                    }
+
+                                                    over "follower_left_gripper_right_pad_lower" (
+                                                        prepend apiSchemas = ["PhysicsCollisionAPI"]
+                                                    )
+                                                    {
+                                                        bool physics:collisionEnabled = 0
+                                                    }
+
+                                                    over "follower_left_gripper_right_tip" (
+                                                        prepend apiSchemas = ["PhysicsCollisionAPI"]
+                                                    )
+                                                    {
+                                                        bool physics:collisionEnabled = 0
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    def "follower_right_base_link"
+                    {
+                        def "follower_right_link_1"
+                        {
+                            def "follower_right_link_2"
+                            {
+                                def "follower_right_link_3"
+                                {
+                                    def "follower_right_link_4"
+                                    {
+                                        def "follower_right_link_5"
+                                        {
+                                            def "follower_right_link_6"
+                                            {
+                                                def "follower_right_carriage_left"
+                                                {
+                                                    def Mesh "follower_right_gripper_left_tape_sleeve_20mm" (
+                                                        prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "PhysxCollisionAPI", "MaterialBindingAPI"]
+                                                    )
+                                                    {
+                                                        uniform bool doubleSided = 0
+                                                        int[] faceVertexCounts = [6, 6, 4, 4, 4, 4, 4, 4]
+                                                        int[] faceVertexIndices = [0, 1, 2, 3, 4, 5, 11, 10, 9, 8, 7, 6, 0, 1, 7, 6, 1, 2, 8, 7, 2, 3, 9, 8, 3, 4, 10, 9, 4, 5, 11, 10, 5, 0, 6, 11]
+                                                        rel material:binding:physics = </World/ReplayPhysicsMaterials/InsulatingTape>
+                                                        uniform token physics:approximation = "convexHull"
+                                                        bool physics:collisionEnabled = 1
+                                                        float physxCollision:contactOffset = 0.0005
+                                                        float physxCollision:restOffset = 0
+                                                        point3f[] points = [(0.049561664, -0.0229742, -0.01125984), (0.068561666, -0.0229742, -0.01125984), (0.06956167, -0.0229742, -0.01025984), (0.06956167, -0.0229742, 0.00739635), (0.068561666, -0.0229742, 0.00839635), (0.049561664, -0.0229742, 0.00839635), (0.049561664, -0.01799537, -0.01125984), (0.068561666, -0.01799537, -0.01125984), (0.06956167, -0.01799537, -0.01025984), (0.06956167, -0.01799537, 0.00739635), (0.068561666, -0.01799537, 0.00839635), (0.049561664, -0.01799537, 0.00839635)]
+                                                        color3f[] primvars:displayColor = [(0.01, 0.01, 0.01)]
+                                                        rel material:binding = </World/ReplayVisualMaterials/BlackInsulatingTape>
+                                                        float[] primvars:displayOpacity = [1]
+                                                        uniform token subdivisionScheme = "none"
+                                                        token visibility = "inherited"
+                                                    }
+
+                                                    over "follower_right_gripper_left_pad_upper" (
+                                                        prepend apiSchemas = ["PhysicsCollisionAPI"]
+                                                    )
+                                                    {
+                                                        bool physics:collisionEnabled = 0
+                                                    }
+
+                                                    over "follower_right_gripper_left_pad_lower" (
+                                                        prepend apiSchemas = ["PhysicsCollisionAPI"]
+                                                    )
+                                                    {
+                                                        bool physics:collisionEnabled = 0
+                                                    }
+
+                                                    over "follower_right_gripper_left_tip" (
+                                                        prepend apiSchemas = ["PhysicsCollisionAPI"]
+                                                    )
+                                                    {
+                                                        bool physics:collisionEnabled = 0
+                                                    }
+                                                }
+
+                                                def "follower_right_carriage_right"
+                                                {
+                                                    def Mesh "follower_right_gripper_right_tape_sleeve_20mm" (
+                                                        prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "PhysxCollisionAPI", "MaterialBindingAPI"]
+                                                    )
+                                                    {
+                                                        uniform bool doubleSided = 0
+                                                        int[] faceVertexCounts = [6, 6, 4, 4, 4, 4, 4, 4]
+                                                        int[] faceVertexIndices = [0, 1, 2, 3, 4, 5, 11, 10, 9, 8, 7, 6, 0, 1, 7, 6, 1, 2, 8, 7, 2, 3, 9, 8, 3, 4, 10, 9, 4, 5, 11, 10, 5, 0, 6, 11]
+                                                        rel material:binding:physics = </World/ReplayPhysicsMaterials/InsulatingTape>
+                                                        uniform token physics:approximation = "convexHull"
+                                                        bool physics:collisionEnabled = 1
+                                                        float physxCollision:contactOffset = 0.0005
+                                                        float physxCollision:restOffset = 0
+                                                        point3f[] points = [(0.049561664, 0.01799537, -0.01125984), (0.068561666, 0.01799537, -0.01125984), (0.06956167, 0.01799537, -0.01025984), (0.06956167, 0.01799537, 0.00739635), (0.068561666, 0.01799537, 0.00839635), (0.049561664, 0.01799537, 0.00839635), (0.049561664, 0.0229742, -0.01125984), (0.068561666, 0.0229742, -0.01125984), (0.06956167, 0.0229742, -0.01025984), (0.06956167, 0.0229742, 0.00739635), (0.068561666, 0.0229742, 0.00839635), (0.049561664, 0.0229742, 0.00839635)]
+                                                        color3f[] primvars:displayColor = [(0.01, 0.01, 0.01)]
+                                                        rel material:binding = </World/ReplayVisualMaterials/BlackInsulatingTape>
+                                                        float[] primvars:displayOpacity = [1]
+                                                        uniform token subdivisionScheme = "none"
+                                                        token visibility = "inherited"
+                                                    }
+
+                                                    over "follower_right_gripper_right_pad_upper" (
+                                                        prepend apiSchemas = ["PhysicsCollisionAPI"]
+                                                    )
+                                                    {
+                                                        bool physics:collisionEnabled = 0
+                                                    }
+
+                                                    over "follower_right_gripper_right_pad_lower" (
+                                                        prepend apiSchemas = ["PhysicsCollisionAPI"]
+                                                    )
+                                                    {
+                                                        bool physics:collisionEnabled = 0
+                                                    }
+
+                                                    over "follower_right_gripper_right_tip" (
+                                                        prepend apiSchemas = ["PhysicsCollisionAPI"]
+                                                    )
+                                                    {
+                                                        bool physics:collisionEnabled = 0
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

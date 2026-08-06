@@ -1,0 +1,15 @@
+{
+  "status": "NOT_STARTED",
+  "fail_closed": true,
+  "rule": "Every stage requires a recorded PASS for all preceding stages; no tool may infer PASS.",
+  "stages": [
+    {"id":"NO_OBJECT_10_30_FRAMES_0P1X","requires":[],"status":"NOT_RUN"},
+    {"id":"NO_OBJECT_SEGMENTS_0P1X","requires":["NO_OBJECT_10_30_FRAMES_0P1X"],"status":"NOT_RUN"},
+    {"id":"NO_OBJECT_FULL_0P1X","requires":["NO_OBJECT_SEGMENTS_0P1X"],"status":"NOT_RUN"},
+    {"id":"NO_OBJECT_FULL_0P25X","requires":["NO_OBJECT_FULL_0P1X"],"status":"NOT_RUN"},
+    {"id":"PHONE_ONLY","requires":["NO_OBJECT_FULL_0P25X"],"status":"NOT_RUN"},
+    {"id":"PHONE_ACCESSORY","requires":["PHONE_ONLY"],"status":"NOT_RUN"},
+    {"id":"PHONE_CHARGER","requires":["PHONE_ACCESSORY"],"status":"NOT_RUN"},
+    {"id":"FULL_TASK","requires":["PHONE_CHARGER"],"status":"NOT_RUN"}
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "simulation_only": true,
+  "authoritative_for_real_robot": false,
+  "status": "NEEDS_MANUAL_APPROVAL",
+  "object_poses_immutable": true,
+  "phone": {
+    "root_scene_position_m": [
+      0.525,
+      0.07,
+      0.83075
+    ],
+    "root_position_status": "VERIFIED_FROM_SCENE_CODE",
+    "initial_pose": "VERTICAL_LANDSCAPE",
+    "axes": {
+      "+X": "landscape long axis",
+      "+Y": "back-face/MagSafe outward normal",
+      "+Z": "short vertical axis"
+    },
+    "size_xyz_m": [
+      0.1496,
+      0.00795,
+      0.0715
+    ],
+    "screen_normal_scene": [
+      0,
+      -1,
+      0
+    ],
+    "back_surface_normal_scene": [
+      0,
+      1,
+      0
+    ],
+    "deprecated_phone_grasp_band": {
+      "status": "UNAPPROVED_HEURISTIC",
+      "trajectory_gate_enabled": false,
+      "success_metric_enabled": false
+    },
+    "left_side_semantic_grasp_frame": {
+      "position_scene_m": [
+        0.45020000000000004,
+        0.07,
+        0.83075
+      ],
+      "position_basis": "phone local -X surface candidate center",
+      "approach_axis_scene": [
+        1,
+        0,
+        0
+      ],
+      "approach_basis": "from outside left toward phone side",
+      "closing_axis": "PENDING_APPROVED_LEFT_PHONE_GRASP_START_ALOHA_FK",
+      "tolerance": "NOT_DEFINED",
+      "source": "USER_APPROVED_ROLE_BUT_POSE_PENDING_VIDEO_ANNOTATION"
+    },
+    "pregrasp_offset": "NOT_DEFINED",
+    "angular_tolerance": "NOT_DEFINED"
+  },
+  "accessory": {
+    "root_scene_position_m": [
+      0.525,
+      0.076425,
+      0.83075
+    ],
+    "root_position_status": "VERIFIED_FROM_SCENE_CODE",
+    "attachment_relation": "back-center of initial phone",
+    "attachment_axis_scene": [
+      0,
+      -1,
+      0
+    ],
+    "initial_removal_direction_scene": [
+      0,
+      1,
+      0
+    ],
+    "removal_direction": "current approved phone back-surface outward normal",
+    "outer_radius_m": 0.0275,
+    "inner_radius_m": 0.0225,
+    "depth_m": 0.0035,
+    "grasp_region": "asset annulus",
+    "grasp_tolerance": "NOT_DEFINED",
+    "removal_distance": "NOT_DEFINED"
+  },
+  "charger": {
+    "root_scene_position_m": [
+      0.42,
+      0.21,
+      0.807
+    ],
+    "root_position_status": "VERIFIED_FROM_SCENE_CODE",
+    "pad_tilt_deg": 15.0,
+    "pad_radius_m": 0.0295,
+    "pad_normal_scene": [
+      0,
+      -0.9659258262890683,
+      0.25881904510252074
+    ],
+    "placement_relation": "phone center aligned to pad face center; portrait; phone back normal opposes pad outward normal",
+    "position_tolerance": "USER_DECISION_REQUIRED",
+    "angular_tolerance": "USER_DECISION_REQUIRED"
+  }
+}

@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "simulation_only": true,
+  "authoritative_for_real_robot": false,
+  "registration_method": "current scene_layout geometry plus requested final total +0.15 m G1 preview forward offset; simulation only",
+  "status": "NEEDS_MANUAL_APPROVAL",
+  "evidence_sources": [
+    "/home/jbnu/aloha_g1_dataset/isaaclab_magsafe_fixed_scene/scene_layout.json",
+    "/home/jbnu/aloha_g1_dataset/isaaclab_magsafe_fixed_scene/magsafe_robot_preview_config.json",
+    "/home/jbnu/aloha_g1_dataset/isaaclab_magsafe_fixed_scene/robot_model_preview_common.py"
+  ],
+  "manual_adjustment_used": true,
+  "manual_adjustment_log": [
+    {
+      "parameter": "g1_root_forward_offset_m",
+      "value_m": 0.15,
+      "basis": "user-requested final total static preview offset; visual approval pending",
+      "original_root_position_m": [
+        0.4175,
+        -0.5,
+        0.7922728583
+      ],
+      "applied_root_position_m": [
+        0.44514890950197095,
+        -0.35257022755443246,
+        0.7922728583
+      ]
+    }
+  ],
+  "T_scene_from_task": [
+    [
+      0.0,
+      -1.0,
+      0.0,
+      0.4175
+    ],
+    [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      1.0,
+      0.795
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "T_task_from_scene": [
+    [
+      0.0,
+      1.0,
+      0.0,
+      0.0
+    ],
+    [
+      -1.0,
+      -0.0,
+      -0.0,
+      0.4175
+    ],
+    [
+      0.0,
+      0.0,
+      1.0,
+      -0.795
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "T_scene_from_g1_base": [
+    [
+      -4.440892098500626e-16,
+      -1.0000000000000004,
+      0.0,
+      0.44514890950197095
+    ],
+    [
+      1.0000000000000004,
+      -4.440892098500626e-16,
+      0.0,
+      -0.35257022755443246
+    ],
+    [
+      0.0,
+      0.0,
+      1.0,
+      0.7922728583
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "T_task_from_g1_base": [
+    [
+      1.0000000000000004,
+      -4.440892098500626e-16,
+      0.0,
+      -0.35257022755443246
+    ],
+    [
+      4.440892098500626e-16,
+      1.0000000000000004,
+      0.0,
+      -0.027648909501970964
+    ],
+    [
+      0.0,
+      0.0,
+      1.0,
+      -0.002727141699999991
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "T_task_from_g1_torso": "UNKNOWN_DYNAMIC_FK",
+  "T_task_from_aloha_scene_root": [
+    [
+      1.0000000000000004,
+      -4.440892098500626e-16,
+      0.0,
+      0.36
+    ],
+    [
+      4.440892098500626e-16,
+      1.0000000000000004,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      1.0,
+      -0.039000000000000035
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "T_task_from_aloha_left_base": "UNKNOWN_NOT_APPROVED",
+  "T_task_from_aloha_right_base": "UNKNOWN_NOT_APPROVED",
+  "constraints": [
+    {
+      "name": "lateral_center",
+      "value_m": 0.4175,
+      "source": "/home/jbnu/aloha_g1_dataset/isaaclab_magsafe_fixed_scene/scene_layout.json"
+    },
+    {
+      "name": "g1_root_forward_offset",
+      "value_m": 0.15,
+      "source": "user-requested final total static preview offset; visual approval pending"
+    },
+    {
+      "name": "table_surface_minus_g1_root_z",
+      "value_m": 0.002727141699999991,
+      "source": "/home/jbnu/aloha_g1_dataset/isaaclab_magsafe_fixed_scene/scene_layout.json + /home/jbnu/aloha_g1_dataset/isaaclab_magsafe_fixed_scene/magsafe_robot_preview_config.json"
+    }
+  ],
+  "validation": {
+    "T_scene_from_task": {
+      "rotation_orthonormal": true,
+      "rotation_determinant": 1.0,
+      "last_row_valid": true,
+      "inverse_consistency": true,
+      "right_handed": true
+    },
+    "T_scene_from_g1_base": {
+      "rotation_orthonormal": true,
+      "rotation_determinant": 1.0000000000000009,
+      "last_row_valid": true,
+      "inverse_consistency": true,
+      "right_handed": true
+    },
+    "T_task_from_g1_base": {
+      "rotation_orthonormal": true,
+      "rotation_determinant": 1.0000000000000009,
+      "last_row_valid": true,
+      "inverse_consistency": true,
+      "right_handed": true
+    },
+    "round_trip_task_scene": true,
+    "units_consistent": true,
+    "one_fixed_transform_for_all_candidates": true
+  }
+}

@@ -1,0 +1,35 @@
+#usda 1.0
+(
+    defaultPrim = "World"
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "World"
+{
+    def Xform "MagSafeScene" (
+        prepend references = @/home/jbnu/aloha_g1_dataset/isaaclab_magsafe_fixed_scene/generated/magsafe_fixed_scene.usda@
+    )
+    {
+    }
+
+    def Xform "G1" (
+        customData = {
+            bool preview_control_applied = 0
+            string preview_pose_source = "/home/jbnu/aloha_g1_dataset/isaaclab_magsafe_fixed_scene/magsafe_robot_preview_config.json"
+            string workspace_calibration = '{"phone_center_world": [0.525, 0.07, 0.83075], "accessory_center_world": [0.525, 0.07642500000000002, 0.83075], "charger_center_world": [0.42, 0.21, 0.807], "task_center_world": [0.525, 0.07321250000000001, 0.83075], "table_forward_direction": [0.18432606334647292, 0.9828651496371169, 0.0], "table_lateral_direction": [-0.9828651496371169, 0.18432606334647292, 0.0], "root_to_task_center_horizontal_distance_m": 0.5832056413961116, "original_root_position": [0.4175, -0.5, 0.7922728583], "applied_root_position": [0.44514890950197095, -0.35257022755443246, 0.7922728583], "root_forward_offset_m": 0.15, "root_lateral_offset_m": 0.0, "root_z_offset_m": 0.0, "root_yaw_offset_deg": 0.0}'
+        }
+    )
+    {
+        quatd xformOp:orient = (0.7071067812, 0, 0, 0.7071067812)
+        double3 xformOp:translate = (0.44514890950197095, -0.35257022755443246, 0.7922728583)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient"]
+
+        def Xform "Asset" (
+            prepend references = @/home/jbnu/robot_assets_sources/unitree_sim_isaaclab_usds/extracted/assets/robots/g1-29dof-dex3-base-fix-usd/g1_29dof_with_dex3_base_fix.usd@
+        )
+        {
+        }
+    }
+}
+

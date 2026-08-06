@@ -1,0 +1,71 @@
+{
+  "status": "VERIFIED_EXISTING_SIDE_SPECIFIC_MAPPING",
+  "frame_direction": "R_target_palm = R_source_ALOHA_TCP @ C_side; palm and TCP origins are treated as the embodiment tool point; G1 wrist-to-palm proxy is handled by FK/IK",
+  "C_left": [
+    [
+      1.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      -1.0
+    ],
+    [
+      0.0,
+      1.0,
+      0.0
+    ]
+  ],
+  "C_right": [
+    [
+      1.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      1.0
+    ],
+    [
+      0.0,
+      -1.0,
+      0.0
+    ]
+  ],
+  "determinants": [
+    1.0,
+    1.0
+  ],
+  "orthonormal_errors": [
+    0.0,
+    0.0
+  ],
+  "g1_palm_proxy": {
+    "left": {
+      "parent": "left_wrist_yaw_link",
+      "local_position": [
+        0.0415,
+        0.003,
+        0
+      ]
+    },
+    "right": {
+      "parent": "right_wrist_yaw_link",
+      "local_position": [
+        0.0415,
+        -0.003,
+        0
+      ]
+    }
+  },
+  "sources": [
+    "/home/jbnu/aloha_g1_dataset/tools/retarget_episode49_optimized_action_to_g1.py",
+    "/home/jbnu/aloha_g1_dataset/configs/aloha_tool_axes_calibration.sim.json",
+    "/home/jbnu/mujoco_menagerie/unitree_g1/g1_with_hands.xml"
+  ],
+  "reflection": false,
+  "arbitrary_transform_added": false
+}

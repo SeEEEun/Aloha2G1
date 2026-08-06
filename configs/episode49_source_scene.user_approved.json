@@ -1,0 +1,34 @@
+{
+  "status": "USER_APPROVED_PROJECT_SCENE_EQUIVALENCE",
+  "scope": "EPISODE_49_SOURCE_RELATION_RECOVERY_ONLY",
+  "phone": {
+    "bottom_left_xy": [
+      0.45,
+      0.255
+    ],
+    "bottom_right_xy": [
+      0.6,
+      0.255
+    ],
+    "size_xyz_m": [
+      0.1496,
+      0.00795,
+      0.0715
+    ],
+    "mass_kg_metadata": 0.177,
+    "orientation": "VERTICAL_LANDSCAPE"
+  },
+  "charger": {
+    "center_xy": [
+      0.42,
+      0.52
+    ]
+  },
+  "accessory": "source phone back-center; active builder attachment transform",
+  "geometry_source": [
+    "/home/jbnu/aloha_g1_dataset/isaaclab_magsafe_fixed_scene/scene_layout.json",
+    "/home/jbnu/aloha_g1_dataset/isaaclab_magsafe_fixed_scene/magsafe_scene_builder.py"
+  ],
+  "target_scene_modification_allowed": false,
+  "camera_registration_required": false
+}

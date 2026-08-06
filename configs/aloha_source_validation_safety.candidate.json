@@ -1,0 +1,187 @@
+{
+  "criteria": {
+    "arm_position_range": {
+      "candidate_value": [
+        [
+          -0.5895704627037048,
+          0.8127336502075195
+        ],
+        [
+          0.6364919543266296,
+          2.4496452808380127
+        ],
+        [
+          0.08411535620689392,
+          1.7900739908218384
+        ],
+        [
+          -1.4597162008285522,
+          1.5787365436553955
+        ],
+        [
+          -0.693331778049469,
+          1.575303316116333
+        ],
+        [
+          -1.0893033742904663,
+          0.3400854468345642
+        ],
+        [
+          -0.47741663455963135,
+          0.995841920375824
+        ],
+        [
+          0.5533303022384644,
+          2.0128557682037354
+        ],
+        [
+          0.41485464572906494,
+          2.342832088470459
+        ],
+        [
+          -1.487182378768921,
+          0.7894636392593384
+        ],
+        [
+          -0.3225375711917877,
+          1.5222781896591187
+        ],
+        [
+          -0.15659570693969727,
+          1.6561760902404785
+        ]
+      ],
+      "derivation": "observed min/max per arm channel",
+      "empirical_limit": true,
+      "episode49_frames_0_29_pass": true,
+      "requires_human_approval": true,
+      "source": "/home/jbnu/aloha_g1_dataset/lerobot_magsafe_50_cam_high_v3/data/chunk-000/file-000.parquet",
+      "status": "EMPIRICAL_RANGE",
+      "unit": "rad",
+      "vendor_limit": false
+    },
+    "consecutive_overrun_limit": {
+      "candidate_value": 2,
+      "derivation": "maximum consecutive intervals above nominal 1/30 s",
+      "empirical_limit": true,
+      "episode49_frames_0_29_pass": null,
+      "requires_human_approval": true,
+      "source": "/home/jbnu/aloha_g1_dataset/lerobot_magsafe_50_cam_high_v3/data/chunk-000/file-000.parquet",
+      "status": "CANDIDATE",
+      "unit": "cycles",
+      "vendor_limit": false
+    },
+    "control_loop_overrun_threshold": {
+      "candidate_value": 3.3060709635421293e-06,
+      "derivation": "99.9 percentile timestamp interval minus nominal period",
+      "empirical_limit": true,
+      "episode49_frames_0_29_pass": null,
+      "requires_human_approval": true,
+      "source": "/home/jbnu/aloha_g1_dataset/lerobot_magsafe_50_cam_high_v3/data/chunk-000/file-000.parquet",
+      "status": "CANDIDATE",
+      "unit": "s late",
+      "vendor_limit": false
+    },
+    "gripper_position_range": {
+      "candidate_value": [
+        [
+          -0.00022205524146556854,
+          0.040023136883974075
+        ],
+        [
+          -0.0005625225603580475,
+          0.029455311596393585
+        ]
+      ],
+      "derivation": "observed state min/max; first test holds actual grippers",
+      "empirical_limit": true,
+      "episode49_frames_0_29_pass": null,
+      "requires_human_approval": true,
+      "source": "/home/jbnu/aloha_g1_dataset/lerobot_magsafe_50_cam_high_v3/data/chunk-000/file-000.parquet",
+      "status": "REQUIRES_LIVE_CURRENT_STATE",
+      "unit": "m",
+      "vendor_limit": false
+    },
+    "max_acceleration": {
+      "candidate_value": 70.7255870103836,
+      "derivation": "99.9 percentile action acceleration at 30 Hz",
+      "empirical_limit": true,
+      "episode49_frames_0_29_pass": true,
+      "requires_human_approval": true,
+      "source": "/home/jbnu/aloha_g1_dataset/lerobot_magsafe_50_cam_high_v3/data/chunk-000/file-000.parquet",
+      "status": "CANDIDATE",
+      "unit": "rad/s^2",
+      "vendor_limit": false
+    },
+    "max_command_step": {
+      "candidate_value": 0.11902037262916565,
+      "derivation": "99.9 percentile absolute action frame step across successful demonstrations",
+      "empirical_limit": true,
+      "episode49_frames_0_29_pass": true,
+      "requires_human_approval": true,
+      "source": "/home/jbnu/aloha_g1_dataset/lerobot_magsafe_50_cam_high_v3/data/chunk-000/file-000.parquet",
+      "status": "CANDIDATE",
+      "unit": "rad",
+      "vendor_limit": false
+    },
+    "max_start_position_error": {
+      "candidate_value": null,
+      "derivation": "successful demonstrations do not establish a safe arbitrary current-to-start displacement",
+      "empirical_limit": false,
+      "episode49_frames_0_29_pass": null,
+      "requires_human_approval": true,
+      "source": "UNRESOLVED",
+      "status": "UNRESOLVED",
+      "unit": "rad and m",
+      "vendor_limit": false
+    },
+    "max_tracking_error": {
+      "candidate_value": 0.598153613626957,
+      "derivation": "99.9 percentile aligned arm action-observation absolute difference",
+      "empirical_limit": true,
+      "episode49_frames_0_29_pass": null,
+      "requires_human_approval": true,
+      "source": "/home/jbnu/aloha_g1_dataset/lerobot_magsafe_50_cam_high_v3/data/chunk-000/file-000.parquet",
+      "status": "CANDIDATE",
+      "unit": "rad",
+      "vendor_limit": false
+    },
+    "max_velocity": {
+      "candidate_value": 3.5706111788749695,
+      "derivation": "99.9 percentile action velocity at 30 Hz",
+      "empirical_limit": true,
+      "episode49_frames_0_29_pass": true,
+      "requires_human_approval": true,
+      "source": "/home/jbnu/aloha_g1_dataset/lerobot_magsafe_50_cam_high_v3/data/chunk-000/file-000.parquet",
+      "status": "CANDIDATE",
+      "unit": "rad/s",
+      "vendor_limit": false
+    },
+    "state_timeout": {
+      "candidate_value": 0.033336639404296875,
+      "derivation": "99.9 percentile successful dataset timestamp interval; not a transport timeout",
+      "empirical_limit": true,
+      "episode49_frames_0_29_pass": null,
+      "requires_human_approval": true,
+      "source": "/home/jbnu/aloha_g1_dataset/lerobot_magsafe_50_cam_high_v3/data/chunk-000/file-000.parquet",
+      "status": "CANDIDATE",
+      "unit": "s",
+      "vendor_limit": false
+    },
+    "tracking_error_duration": {
+      "candidate_value": null,
+      "derivation": "dataset samples error but does not label unsafe persistence duration",
+      "empirical_limit": false,
+      "episode49_frames_0_29_pass": null,
+      "requires_human_approval": true,
+      "source": "UNRESOLVED",
+      "status": "UNRESOLVED",
+      "unit": "s",
+      "vendor_limit": false
+    }
+  },
+  "envelope_type": "EMPIRICAL_SUCCESSFUL_OPERATION_ENVELOPE",
+  "hardware_replay_allowed": false,
+  "reviewed_config_generated": false,
+  "status": "CANDIDATE_NOT_APPROVED"
+}

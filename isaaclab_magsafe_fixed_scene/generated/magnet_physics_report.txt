@@ -1,0 +1,102 @@
+MAGSAFE MAGNET PHYSICS REPORT
+parameter_status: DEBUG_INITIAL_GUESS (not measured)
+Isaac Sim: 6.0.1 pip
+Isaac Lab: 3.0.0-beta2.patch1 family
+external wrench API: RigidObject.instantaneous_wrench_composer.set_forces_and_torques_index(is_global=True)
+joint API: pxr.UsdPhysics.FixedJoint (accessory-phone); force_soft_lock (phone-charger, yaw-free)
+dynamic: phone mass=0.177 kg gravity=on CCD=on contact-report=on; accessory mass=0.025 kg DEBUG_INITIAL_GUESS gravity=on CCD=on contact-report=on
+static: table and charger retain collision proxies and have no RigidBodyAPI
+model: with v_rel=target-source, F=smoothstep(1-d/R)*(kp*position_error+kd*v_rel), T=smoothstep*(kpR*normal_rotation_vector+kdR*omega_rel), clamped. This is algebraically the requested negative damping against source-minus-target velocity.
+parameters: {
+  "metadata": {
+    "parameter_status": "DEBUG_INITIAL_GUESS",
+    "seed": 42,
+    "attachment_modes_supported": [
+      "breakable_joint",
+      "force_soft_lock"
+    ]
+  },
+  "accessory_phone": {
+    "attachment_mode": "breakable_joint",
+    "initial_state": "ATTACHED",
+    "capture_radius_m": 0.035,
+    "attach_distance_m": 0.004,
+    "attach_angle_deg": 12.0,
+    "attach_linear_speed_mps": 0.08,
+    "attach_angular_speed_rps": 0.8,
+    "kp_position": 35.0,
+    "kd_position": 2.5,
+    "kp_orientation": 0.25,
+    "kd_orientation": 0.015,
+    "max_force_n": 8.0,
+    "max_torque_nm": 0.35,
+    "break_force_n": 5.0,
+    "break_torque_nm": 0.25,
+    "cooldown_s": 0.4,
+    "allow_reattach": false
+  },
+  "phone_charger": {
+    "attachment_mode": "force_soft_lock",
+    "initial_state": "DETACHED",
+    "capture_radius_m": 0.045,
+    "attach_distance_m": 0.005,
+    "attach_angle_deg": 15.0,
+    "attach_linear_speed_mps": 0.1,
+    "attach_angular_speed_rps": 1.0,
+    "kp_position": 500.0,
+    "kd_position": 10.0,
+    "kp_orientation": 1.0,
+    "kd_orientation": 0.05,
+    "max_force_n": 10.0,
+    "max_torque_nm": 0.45,
+    "break_force_n": 8.0,
+    "break_torque_nm": 0.4,
+    "cooldown_s": 0.4,
+    "allow_reattach": true
+  },
+  "accessory": {
+    "mass_kg": 0.025,
+    "mass_status": "DEBUG_INITIAL_GUESS"
+  },
+  "safety": {
+    "max_phone_acceleration_mps2": 45.0,
+    "max_accessory_acceleration_mps2": 80.0,
+    "penetration_limit_m": 0.002,
+    "enable_ccd": true
+  },
+  "logging": {
+    "console_period_s": 0.25,
+    "csv_period_s": 0.008333333333333333
+  }
+}
+tests: {
+  "initial_stability": {
+    "pass": true,
+    "duration_s": 3.0
+  },
+  "accessory_detach": {
+    "pass": true,
+    "states": [
+      "ATTACHED",
+      "COOLDOWN"
+    ],
+    "detach_force_n": 5.1
+  },
+  "charger_snap": {
+    "pass": true,
+    "states": [
+      "ATTRACTING",
+      "ATTACHED"
+    ]
+  },
+  "outside_capture": {
+    "pass": true,
+    "force_n": 0.0
+  },
+  "wrong_orientation": {
+    "pass": true,
+    "state": "DETACHED"
+  }
+}
+limitations: electromagnetic fields are not solved; break thresholds and accessory mass are initial estimates; the accessory support-ring proxy intersects the tabletop in the inherited open pose, so its segment collisions are disabled only in the magnetic layer while geometry/prim paths are preserved; full contact-manifold depth is not exposed by this single-env controller.
+final_status: MAGNET_PHYSICS_OK

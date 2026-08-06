@@ -1,0 +1,314 @@
+#usda 1.0
+(
+    defaultPrim = "ChargerStand"
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "ChargerStand" (
+    customData = {
+        dictionary magsafe = {
+            int asset_version = 1
+            string class = "magsafe_charger"
+            bool fixed = 1
+        }
+    }
+)
+{
+    def "Materials"
+    {
+        def Material "WhitePlastic"
+        {
+            token outputs:surface.connect = </ChargerStand/Materials/WhitePlastic/PreviewSurface.outputs:surface>
+
+            def Shader "PreviewSurface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (0.91, 0.92, 0.93)
+                color3f inputs:emissiveColor = (0, 0, 0)
+                float inputs:metallic = 0
+                float inputs:opacity = 1
+                float inputs:roughness = 0.24
+                token outputs:surface
+            }
+        }
+
+        def Material "PadFace"
+        {
+            token outputs:surface.connect = </ChargerStand/Materials/PadFace/PreviewSurface.outputs:surface>
+
+            def Shader "PreviewSurface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (0.96, 0.97, 0.98)
+                color3f inputs:emissiveColor = (0, 0, 0)
+                float inputs:metallic = 0
+                float inputs:opacity = 1
+                float inputs:roughness = 0.18
+                token outputs:surface
+            }
+        }
+
+        def Material "StemMetal"
+        {
+            token outputs:surface.connect = </ChargerStand/Materials/StemMetal/PreviewSurface.outputs:surface>
+
+            def Shader "PreviewSurface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (0.26, 0.28, 0.3)
+                color3f inputs:emissiveColor = (0, 0, 0)
+                float inputs:metallic = 0.82
+                float inputs:opacity = 1
+                float inputs:roughness = 0.2
+                token outputs:surface
+            }
+        }
+
+        def Material "StatusLED"
+        {
+            token outputs:surface.connect = </ChargerStand/Materials/StatusLED/PreviewSurface.outputs:surface>
+
+            def Shader "PreviewSurface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (0.05, 0.55, 0.18)
+                color3f inputs:emissiveColor = (0.04, 0.95, 0.22)
+                float inputs:metallic = 0
+                float inputs:opacity = 1
+                float inputs:roughness = 0.24
+                token outputs:surface
+            }
+        }
+    }
+
+    def "Visuals"
+    {
+        def Cylinder "Base" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+            customData = {
+                dictionary magsafe = {
+                    string class = "charger_base_visual"
+                }
+            }
+        )
+        {
+            uniform token axis = "Z"
+            double height = 0.024
+            rel material:binding = </ChargerStand/Materials/WhitePlastic>
+            double radius = 0.0525
+            double3 xformOp:translate = (0, 0, 0.012)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Cube "Support_0" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+            customData = {
+                dictionary magsafe = {
+                    string class = "charger_support_visual"
+                }
+            }
+        )
+        {
+            rel material:binding = </ChargerStand/Materials/StemMetal>
+            double size = 2
+            quatf xformOp:orient = (0.9998494, -0.017354233, 0, 0)
+            float3 xformOp:scale = (0.003, 0.003, 0.04322363)
+            double3 xformOp:translate = (-0.0065, 0.0115, 0.07119759406223625)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+        }
+
+        def Cube "Support_1" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+            customData = {
+                dictionary magsafe = {
+                    string class = "charger_support_visual"
+                }
+            }
+        )
+        {
+            rel material:binding = </ChargerStand/Materials/StemMetal>
+            double size = 2
+            quatf xformOp:orient = (0.9998494, -0.017354233, 0, 0)
+            float3 xformOp:scale = (0.003, 0.003, 0.04322363)
+            double3 xformOp:translate = (0.0065, 0.0115, 0.07119759406223625)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+        }
+
+        def Cylinder "PadBody" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+            customData = {
+                dictionary magsafe = {
+                    string class = "charger_pad_visual"
+                }
+            }
+        )
+        {
+            uniform token axis = "Z"
+            double height = 0.008
+            rel material:binding = </ChargerStand/Materials/WhitePlastic>
+            double radius = 0.0295
+            quatf xformOp:orient = (0.7933533, 0.6087614, 0, -0)
+            double3 xformOp:translate = (0, 0.01, 0.13150518812447248)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient"]
+        }
+
+        def Cylinder "PadFace" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+            customData = {
+                dictionary magsafe = {
+                    string class = "charger_pad_face_visual"
+                }
+            }
+        )
+        {
+            uniform token axis = "Z"
+            double height = 0.0006
+            rel material:binding = </ChargerStand/Materials/PadFace>
+            double radius = 0.0283
+            quatf xformOp:orient = (0.7933533, 0.6087614, 0, -0)
+            double3 xformOp:translate = (0, 0.005846518946957006, 0.1326181100184133)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient"]
+        }
+
+        def Mesh "StatusLED" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+            customData = {
+                dictionary magsafe = {
+                    string class = "charger_status_led"
+                }
+            }
+        )
+        {
+            uniform bool doubleSided = 0
+            float3[] extent = [(-0.006, -0.0006, -0.00225), (0.006, 0.0006, 0.00225)]
+            int[] faceVertexCounts = [36, 36, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+            int[] faceVertexIndices = [35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 0, 1, 37, 36, 1, 2, 38, 37, 2, 3, 39, 38, 3, 4, 40, 39, 4, 5, 41, 40, 5, 6, 42, 41, 6, 7, 43, 42, 7, 8, 44, 43, 8, 9, 45, 44, 9, 10, 46, 45, 10, 11, 47, 46, 11, 12, 48, 47, 12, 13, 49, 48, 13, 14, 50, 49, 14, 15, 51, 50, 15, 16, 52, 51, 16, 17, 53, 52, 17, 18, 54, 53, 18, 19, 55, 54, 19, 20, 56, 55, 20, 21, 57, 56, 21, 22, 58, 57, 22, 23, 59, 58, 23, 24, 60, 59, 24, 25, 61, 60, 25, 26, 62, 61, 26, 27, 63, 62, 27, 28, 64, 63, 28, 29, 65, 64, 29, 30, 66, 65, 30, 31, 67, 66, 31, 32, 68, 67, 32, 33, 69, 68, 33, 34, 70, 69, 34, 35, 71, 70, 35, 0, 36, 71]
+            rel material:binding = </ChargerStand/Materials/StatusLED>
+            point3f[] points = [(0.006, -0.0006, 0.00025), (0.0059615704, -0.0006, 0.00064018066), (0.005847759, -0.0006, 0.0010153669), (0.005662939, -0.0006, 0.0013611405), (0.0054142135, -0.0006, 0.0016642136), (0.0051111407, -0.0006, 0.0019129392), (0.0047653667, -0.0006, 0.0020977592), (0.0043901806, -0.0006, 0.0022115705), (0.004, -0.0006, 0.00225), (-0.004, -0.0006, 0.00225), (-0.0043901806, -0.0006, 0.0022115705), (-0.0047653667, -0.0006, 0.0020977592), (-0.0051111407, -0.0006, 0.0019129392), (-0.0054142135, -0.0006, 0.0016642136), (-0.005662939, -0.0006, 0.0013611405), (-0.005847759, -0.0006, 0.0010153669), (-0.0059615704, -0.0006, 0.00064018066), (-0.006, -0.0006, 0.00025), (-0.006, -0.0006, -0.00025), (-0.0059615704, -0.0006, -0.00064018066), (-0.005847759, -0.0006, -0.0010153669), (-0.005662939, -0.0006, -0.0013611405), (-0.0054142135, -0.0006, -0.0016642136), (-0.0051111407, -0.0006, -0.0019129392), (-0.0047653667, -0.0006, -0.0020977592), (-0.0043901806, -0.0006, -0.0022115705), (-0.004, -0.0006, -0.00225), (0.004, -0.0006, -0.00225), (0.0043901806, -0.0006, -0.0022115705), (0.0047653667, -0.0006, -0.0020977592), (0.0051111407, -0.0006, -0.0019129392), (0.0054142135, -0.0006, -0.0016642136), (0.005662939, -0.0006, -0.0013611405), (0.005847759, -0.0006, -0.0010153669), (0.0059615704, -0.0006, -0.00064018066), (0.006, -0.0006, -0.00025), (0.006, 0.0006, 0.00025), (0.0059615704, 0.0006, 0.00064018066), (0.005847759, 0.0006, 0.0010153669), (0.005662939, 0.0006, 0.0013611405), (0.0054142135, 0.0006, 0.0016642136), (0.0051111407, 0.0006, 0.0019129392), (0.0047653667, 0.0006, 0.0020977592), (0.0043901806, 0.0006, 0.0022115705), (0.004, 0.0006, 0.00225), (-0.004, 0.0006, 0.00225), (-0.0043901806, 0.0006, 0.0022115705), (-0.0047653667, 0.0006, 0.0020977592), (-0.0051111407, 0.0006, 0.0019129392), (-0.0054142135, 0.0006, 0.0016642136), (-0.005662939, 0.0006, 0.0013611405), (-0.005847759, 0.0006, 0.0010153669), (-0.0059615704, 0.0006, 0.00064018066), (-0.006, 0.0006, 0.00025), (-0.006, 0.0006, -0.00025), (-0.0059615704, 0.0006, -0.00064018066), (-0.005847759, 0.0006, -0.0010153669), (-0.005662939, 0.0006, -0.0013611405), (-0.0054142135, 0.0006, -0.0016642136), (-0.0051111407, 0.0006, -0.0019129392), (-0.0047653667, 0.0006, -0.0020977592), (-0.0043901806, 0.0006, -0.0022115705), (-0.004, 0.0006, -0.00225), (0.004, 0.0006, -0.00225), (0.0043901806, 0.0006, -0.0022115705), (0.0047653667, 0.0006, -0.0020977592), (0.0051111407, 0.0006, -0.0019129392), (0.0054142135, 0.0006, -0.0016642136), (0.005662939, 0.0006, -0.0013611405), (0.005847759, 0.0006, -0.0010153669), (0.0059615704, 0.0006, -0.00064018066), (0.006, 0.0006, -0.00025)]
+            uniform token subdivisionScheme = "none"
+            double3 xformOp:translate = (0, -0.0532, 0.011519999999999999)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+    }
+
+    def "Colliders"
+    {
+        def Cylinder "Base" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+            customData = {
+                dictionary magsafe = {
+                    string class = "charger_base_collider"
+                }
+            }
+        )
+        {
+            uniform token axis = "Z"
+            double height = 0.024
+            uniform token purpose = "guide"
+            double radius = 0.0525
+            token visibility = "invisible"
+            double3 xformOp:translate = (0, 0, 0.012)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Cube "Support_0" (
+            prepend apiSchemas = ["MaterialBindingAPI", "PhysicsCollisionAPI"]
+            customData = {
+                dictionary magsafe = {
+                    string class = "charger_support_collider"
+                }
+            }
+        )
+        {
+            rel material:binding = </ChargerStand/Materials/StemMetal>
+            uniform token purpose = "guide"
+            double size = 2
+            token visibility = "invisible"
+            quatf xformOp:orient = (0.9998494, -0.017354233, 0, 0)
+            float3 xformOp:scale = (0.003, 0.003, 0.04322363)
+            double3 xformOp:translate = (-0.0065, 0.0115, 0.07119759406223625)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+        }
+
+        def Cube "Support_1" (
+            prepend apiSchemas = ["MaterialBindingAPI", "PhysicsCollisionAPI"]
+            customData = {
+                dictionary magsafe = {
+                    string class = "charger_support_collider"
+                }
+            }
+        )
+        {
+            rel material:binding = </ChargerStand/Materials/StemMetal>
+            uniform token purpose = "guide"
+            double size = 2
+            token visibility = "invisible"
+            quatf xformOp:orient = (0.9998494, -0.017354233, 0, 0)
+            float3 xformOp:scale = (0.003, 0.003, 0.04322363)
+            double3 xformOp:translate = (0.0065, 0.0115, 0.07119759406223625)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+        }
+
+        def Cylinder "Pad" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+            customData = {
+                dictionary magsafe = {
+                    string class = "charger_pad_collider"
+                }
+            }
+        )
+        {
+            uniform token axis = "Z"
+            double height = 0.008
+            uniform token purpose = "guide"
+            double radius = 0.0295
+            token visibility = "invisible"
+            quatf xformOp:orient = (0.7933533, 0.6087614, 0, -0)
+            double3 xformOp:translate = (0, 0.01, 0.13150518812447248)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient"]
+        }
+    }
+
+    def "Frames"
+    {
+        def Xform "BaseCenter" (
+            customData = {
+                dictionary magsafe = {
+                    string class = "reference_frame"
+                }
+            }
+        )
+        {
+            double3 xformOp:translate = (0, 0, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Xform "PadCenter" (
+            customData = {
+                dictionary magsafe = {
+                    string class = "reference_frame"
+                    string normal_xyz = "[0.0, -0.9659258262890683, 0.25881904510252074]"
+                }
+            }
+        )
+        {
+            double3 xformOp:translate = (0, 0.01, 0.13150518812447248)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Xform "PhoneTargetCenter" (
+            customData = {
+                dictionary magsafe = {
+                    string class = "reference_frame"
+                    string normal_axis = "pad +Z after rotation"
+                }
+            }
+        )
+        {
+            double3 xformOp:translate = (0, 0.005846518946957006, 0.1326181100184133)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+    }
+}
+

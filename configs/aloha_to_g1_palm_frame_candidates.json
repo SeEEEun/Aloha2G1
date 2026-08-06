@@ -1,0 +1,43 @@
+{
+  "source_fk": "validate_smolvla_in_stationary_aloha_mujoco.py: fk; follower_left/right_link_6; TCP offset [0.1487,0,-0.00105]",
+  "closing_axis": "NOT_EXPLICITLY_CALIBRATED",
+  "approach_axis": "NOT_EXPLICITLY_CALIBRATED",
+  "candidates": {
+    "left_C": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        -1
+      ],
+      [
+        0,
+        1,
+        0
+      ]
+    ],
+    "right_C": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        1
+      ],
+      [
+        0,
+        -1,
+        0
+      ]
+    ],
+    "source": "retarget_episode49_optimized_action_to_g1.py",
+    "status": "CODE_VERIFIED_CANDIDATE_NOT_PHYSICAL_CALIBRATION"
+  }
+}
