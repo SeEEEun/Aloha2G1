@@ -1,10 +1,49 @@
 {
   "g1": {
-    "position_xyz_m": [0.4175, -0.5, 0.7922728583],
-    "orientation_wxyz": [0.7071067812, 0.0, 0.0, 0.7071067812]
+    "position_xyz_m": [
+      0.4175,
+      -0.5,
+      0.7922728583
+    ],
+    "orientation_wxyz": [
+      0.7071067812,
+      0.0,
+      0.0,
+      0.7071067812
+    ]
   },
   "stationary_aloha": {
-    "position_xyz_m": [0.4175, 0.36, 0.756],
-    "orientation_wxyz": [0.7071067812, 0.0, 0.0, 0.7071067812]
+    "position_xyz_m": [
+      0.4175,
+      0.36,
+      0.756
+    ],
+    "orientation_wxyz": [
+      0.7071067812,
+      0.0,
+      0.0,
+      0.7071067812
+    ]
+  },
+  "g1_root_registration": {
+    "status": "USER_AUTHORIZED_FORWARD_ROOT_REGISTRATION",
+    "total_forward_offset_m": 0.199,
+    "original_root_xyz_m": [
+      0.4175,
+      -0.5,
+      0.7922728583
+    ],
+    "applied_root_xyz_m": [
+      0.4541808866059481,
+      -0.30440983522221376,
+      0.7922728583
+    ],
+    "forward_unit_vector": [
+      0.18432606334647292,
+      0.9828651496371169,
+      0.0
+    ],
+    "approved_config": "/home/jbnu/aloha_g1_dataset/configs/g1_root_forward_v14.approved.json",
+    "applied_exactly_once": true
   }
 }

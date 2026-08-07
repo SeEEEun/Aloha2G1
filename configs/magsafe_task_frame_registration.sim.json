@@ -2,29 +2,31 @@
   "schema_version": 1,
   "simulation_only": true,
   "authoritative_for_real_robot": false,
-  "registration_method": "current scene_layout geometry plus requested final total +0.15 m G1 preview forward offset; simulation only",
-  "status": "NEEDS_MANUAL_APPROVAL",
+  "registration_method": "current scene_layout geometry plus user-authorized final total +0.199 m G1 preview forward offset; simulation only",
+  "status": "USER_AUTHORIZED_FORWARD_ROOT_REGISTRATION",
   "evidence_sources": [
     "/home/jbnu/aloha_g1_dataset/isaaclab_magsafe_fixed_scene/scene_layout.json",
     "/home/jbnu/aloha_g1_dataset/isaaclab_magsafe_fixed_scene/magsafe_robot_preview_config.json",
-    "/home/jbnu/aloha_g1_dataset/isaaclab_magsafe_fixed_scene/robot_model_preview_common.py"
+    "/home/jbnu/aloha_g1_dataset/isaaclab_magsafe_fixed_scene/robot_model_preview_common.py",
+    "/home/jbnu/aloha_g1_dataset/configs/g1_root_forward_v14.approved.json"
   ],
   "manual_adjustment_used": true,
   "manual_adjustment_log": [
     {
       "parameter": "g1_root_forward_offset_m",
-      "value_m": 0.15,
-      "basis": "user-requested final total static preview offset; visual approval pending",
+      "value_m": 0.199,
+      "basis": "minimum feasible +0.194 m root had <2 mm contact margin; the required +5 mm practical candidate retained every fidelity/collision gate with path correlation equal within 1e-4",
       "original_root_position_m": [
         0.4175,
         -0.5,
         0.7922728583
       ],
       "applied_root_position_m": [
-        0.44514890950197095,
-        -0.35257022755443246,
+        0.4541808866059481,
+        -0.30440983522221376,
         0.7922728583
-      ]
+      ],
+      "application_semantics": "total offset from original root; applied exactly once"
     }
   ],
   "T_scene_from_task": [
@@ -84,13 +86,13 @@
       -4.440892098500626e-16,
       -1.0000000000000004,
       0.0,
-      0.44514890950197095
+      0.4541808866059481
     ],
     [
       1.0000000000000004,
       -4.440892098500626e-16,
       0.0,
-      -0.35257022755443246
+      -0.30440983522221376
     ],
     [
       0.0,
@@ -110,13 +112,13 @@
       1.0000000000000004,
       -4.440892098500626e-16,
       0.0,
-      -0.35257022755443246
+      -0.30440983522221376
     ],
     [
       4.440892098500626e-16,
       1.0000000000000004,
       0.0,
-      -0.027648909501970964
+      -0.03668088660594809
     ],
     [
       0.0,
@@ -168,8 +170,8 @@
     },
     {
       "name": "g1_root_forward_offset",
-      "value_m": 0.15,
-      "source": "user-requested final total static preview offset; visual approval pending"
+      "value_m": 0.199,
+      "source": "/home/jbnu/aloha_g1_dataset/configs/g1_root_forward_v14.approved.json"
     },
     {
       "name": "table_surface_minus_g1_root_z",

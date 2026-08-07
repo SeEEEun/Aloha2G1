@@ -23,7 +23,8 @@ from isaaclab.app import AppLauncher
 
 ROOT = Path("/home/jbnu/aloha_g1_dataset")
 V12 = ROOT / "outputs/scene_registered_retargeting/current_layout_ep49_target_phase_anchored_v12"
-OUT = ROOT / "outputs/scene_registered_retargeting/current_layout_ep49_target_phase_anchored_v12_renderfix"
+V14 = ROOT / "outputs/scene_registered_retargeting/current_layout_ep49_root_registered_v14"
+OUT_V12 = ROOT / "outputs/scene_registered_retargeting/current_layout_ep49_target_phase_anchored_v12_renderfix"
 SCENE_DIR = ROOT / "isaaclab_magsafe_fixed_scene"
 FIXED_SCENE = SCENE_DIR / "generated/magsafe_fixed_scene.usda"
 ACTIVE_SCENE = SCENE_DIR / "generated/magsafe_g1_model_preview.usda"
@@ -32,19 +33,17 @@ G1_USD = Path(
     "/home/jbnu/robot_assets_sources/unitree_sim_isaaclab_usds/extracted/assets/robots/"
     "g1-29dof-dex3-base-fix-usd/g1_29dof_with_dex3_base_fix.usd"
 )
-TRAJECTORIES = {
-    "exact": V12 / "position_only_exact_arm_trajectory.npz",
-    "nullspace": V12 / "position_only_nullspace_arm_trajectory.npz",
-}
 KEY_FRAMES = [0, 169, 216, 319, 334, 523, 695, 989]
 METHOD = "ALOHA_PRIMARY_TARGET_SIDE_PHASE_ANCHORED_RETARGETING"
 PROOF_CAMERA = ((1.15, -1.22, 1.38), (0.49, -0.01, 1.00))
+CONTACT_CAMERA = ((0.91, -0.36, 1.17), (0.46, 0.11, 0.93))
 
 
 parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument("--trajectory", choices=tuple(TRAJECTORIES), default="exact")
+parser.add_argument("--trajectory", choices=("exact", "nullspace"), default="exact")
+parser.add_argument("--v14", action="store_true", help="render applied root-registered v14 trajectories")
 parser.add_argument("--mode", choices=("keyframes", "robot-only", "review"), default="keyframes")
-parser.add_argument("--cameras", nargs="+", choices=("proof", "overview", "side", "top"), default=["proof"])
+parser.add_argument("--cameras", nargs="+", choices=("proof", "overview", "side", "top", "contact"), default=["proof"])
 parser.add_argument("--gui", action="store_true")
 parser.add_argument("--max-frames", type=int)
 parser.add_argument("--width", type=int, default=960)
@@ -53,6 +52,13 @@ AppLauncher.add_app_launcher_args(parser)
 args = parser.parse_args()
 launcher = AppLauncher(args)
 simulation_app = launcher.app
+
+RUN_DIR = V14 if args.v14 else V12
+OUT = V14 if args.v14 else OUT_V12
+TRAJECTORIES = {
+    "exact": RUN_DIR / ("position_only_exact_v14.npz" if args.v14 else "position_only_exact_arm_trajectory.npz"),
+    "nullspace": RUN_DIR / ("position_only_nullspace_v14.npz" if args.v14 else "position_only_nullspace_arm_trajectory.npz"),
+}
 
 
 def sha256(path: Path) -> str:
@@ -98,11 +104,19 @@ with np.load(NPZ, allow_pickle=False) as payload:
     numerical_right_rotation = payload["achieved_right_rotation_scene"].astype(float)
     target_left = payload["corrected_left_position_scene"].astype(float)
     target_right = payload["corrected_right_position_scene"].astype(float)
+    root_forward_offset_m = float(payload["g1_root_forward_offset_m"]) if "g1_root_forward_offset_m" in payload.files else 0.15
+CONTACT_METRICS = None
+if args.v14:
+    CONTACT_METRICS = json.loads((V14 / "physical_contact_reachability_v14.json").read_text())["candidates"][args.trajectory.upper()]
 if q.shape != (990, 14) or not np.array_equal(q, q_alias) or not np.isfinite(q).all():
     raise RuntimeError("immutable v12 q schema failed")
 
 
 def output_video_name(camera: str) -> str:
+    if args.v14:
+        if args.mode == "robot-only":
+            return f"v14_g1_{args.trajectory}_robot_only.mp4"
+        return f"v14_{args.trajectory}_{camera}.mp4"
     if args.mode == "robot-only":
         return f"g1_{args.trajectory}_robot_only_motion_proof.mp4"
     return f"isaaclab_position_only_{args.trajectory}_{camera}_RENDERFIX.mp4"
@@ -113,7 +127,7 @@ def add_metadata(raw: Path, output: Path, metadata: dict) -> None:
     subprocess.run(
         [
             "ffmpeg", "-y", "-loglevel", "error", "-i", str(raw), "-map", "0", "-c", "copy",
-            "-metadata", f"title=G1 v12 renderfix {args.trajectory} {args.mode}",
+            "-metadata", f"title=G1 {'v14 root-registered' if args.v14 else 'v12 renderfix'} {args.trajectory} {args.mode}",
             "-metadata", "comment=" + json.dumps(metadata, separators=(",", ":")),
             "-movflags", "+faststart", str(temporary),
         ],
@@ -148,7 +162,7 @@ def main() -> int:
     )
     scene_hashes_before = {str(path.resolve()): sha256(path) for path in (LAYOUT, FIXED_SCENE, ACTIVE_SCENE)}
     stage_path = OUT / f"renderfix_{args.trajectory}_{args.mode}.usda"
-    stage = compose_stage(stage_path, "G1", G1_USD, "g1", forward_offset_m=0.15)
+    stage = compose_stage(stage_path, "G1", G1_USD, "g1", forward_offset_m=root_forward_offset_m)
 
     dome = UsdLux.DomeLight.Define(stage, "/World/RenderfixLights/Dome")
     dome.CreateIntensityAttr(900.0)
@@ -165,13 +179,22 @@ def main() -> int:
                 api.GetRigidBodyEnabledAttr().Set(False)
 
     marker_specs = {}
-    if args.mode == "review":
+    if args.mode == "review" or (args.v14 and args.mode == "keyframes"):
         marker_specs = {
             "TargetL": ((1.0, 0.05, 0.05), 0.011),
             "TargetR": ((0.05, 0.25, 1.0), 0.011),
             "AchievedL": ((1.0, 0.8, 0.05), 0.008),
             "AchievedR": ((0.05, 1.0, 0.4), 0.008),
         }
+        if args.v14 and args.mode == "keyframes":
+            marker_specs.update({
+                "ContactA": ((0.0, 1.0, 1.0), 0.007),
+                "SurfaceA": ((1.0, 0.0, 1.0), 0.007),
+                "ContactB": ((0.0, 1.0, 1.0), 0.007),
+                "SurfaceB": ((1.0, 0.0, 1.0), 0.007),
+                "ContactC": ((0.0, 1.0, 1.0), 0.007),
+                "SurfaceC": ((1.0, 0.0, 1.0), 0.007),
+            })
         for name, (color, radius) in marker_specs.items():
             sphere = UsdGeom.Sphere.Define(stage, f"/World/RenderfixDiagnostics/{name}")
             sphere.CreateRadiusAttr(radius)
@@ -256,7 +279,7 @@ def main() -> int:
         body_visual_ops[body_name] = UsdGeom.Xformable(body_prim).MakeMatrixXform()
     if missing_body_prims:
         raise RuntimeError(f"missing visual body prims: {missing_body_prims}")
-    camera_poses = {**CAMERAS, "proof": PROOF_CAMERA}
+    camera_poses = {**CAMERAS, "proof": PROOF_CAMERA, "contact": CONTACT_CAMERA}
     for name, camera in cameras.items():
         eye, target = camera_poses[name]
         camera.set_world_poses_from_view(np.asarray([eye], np.float32), np.asarray([target], np.float32))
@@ -336,6 +359,22 @@ def main() -> int:
                 "TargetL": target_left[frame], "TargetR": target_right[frame],
                 "AchievedL": numerical_left_palm[frame], "AchievedR": numerical_right_palm[frame],
             }
+            hidden = np.array([-10.0, -10.0, -10.0])
+            values.update({name: hidden for name in ("ContactA", "SurfaceA", "ContactB", "SurfaceB", "ContactC", "SurfaceC")})
+            if CONTACT_METRICS is not None and frame in (169, 523):
+                row = CONTACT_METRICS[f"action{frame}"]
+                values.update({
+                    "ContactA": row["left_A_contact_position_m"],
+                    "SurfaceA": row["left_A_target_surface_m"],
+                    "ContactB": row["left_B_contact_position_m"],
+                    "SurfaceB": row["left_B_target_surface_m"],
+                })
+            elif CONTACT_METRICS is not None and frame == 319:
+                row = CONTACT_METRICS["action319"]
+                values.update({
+                    "ContactC": row["right_C_contact_position_m"],
+                    "SurfaceC": row["right_C_ring_target_m"],
+                })
             op.Set(Gf.Vec3d(*map(float, values[name])))
         simulation.render()
 
@@ -385,7 +424,7 @@ def main() -> int:
 
         eye, target = camera_poses[args.cameras[0]]
         simulation.set_camera_view(eye, target)
-        window = ui.Window("V12 RENDERFIX Articulation Parity", width=570, height=160)
+        window = ui.Window("V14 ROOT-REGISTERED Articulation Parity" if args.v14 else "V12 RENDERFIX Articulation Parity", width=570, height=160)
         frame_model = ui.SimpleIntModel(0)
         with window.frame:
             with ui.VStack(spacing=5):
@@ -526,7 +565,7 @@ def main() -> int:
                 else:
                     cv2.rectangle(image, (0, 0), (args.width, 76), (0, 0, 0), -1)
                     cv2.putText(
-                        image, f"V12 RENDERFIX | {args.trajectory.upper()} | action {frame:03d}/989",
+                        image, f"{'V14 ROOT REGISTERED' if args.v14 else 'V12 RENDERFIX'} | {args.trajectory.upper()} | action {frame:03d}/989",
                         (12, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.58, (80, 255, 120), 1, cv2.LINE_AA,
                     )
                     cv2.putText(
@@ -560,7 +599,7 @@ def main() -> int:
                 "q_key": "g1_arm_q",
                 "joint_mapping_sha256": mapping_hash,
                 "joint_names": joint_names,
-                "root_forward_offset_m": 0.15,
+                "root_forward_offset_m": root_forward_offset_m,
                 "frame_count": total,
                 "fps": 7.5,
                 "trajectory_kind": args.trajectory,

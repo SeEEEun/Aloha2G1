@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "status": "USER_AUTHORIZED_FORWARD_ROOT_REGISTRATION",
+  "simulation_only": true,
+  "authoritative_for_real_robot": false,
+  "previous_total_forward_offset_m": 0.15,
+  "selected_total_forward_offset_m": 0.199,
+  "minimum_physical_forward_offset_m": 0.194,
+  "original_root_xyz_m": [
+    0.4175,
+    -0.5,
+    0.7922728583
+  ],
+  "new_exact_root_xyz_m": [
+    0.4541808866059481,
+    -0.30440983522221376,
+    0.7922728583
+  ],
+  "verified_forward_unit_vector": [
+    0.18432606334647292,
+    0.9828651496371169,
+    0.0
+  ],
+  "selection_reason": "minimum feasible +0.194 m root had <2 mm contact margin; the required +5 mm practical candidate retained every fidelity/collision gate with path correlation equal within 1e-4",
+  "physical_contact_metrics": {
+    "action169_A_gap_mm": 1.986038137572304e-05,
+    "action169_B_gap_mm": 7.726783894400478e-05,
+    "action319_C_gap_mm": 0.0001268029267372693,
+    "action523_A_gap_mm": 0.09983804611593075,
+    "action523_B_gap_mm": 0.006592110897635202,
+    "phone_center_to_pad_mm": 0.0,
+    "phone_normal_error_deg": 0.0
+  },
+  "aloha_fidelity_metrics": {
+    "path_shape": 0.9828737986374434,
+    "speed": 0.9749970492003738,
+    "rotation_progress": 1.0
+  },
+  "workspace_scale": 0.42,
+  "source_hashes": {
+    "/home/jbnu/aloha_g1_dataset/evaluation/smolvla_episode49_temporal_consensus/episode_000049_temporal_consensus.npz": "a7f5543e07e315d59f52004dab48423a4ee52dfcbafb9b6d5d1a731fcbd3694c",
+    "/home/jbnu/aloha_g1_dataset/configs/episode49_task_timeline.approved.json": "12a40dd6df78a71f5692203e2260df9e3e94399cabe7314abca473e7f1e1eb2f",
+    "/home/jbnu/aloha_g1_dataset/configs/episode49_action_observation_alignment.approved.json": "7dc6f84f2794e6eefbb6e2c31c2028b842a5529512e31b53e98400bcae0a7e9f",
+    "/home/jbnu/aloha_g1_dataset/isaaclab_magsafe_fixed_scene/scene_layout.json": "619890060e965e23804b4395bb6b44d33e8c00451ce0669f44799fd3d827d6b8",
+    "/home/jbnu/aloha_g1_dataset/isaaclab_magsafe_fixed_scene/magsafe_robot_preview_config.json": "1e95b04a0159d1331a13ae095d38c5e1ab536d53b413b31046ccb376c2ea57d6",
+    "/home/jbnu/aloha_g1_dataset/isaaclab_magsafe_fixed_scene/generated/magsafe_g1_model_preview.usda": "45b23be4ed47f13d904c8dad6c13cf2acd4343e0aa7ea0146c1e90a611f224f1",
+    "/home/jbnu/aloha_g1_dataset/isaaclab_magsafe_fixed_scene/generated/magsafe_fixed_scene.usda": "f24aeebf90d5a4df87074310aa6f5f170e42ec2e84629e3359ea96b653173623",
+    "/home/jbnu/aloha_g1_dataset/configs/magsafe_task_frame_registration.sim.json": "5f05469d4245e1fbe0c6624056514a53ab7efe41e94a4c858125d73846b80b50",
+    "/home/jbnu/aloha_g1_dataset/outputs/scene_registered_retargeting/current_layout_ep49_target_phase_anchored_v12/aloha_phase_motion_library.npz": "1d17663a0d02cb1fe608715c4b619c294b9528644766e47ccb464269231c97f3",
+    "/home/jbnu/aloha_g1_dataset/outputs/scene_registered_retargeting/current_layout_ep49_target_phase_anchored_v12/position_only_exact_arm_trajectory.npz": "cd40cc8be57ecb4061fef5de6a6432cd02c32502780b6b5d28dcd2f69e9eebbb",
+    "/home/jbnu/aloha_g1_dataset/outputs/scene_registered_retargeting/current_layout_ep49_target_phase_anchored_v12/target_phone_pose_trajectory.npz": "535a87234156fadff642a1e6c5f5aeb984c083f77dd3ef37c2fbe8bdf8d3124b",
+    "/home/jbnu/aloha_g1_dataset/outputs/scene_registered_retargeting/current_layout_ep49_target_phase_anchored_v12/target_accessory_pose_trajectory.npz": "d2c2e356f833e81916fcd7ca552c11129b03cc70001506217c2c3c5c26883b7b",
+    "/home/jbnu/aloha_g1_dataset/outputs/scene_registered_retargeting/current_layout_ep49_physical_contact_anchored_v13/charger_active_fk_contact_reach_audit.json": "7faa6fdc79240c5d4d0d0d3199d14d3885294efc653aa667dcb4e9005b834a95"
+  },
+  "backup": "/home/jbnu/aloha_g1_dataset/backups/g1_root_forward_015_pre_v14_20260807_110041",
+  "no_dex3_trajectory": true,
+  "no_physics": true,
+  "no_hardware": true
+}

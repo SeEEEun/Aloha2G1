@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+import json
 
 from isaaclab.app import AppLauncher
 
@@ -13,13 +14,24 @@ G1_USD = Path(
     "g1-29dof-dex3-base-fix-usd/g1_29dof_with_dex3_base_fix.usd"
 )
 OUTPUT = ROOT / "generated" / "magsafe_g1_model_preview.usda"
+POSE_CONFIG = ROOT / "magsafe_robot_preview_config.json"
+
+
+def approved_total_forward_offset() -> float:
+    """Read the explicitly approved simulation registration, if present."""
+    if POSE_CONFIG.is_file():
+        payload = json.loads(POSE_CONFIG.read_text())
+        registration = payload.get("g1_root_registration", {})
+        if registration.get("status") == "USER_AUTHORIZED_FORWARD_ROOT_REGISTRATION":
+            return float(registration["total_forward_offset_m"])
+    return 0.15
 
 parser = argparse.ArgumentParser(description="Static/default-pose G1 model preview.")
 parser.add_argument("--camera", choices=("overview", "front", "side", "top"), default="overview")
 parser.add_argument("--hold-seconds", type=float, default=None, help=argparse.SUPPRESS)
 # Final total offset for this static environment. This is applied once to the
 # original root pose; it is not an increment on top of an earlier preview.
-parser.add_argument("--root-forward-offset-m", type=float, default=0.15)
+parser.add_argument("--root-forward-offset-m", type=float, default=approved_total_forward_offset())
 parser.add_argument("--root-lateral-offset-m", type=float, default=0.0)
 parser.add_argument("--root-z-offset-m", type=float, default=0.0)
 parser.add_argument("--root-yaw-offset-deg", type=float, default=0.0)

@@ -15,6 +15,7 @@ G1_XML=Path('/home/jbnu/mujoco_menagerie/unitree_g1/g1_with_hands.xml')
 ACTION=ROOT/'evaluation/smolvla_episode49_temporal_consensus/episode_000049_temporal_consensus.npz'
 ARM=ROOT/'converted_runs/smolvla_20k_episode49_consensus_relative_g1/g1_episode49_consensus_relative_trajectory.npz'
 FULL=ROOT/'outputs/g1_magsafe_arm_dex3_full_trajectory.npz'
+APPROVED_ROOT=ROOT/'configs/g1_root_forward_v14.approved.json'
 
 def sha(p):
  h=hashlib.sha256()
@@ -40,11 +41,15 @@ def build():
  acc=phone+np.array([0,layout['phone']['size_landscape_xyz'][1]/2+layout['accessory']['phone_back_clearance']+layout['accessory']['main_depth']/2,0])
  ch=np.array([*layout['charger']['center_xy'],layout['table']['surface_height']+(layout['charger']['mount_plate']['size_xyz'][2] if layout['charger']['mount_plate']['enabled'] else 0)])
 
- # Reproduce preview_magsafe_g1_model.py --root-forward-offset-m 0.15.
+ # Reproduce preview_magsafe_g1_model.py using the explicitly approved total
+ # forward offset.  The pose file always retains the original root, preventing
+ # cumulative/double application.
  # Forward is the horizontal direction from the original G1 root toward
  # the current phone/accessory task center.
  # Final total offset, applied exactly once to the original root pose.
- root_forward_offset_m=.15
+ approved=json.load(open(APPROVED_ROOT)) if APPROVED_ROOT.is_file() else None
+ root_forward_offset_m=float(approved['selected_total_forward_offset_m']) if approved else .15
+ root_label=f'{root_forward_offset_m:.3f}'
  original_root=np.asarray(gp['position_xyz_m'],float)
  task_center=(phone+acc)/2
  forward_xy=task_center[:2]-original_root[:2]
@@ -63,7 +68,7 @@ def build():
  Tts=np.linalg.inv(Tst); Ttg=Tts@Tsg; Tta=Tts@Tsa
  frames=[rec('fixed_scene_world',None,np.eye(4),str(LAYOUT),'verified',1.0,'+X table left-to-right; +Y operator-to-charger; +Z up'),
   rec('magsafe_task_frame','fixed_scene_world',Tst,str(LAYOUT),'inferred_pending_manual_approval',.8,'+X toward workspace; +Y task-left; +Z up'),
-  rec('g1_model_world',None,np.eye(4),str(G1_XML),'verified_model_local',1.0),rec('g1_base','fixed_scene_world',Tsg,str(POSES)+':g1 + requested final total +0.15 m forward offset','verified_for_preview_composition_only',.9),
+  rec('g1_model_world',None,np.eye(4),str(G1_XML),'verified_model_local',1.0),rec('g1_base','fixed_scene_world',Tsg,str(POSES)+f':g1 + approved final total +{root_label} m forward offset','verified_for_preview_composition_only',.9),
   rec('g1_torso','g1_base',None,str(G1_XML),'dynamic_fk',1.0),rec('g1_left_wrist_yaw','g1_base',None,str(G1_XML),'dynamic_fk',1.0),rec('g1_right_wrist_yaw','g1_base',None,str(G1_XML),'dynamic_fk',1.0),
   rec('g1_left_palm_proxy','g1_left_wrist_yaw',T(np.eye(3),[.0415,.003,0]),str(G1_XML),'verified_from_geom_transform',1.0),rec('g1_right_palm_proxy','g1_right_wrist_yaw',T(np.eye(3),[.0415,-.003,0]),str(G1_XML),'verified_from_geom_transform',1.0),
   rec('aloha_stationary_world',None,np.eye(4),str(ALOHA_XML),'verified_model_local',1.0),rec('aloha_scene_root','fixed_scene_world',Tsa,str(POSES)+':stationary_aloha','verified_for_preview_composition_only',.9),
@@ -73,15 +78,15 @@ def build():
  graph={'schema_version':1,'created_at':datetime.now(timezone.utc).isoformat(),'frames':frames,'unknown_transforms':['task_from_g1_torso (dynamic)','task_from_aloha_left_base/right_base: preview composition path exists but task correspondence is not approved'],'hashes':{str(p):sha(p) for p in (ACTION,ARM,FULL,LAYOUT,POSES,G1_XML,ALOHA_XML)}}
  dump(REG/'frame_graph.json',graph)
  md=['# Coordinate frame graph','',*[f"- `{x['frame_name']}` ← `{x['parent_frame']}`: **{x['status']}**, source `{x['source']}`" for x in frames]];(REG/'frame_graph.md').write_text('\n'.join(md)+'\n')
- registration={'schema_version':1,'simulation_only':True,'authoritative_for_real_robot':False,'registration_method':'current scene_layout geometry plus requested final total +0.15 m G1 preview forward offset; simulation only','status':'NEEDS_MANUAL_APPROVAL','evidence_sources':[str(LAYOUT),str(POSES),str(ROOT/'isaaclab_magsafe_fixed_scene/robot_model_preview_common.py')],
+ registration={'schema_version':1,'simulation_only':True,'authoritative_for_real_robot':False,'registration_method':f'current scene_layout geometry plus approved final total +{root_label} m G1 preview forward offset; simulation only','status':'USER_AUTHORIZED_FORWARD_ROOT_REGISTRATION' if approved else 'NEEDS_MANUAL_APPROVAL','evidence_sources':[str(LAYOUT),str(POSES),str(ROOT/'isaaclab_magsafe_fixed_scene/robot_model_preview_common.py'),str(APPROVED_ROOT) if approved else 'NO_V14_APPROVAL_FILE'],
   'manual_adjustment_used':True,'manual_adjustment_log':[{
       'parameter':'g1_root_forward_offset_m',
       'value_m':root_forward_offset_m,
-      'basis':'user-requested final total static preview offset; visual approval pending',
+      'basis':approved['selection_reason'] if approved else 'user-requested final total static preview offset; visual approval pending',
       'original_root_position_m':original_root.tolist(),
       'applied_root_position_m':applied_root.tolist()
      }],'T_scene_from_task':Tst.tolist(),'T_task_from_scene':Tts.tolist(),'T_scene_from_g1_base':Tsg.tolist(),'T_task_from_g1_base':Ttg.tolist(),'T_task_from_g1_torso':'UNKNOWN_DYNAMIC_FK','T_task_from_aloha_scene_root':Tta.tolist(),'T_task_from_aloha_left_base':'UNKNOWN_NOT_APPROVED','T_task_from_aloha_right_base':'UNKNOWN_NOT_APPROVED',
-  'constraints':[{'name':'lateral_center','value_m':layout['table']['size_x']/2,'source':str(LAYOUT)},{'name':'g1_root_forward_offset','value_m':root_forward_offset_m,'source':'user-requested final total static preview offset; visual approval pending'},{'name':'table_surface_minus_g1_root_z','value_m':layout['table']['surface_height']-gp['position_xyz_m'][2],'source':str(LAYOUT)+' + '+str(POSES)}],
+  'constraints':[{'name':'lateral_center','value_m':layout['table']['size_x']/2,'source':str(LAYOUT)},{'name':'g1_root_forward_offset','value_m':root_forward_offset_m,'source':str(APPROVED_ROOT) if approved else 'user-requested final total static preview offset; visual approval pending'},{'name':'table_surface_minus_g1_root_z','value_m':layout['table']['surface_height']-gp['position_xyz_m'][2],'source':str(LAYOUT)+' + '+str(POSES)}],
   'validation':{'T_scene_from_task':validate_transform(Tst),'T_scene_from_g1_base':validate_transform(Tsg),'T_task_from_g1_base':validate_transform(Ttg),'round_trip_task_scene':bool(np.allclose(Tts@Tst,np.eye(4))),'units_consistent':True,'one_fixed_transform_for_all_candidates':True}}
  dump(ROOT/'configs/magsafe_task_frame_registration.sim.json',registration)
  semantic={'schema_version':1,'simulation_only':True,'authoritative_for_real_robot':False,'status':'NEEDS_MANUAL_APPROVAL','object_poses_immutable':True,
