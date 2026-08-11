@@ -1,0 +1,19 @@
+{
+  "verified": false,
+  "mechanism": "Independent power toggle switches for follower/leader x left/right; each follower has its own switch",
+  "location": "Reachable from outside the robot workspace",
+  "cuts_left_follower": true,
+  "cuts_right_follower": true,
+  "single_operator_action": false,
+  "simultaneous_both_followers_cut": false,
+  "reachable_outside_workspace": true,
+  "power_loss_arm_behavior": null,
+  "power_loss_arm_behavior_tested": false,
+  "power_loss_arm_behavior_report": "UNKNOWN_NOT_TESTED",
+  "area_below_both_arms_clear": null,
+  "power_loss_behavior_accepted": false,
+  "operator_stop_accepted_for_characterization": false,
+  "verified_by": null,
+  "verification_date": null,
+  "notes": "User reported that left and right follower power require separate switch actions. No power-off arm-behavior test was performed. Possible gravity sag/drop was identified only as an unverified concern and is not recorded as observed behavior. The current switch arrangement is not accepted as the emergency procedure for characterization."
+}

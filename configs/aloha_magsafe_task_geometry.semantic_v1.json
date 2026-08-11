@@ -1,0 +1,17 @@
+{
+  "schema_name": "aloha_magsafe_task_geometry_semantic_v1",
+  "status": "PROJECT_SCENE_GEOMETRY_USED_ONLY_WHERE_AUTHORITATIVE",
+  "initial_phone_left_grasp_region_world": {
+    "center_xyz_m": [0.4502, 0.255, 0.83075],
+    "surface": "initial phone left long-side edge",
+    "authoritative_interval": "before phone acquisition"
+  },
+  "charger_task_direction_world": [-0.105, 0.265846518946957, 0.1088681100184133],
+  "source_phone_center_xyz_m": [0.525, 0.255, 0.83075],
+  "source_charger_pad_face_xyz_m": [0.42, 0.525846518946957, 0.9396181100184133],
+  "limitations": [
+    "No exact time-varying source phone carrier is assumed.",
+    "No reconstructed source accessory world pose is used after acquisition.",
+    "Geometry contributes evidence only where its state is authoritative."
+  ]
+}

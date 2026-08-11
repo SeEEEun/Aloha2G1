@@ -1,0 +1,92 @@
+{
+  "schema_name": "aloha_magsafe_semantic_detector_config_v2",
+  "version": 2,
+  "rotation_v2": {
+    "smoothing_sec": 0.13333333333333333,
+    "motion_quantile": 0.62,
+    "motion_mad_multiplier": 0.8,
+    "low_speed_quantile": 0.38,
+    "minimum_rotation_run_sec": 0.12,
+    "plateau_dwell_sec": 0.3,
+    "post_plateau_sec": 0.55,
+    "later_consistency_sec": 1.2,
+    "stability_angle_rad": 0.08,
+    "completion_threshold": 0.82,
+    "onset_context_sec": 0.35
+  },
+  "terminal_v2": {
+    "smoothing_sec": 0.16666666666666666,
+    "minimum_suffix_sec": 0.45,
+    "future_energy_rate_threshold": 0.1,
+    "future_peak_threshold": 0.6,
+    "position_spread_m": 0.012,
+    "rotation_spread_rad": 0.1,
+    "gripper_derivative_threshold": 0.12,
+    "return_proximity_threshold": 0.75,
+    "return_low_speed_score": 0.7,
+    "return_dwell_sec": 0.35
+  },
+  "release_v2": {
+    "open_normalized_threshold": 0.65,
+    "open_plateau_sec": 0.4,
+    "departure_window_sec": 0.6,
+    "departure_distance_m": 0.015,
+    "minimum_physical_release_evidence": 0.3
+  },
+  "removal_v2": {
+    "motion_quantile": 0.65,
+    "minimum_run_sec": 0.12,
+    "completion_fraction": 0.75,
+    "minimum_removal_displacement_m": 0.015,
+    "approach_region_exit_m": 0.012
+  },
+  "duration_bounds_sec": {
+    "left_phone_grasp_start->phone_rotation_to_portrait_start": [0.03, 5.0],
+    "phone_rotation_to_portrait_start->phone_portrait_reached": [0.1, 5.0],
+    "phone_portrait_reached->right_accessory_grasp_start": [0.0, 12.0],
+    "right_accessory_grasp_start->accessory_detachment_start": [0.02, 4.0],
+    "accessory_detachment_start->accessory_removed": [0.08, 4.0],
+    "accessory_removed->phone_move_to_charger_start": [0.0, 10.0],
+    "phone_move_to_charger_start->phone_charger_attachment_complete": [0.25, 14.0],
+    "phone_charger_attachment_complete->left_phone_release_complete": [0.03, 10.0],
+    "left_phone_release_complete->left_arm_return_near_home": [0.0, 14.0]
+  },
+  "decoder_v2": {
+    "beam_width": 128,
+    "candidates_per_event": 64,
+    "decode_candidates_per_event": 24,
+    "terminal_core_beam_count": 24,
+    "global_sequence_alternatives": 3,
+    "alternative_count": 3,
+    "missing_event_penalty": 4.0,
+    "minimum_duration_prior_scale_sec": 0.35,
+    "minimum_duration_prior_scale_normalized": 0.015,
+    "v2_evidence_model_bonus": 0.16,
+    "generic_seed_consistency_bonus": 0.05,
+    "local_evidence_weight": 0.56,
+    "duration_prior_weight": 0.2,
+    "phase_consistency_weight": 0.24,
+    "backward_terminal_weight": 0.24
+  },
+  "confidence_v2": {
+    "local_score_weight": 0.48,
+    "evidence_breadth_weight": 0.22,
+    "sequence_separation_weight": 0.2,
+    "dwell_stability_weight": 0.1,
+    "local_margin_saturation": 0.2,
+    "sequence_margin_saturation": 0.5,
+    "high_threshold": 0.78,
+    "medium_threshold": 0.54,
+    "low_threshold": 0.34,
+    "ambiguous_cap": 0.3,
+    "portrait_fallback_min_score": 0.72
+  },
+  "runtime_rules": {
+    "duration_units": "seconds",
+    "action_index_domain": true,
+    "absolute_event_indices": false,
+    "reference_timeline_allowed_during_detection": false,
+    "episode_specific_thresholds": false,
+    "heldout_parameters_allowed": false
+  }
+}

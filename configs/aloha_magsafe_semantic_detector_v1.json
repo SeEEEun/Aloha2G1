@@ -1,0 +1,50 @@
+{
+  "schema_name": "aloha_magsafe_semantic_detector_config_v1",
+  "version": 1,
+  "gripper": {
+    "smoothing_sec": 0.23333333333333334,
+    "debounce_sec": 0.13333333333333333,
+    "grasp_transition_sec": 0.16666666666666666,
+    "minimum_cluster_span": 0.00001,
+    "open_normalized_threshold": 0.68,
+    "close_normalized_threshold": 0.32,
+    "motion_score_threshold": 0.18
+  },
+  "kinematics": {
+    "feature_smoothing_sec": 0.16666666666666666,
+    "motion_onset_dwell_sec": 0.13333333333333333,
+    "low_speed_dwell_sec": 0.3,
+    "terminal_dwell_sec": 0.5,
+    "terminal_position_spread_m": 0.01,
+    "minimum_event_separation_sec": 0.06666666666666667,
+    "minimum_major_phase_sec": 0.2,
+    "minimum_gripper_hold_sec": 0.5,
+    "accessory_hold_before_release_sec": 0.5,
+    "speed_noise_quantile": 0.25,
+    "speed_motion_quantile": 0.62,
+    "angular_noise_quantile": 0.25,
+    "angular_motion_quantile": 0.62,
+    "return_distance_relative_quantile": 0.18,
+    "removal_progress_threshold": 0.72,
+    "rotation_progress_threshold": 0.88,
+    "transport_progress_threshold": 0.9
+  },
+  "decoder": {
+    "beam_width": 96,
+    "candidates_per_event": 64,
+    "alternative_count": 3,
+    "confidence_high": 0.75,
+    "confidence_medium": 0.45,
+    "confidence_low": 0.25,
+    "ambiguity_score_margin": 0.035,
+    "missing_event_penalty": 3.0,
+    "partial_order_penalty": 1000.0
+  },
+  "runtime_rules": {
+    "duration_units": "seconds",
+    "action_index_domain": true,
+    "absolute_event_indices": false,
+    "reference_timeline_allowed_during_detection": false,
+    "episode_specific_thresholds": false
+  }
+}
