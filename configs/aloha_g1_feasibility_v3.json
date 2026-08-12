@@ -1,0 +1,88 @@
+{
+  "schema_version": "aloha_g1_common_feasibility_v3_search",
+  "offline_only": true,
+  "training_allowed": false,
+  "physics_sweep_allowed": false,
+  "real_robot_command_allowed": false,
+  "dependencies": {
+    "common_arm_v2": "outputs/g1_dataset_retargeting_arm_v2/candidates/frozen_common_arm_v2_config.json",
+    "common_arm_v2_split": "outputs/g1_dataset_retargeting_arm_v2/split/calibration_validation_split.json",
+    "common_arm_v2_first_failures": "outputs/g1_dataset_retargeting_arm_v2/summary/first_failure_decomposition_v2.json",
+    "integrated_v2": "outputs/g1_dataset_retargeting_integrated_v2",
+    "proposed_hand_v2_1": "outputs/g1_dataset_retargeting_hand_v2_1/config/proposed_hand_v2_1_candidate.json",
+    "proposed_hand_v2_1_readiness": "outputs/g1_dataset_retargeting_hand_v2_1/summary/integration_readiness.json"
+  },
+  "frozen_upstream_contract": {
+    "uniform_scale": 0.30,
+    "task_ready_anchor_fraction": 0.0,
+    "global_mapping_reoptimization_allowed": false,
+    "hand_v2_1_modification_allowed": false,
+    "baseline_hand_state_modification_allowed": false,
+    "source_modification_allowed": false
+  },
+  "shared_solver": {
+    "class": "SharedConstrainedFeasibilitySolver",
+    "algorithm": "deterministic_two_stage_box_constrained_slsqp_projection",
+    "position_tolerance_m": 0.005,
+    "orientation_tolerance_rad": 0.75,
+    "required_ik_success_rate": 0.99,
+    "orientation_slack_candidates_rad": [0.35, 0.50, 0.65],
+    "full_calibration_finalist_count": 2,
+    "orientation_slack_policy": "implicit nonnegative hinge; actual error minus unchanged orientation tolerance; globally bounded",
+    "task_position_weight": 10000.0,
+    "task_orientation_weight": 0.02,
+    "orientation_slack_penalty": 0.02,
+    "v2_deviation_weight": 0.20,
+    "nominal_posture_weight": 0.0005,
+    "previous_q_weight": 0.01,
+    "next_q_weight": 0.01,
+    "acceleration_reference_weight": 0.01,
+    "joint_margin_weight": 0.001,
+    "joint_soft_margin_rad": 0.02,
+    "active_joint_bound_threshold_rad": 1e-6,
+    "hard_joint_interior_rad": 1e-8,
+    "max_stage1_iterations": 100,
+    "max_stage2_iterations": 120,
+    "max_collision_outer_passes": 5,
+    "max_trajectory_repair_passes": 1,
+    "collision_clearance_m": 1e-5,
+    "collision_penalty_candidates": [20.0, 100.0],
+    "slsqp_ftol": 1e-9,
+    "successful_frame_exact_preservation": true,
+    "hard_temporal_constraints_inside_repair": true,
+    "temporal_step_constraint_interior_rad": 2e-6,
+    "temporal_acceleration_constraint_interior_rad_s2": 0.002,
+    "method_specific_parameters_allowed": false
+  },
+  "shared_hand_temporal_projection": {
+    "algorithm": "conditional_causal_quintic_fir",
+    "trigger": "existing hand command violates unchanged hard temporal limits",
+    "transition_frames": 16,
+    "endpoint_states_unchanged": true,
+    "semantic_labels_unchanged": true,
+    "apply_identically_to_a_and_b": true
+  },
+  "collision_policy": {
+    "distance_convention": "MuJoCo signed contact distance in metres; negative means penetration",
+    "penetration_tolerance_m": 1e-5,
+    "gate_change_allowed_only_for_semantic_bug": true,
+    "selected_gate_change": "NONE",
+    "same_geometry_model_for_a_b": true,
+    "same_hard_constraint_for_a_b": true
+  },
+  "candidate_selection_priority": [
+    "maximize_min_a_b_strict_episode_valid_rate",
+    "maximize_min_a_b_ik_success",
+    "minimize_total_prohibited_collision_frames",
+    "minimize_active_or_failed_joint_limit_frames",
+    "minimize_temporal_violation_episodes",
+    "minimize_position_error_degradation",
+    "minimize_orientation_slack_used",
+    "preserve_b_pinch_and_bimanual_advantage"
+  ],
+  "readiness": {
+    "do_not_require_50_of_50": true,
+    "report_native_and_matched_valid_ids": true,
+    "g1_training_state_adapter": "G1_TRAINING_STATE_ADAPTER_PENDING"
+  }
+}
