@@ -1,0 +1,10 @@
+{
+  "schema_version": "camera_preset_pointer_v1",
+  "name": "SOURCE_LIKE_CAM_HIGH_DIAGNOSTIC",
+  "status": "DIAGNOSTIC_ONLY_NOT_FINAL_DEPLOYMENT_VIEW",
+  "camera_config": "outputs/policy_b_isaac_validation/camera/source_like_cam_high.json",
+  "render_allowed": true,
+  "rollout_allowed": true,
+  "final_deployment_use": false,
+  "warning": "Preserved for reproducing earlier diagnostics only. Do not tune or treat as the helmet D455 view."
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": "dex3_contact_calibration_v1",
+  "status": "REAL_DEX3_CONTACT_CALIBRATION_NOT_PERFORMED",
+  "source_recording": "NOT_RECORDED",
+  "left_sensor_index_annotation": "NOT_ANNOTATED",
+  "right_sensor_index_annotation": "NOT_ANNOTATED",
+  "baseline_statistics": "NOT_CALIBRATED",
+  "contact_delta_detection_rule": "NOT_CALIBRATED",
+  "release_delta_detection_rule": "NOT_CALIBRATED",
+  "saturation_limits": "NOT_CALIBRATED",
+  "force_units": "NOT_ASSIGNED",
+  "copied_thresholds_allowed": false,
+  "execution_adapter_activation_allowed": false
+}

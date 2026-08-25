@@ -1,0 +1,121 @@
+{
+  "schema_version": "helmet_d455_camera_config_v1",
+  "name": "HELMET_D455_FINAL_PENDING",
+  "status": "CAMERA_NOT_MOUNTED",
+  "device": {
+    "product": "Intel RealSense D455",
+    "serial": "CAMERA_NOT_MOUNTED",
+    "firmware_version": "CAMERA_NOT_MOUNTED",
+    "recommended_firmware_version": "CAMERA_NOT_MOUNTED",
+    "usb_mode": "CAMERA_NOT_MOUNTED",
+    "physical_port": "CAMERA_NOT_MOUNTED"
+  },
+  "streams": {
+    "color": {
+      "width_px": 640,
+      "height_px": 480,
+      "fps": 30,
+      "format": "rgb8"
+    },
+    "depth": {
+      "width_px": 640,
+      "height_px": 480,
+      "fps": 30,
+      "format": "z16"
+    }
+  },
+  "intrinsics": {
+    "color": "CAMERA_NOT_MOUNTED",
+    "depth": "CAMERA_NOT_MOUNTED"
+  },
+  "depth_to_color_extrinsics": "CAMERA_NOT_MOUNTED",
+  "timestamping": {
+    "device_timestamp_domain": "CAMERA_NOT_MOUNTED",
+    "device_frame_timestamp_ms": "CAMERA_NOT_MOUNTED",
+    "host_monotonic_timestamp_ns": "CAPTURED_PER_FRAME",
+    "host_wall_timestamp_ns": "CAPTURED_PER_FRAME"
+  },
+  "capture_settings": {
+    "color": "CAMERA_NOT_MOUNTED",
+    "depth": "CAMERA_NOT_MOUNTED",
+    "fixed_exposure_requested": true,
+    "rule": "record every supported exposure/gain/auto-exposure/white-balance/emitter setting after warmup"
+  },
+  "coordinate_frames": {
+    "camera_axes": "ROS/OpenCV optical frame: +X right, +Y down, +Z forward",
+    "task_frame": {
+      "origin": "front-left inner corner of the black tabletop workspace frame on the tabletop plane",
+      "x_axis": "left-to-right across the workspace",
+      "y_axis": "front-to-back across the workspace",
+      "z_axis": "up from the tabletop"
+    },
+    "world_from_task_matrix": [
+      [1.0, 0.0, 0.0, 0.0],
+      [0.0, 1.0, 0.0, 0.0],
+      [0.0, 0.0, 1.0, 0.795],
+      [0.0, 0.0, 0.0, 1.0]
+    ],
+    "world_from_task_provenance": "isaaclab_doll_handoff_scene/scene_layout.json tabletop/task-frame registration; this is not a camera measurement"
+  },
+  "mount": {
+    "status": "CAMERA_NOT_MOUNTED",
+    "type": "helmet_link_mounted",
+    "parent_link": "CAMERA_NOT_MOUNTED",
+    "parent_link_can_move": "CAMERA_NOT_MOUNTED",
+    "locked_parent_pose_id": "CAMERA_NOT_MOUNTED",
+    "parent_link_fk_provider": "CAMERA_NOT_MOUNTED",
+    "parent_from_camera_matrix": "EXTRINSIC_NOT_CALIBRATED",
+    "runtime_requirement": "if parent_link_can_move is true, lock the parent pose or provide timestamp-aligned parent-link FK"
+  },
+  "extrinsics": {
+    "status": "EXTRINSIC_NOT_CALIBRATED",
+    "method": "EXTRINSIC_NOT_CALIBRATED",
+    "task_from_camera_matrix": "EXTRINSIC_NOT_CALIBRATED",
+    "position_task_frame_xyz_m": "EXTRINSIC_NOT_CALIBRATED",
+    "orientation_task_xyzw_ros_camera": "EXTRINSIC_NOT_CALIBRATED"
+  },
+  "calibration": {
+    "charuco": {
+      "board_spec": "configs/helmet_d455_charuco_board.json",
+      "task_from_board_matrix": "EXTRINSIC_NOT_CALIBRATED",
+      "task_from_board_rule": "measure the board pose in the task frame for the physical capture; do not infer or guess it",
+      "minimum_valid_frames": 8,
+      "maximum_pose_reprojection_rmse_px": 1.5,
+      "maximum_translation_spread_m": 0.01,
+      "maximum_rotation_spread_deg": 1.5
+    },
+    "black_workspace_frame": {
+      "corner_order": [
+        "lower_left_front",
+        "lower_right_front",
+        "upper_right_back",
+        "upper_left_back"
+      ],
+      "corners_task_xyz_m": [
+        [0.0, 0.0, 0.0],
+        [0.835, 0.0, 0.0],
+        [0.835, 0.72, 0.0],
+        [0.0, 0.72, 0.0]
+      ],
+      "physical_dimensions_m": {
+        "x": 0.835,
+        "y": 0.72
+      },
+      "maximum_euclidean_rmse_px": 5.0,
+      "maximum_corner_error_px": 10.0,
+      "observed_corners_px": "EXTRINSIC_NOT_CALIBRATED"
+    }
+  },
+  "rendering": {
+    "primary_camera_key": "observation.images.cam_high",
+    "clipping_range_m": [0.01, 10.0],
+    "distortion_application": "render ideal pinhole RGB, then apply the recorded OpenCV color distortion model",
+    "final_50_episode_render_allowed": false
+  },
+  "freeze": {
+    "physical_device_required": true,
+    "synthetic_calibration_may_freeze_final": false,
+    "required_final_filename": "helmet_d455_final.json",
+    "required_status": "FROZEN_HELMET_D455_FINAL"
+  }
+}

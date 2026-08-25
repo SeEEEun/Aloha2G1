@@ -1,0 +1,76 @@
+{
+  "schema_version": "pre_mount_official_upstream_audit_v1",
+  "audited_on": "2026-08-25",
+  "policy": "Pinned read-only implementation references; no upstream repository is vendored into the project history.",
+  "repositories": [
+    {
+      "repository": "unitreerobotics/unitree_sdk2",
+      "remote_url": "https://github.com/unitreerobotics/unitree_sdk2",
+      "commit_sha": "f29ee9f234851e9e79f75102c0f9e83008d8fdd1",
+      "license": "BSD-3-Clause",
+      "local_path": "/home/jbnu/jaeyoung/unitree/unitree_sdk2",
+      "project_history": "external_reference_only",
+      "files_interfaces_used": [
+        "example/g1/dex3/g1_dex3_example.cpp: authoritative rt/lf/dex3/{left,right}/state topics and HandState subscription pattern only",
+        "include/unitree/idl/hg/HandState_.hpp: motor_state and press_sensor_state arrays",
+        "include/unitree/idl/hg/MotorState_.hpp: q, dq, ddq, tau_est and diagnostic fields",
+        "include/unitree/idl/hg/PressSensorState_.hpp: nine sensor records, each exposing raw pressure[12], temperature[12], lost, reserve"
+      ]
+    },
+    {
+      "repository": "unitreerobotics/xr_teleoperate",
+      "remote_url": "https://github.com/unitreerobotics/xr_teleoperate.git",
+      "commit_sha": "845b25a32f7febedf220e830952a7134897adb9d",
+      "license": "Apache-2.0",
+      "local_path": "external/third_party/xr_teleoperate",
+      "project_history": "ignored_external_clone",
+      "files_interfaces_used": [
+        "teleop/utils/episode_writer.py: data.json, colors/depths/states/actions episode layout and recording frequency",
+        "teleop/robot_control/hand_retargeting.py: official Dex3 seven-motor side ordering",
+        "teleop/teleop_hand_and_arm.py: recording metadata and camera-key integration reference"
+      ]
+    },
+    {
+      "repository": "unitreerobotics/unitree_lerobot",
+      "remote_url": "https://github.com/unitreerobotics/unitree_lerobot.git",
+      "commit_sha": "41c2805742de879ddab2d8d6beaeaf215f876395",
+      "license": "Apache-2.0",
+      "local_path": "external/third_party/unitree_lerobot",
+      "project_history": "ignored_external_clone",
+      "files_interfaces_used": [
+        "unitree_lerobot/utils/convert_unitree_json_to_lerobot.py: official JSON state/action/color extraction and LeRobot episode conversion reference",
+        "unitree_lerobot/eval_robot/utils/episode_writer.py: Unitree episode writer compatibility reference",
+        "unitree_lerobot/eval_robot/assets/unitree_hand/unitree_dex3.yml: named Dex3 interface reference"
+      ],
+      "checkout_note": "Git LFS payloads were not fetched; source and pointer files are sufficient for this interface audit."
+    },
+    {
+      "repository": "unitreerobotics/unitree_sim_isaaclab",
+      "remote_url": "https://github.com/unitreerobotics/unitree_sim_isaaclab.git",
+      "commit_sha": "e30c25b1dffdf92ada1d6c8c1fe9a47bdde0fecc",
+      "license": "Apache-2.0",
+      "local_path": "/home/jbnu/robot_assets_sources/unitree_sim_isaaclab",
+      "project_history": "external_reference_only",
+      "files_interfaces_used": [
+        "tasks/common_config/camera_configs.py: Isaac Lab camera configuration pattern",
+        "tasks/common_observations/camera_state.py: observation camera state interface",
+        "tasks/g1_tasks: G1/Dex3 fixed-base task and named-joint integration references"
+      ]
+    },
+    {
+      "repository": "realsenseai/librealsense",
+      "remote_url": "https://github.com/IntelRealSense/librealsense.git",
+      "commit_sha": "e196cefa896e312d79c2df400c7623aa1e9c62ac",
+      "license": "Apache-2.0",
+      "local_path": "/home/jbnu/librealsense",
+      "project_history": "external_reference_only",
+      "files_interfaces_used": [
+        "wrappers/python/examples/box_dimensioner_multicam/realsense_device_manager.py: serial, profiles, intrinsics and stream-to-stream extrinsics",
+        "wrappers/python/examples/depth_auto_calibration_example.py: USB descriptor and exposure option handling",
+        "examples/sensor-control/api_how_to.h: profile intrinsics and get_extrinsics_to direction contract",
+        "pyrealsense2 runtime: device info, synchronized RGB/depth frames, device/host timestamps and supported sensor options"
+      ]
+    }
+  ],
+  "upstream_worktrees_modified": false
+}

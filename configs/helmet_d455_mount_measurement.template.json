@@ -1,0 +1,12 @@
+{
+  "mount": {
+    "status": "CAMERA_NOT_MOUNTED",
+    "type": "helmet_link_mounted",
+    "parent_link": "CAMERA_NOT_MOUNTED",
+    "parent_link_can_move": "CAMERA_NOT_MOUNTED",
+    "locked_parent_pose_id": "CAMERA_NOT_MOUNTED",
+    "parent_link_fk_provider": "CAMERA_NOT_MOUNTED",
+    "parent_from_camera_matrix": "EXTRINSIC_NOT_CALIBRATED",
+    "runtime_requirement": "If parent_link_can_move is true: enter either a named locked pose, or a timestamp-aligned FK provider plus measured parent_from_camera_matrix. Do not guess."
+  }
+}

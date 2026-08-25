@@ -1,0 +1,46 @@
+{
+  "schema_version": "helmet_d455_charuco_board_v1",
+  "name": "HELMET_D455_CHARUCO_7X5_50MM",
+  "dictionary": "DICT_4X4_50",
+  "squares_x": 7,
+  "squares_y": 5,
+  "square_length_m": 0.05,
+  "marker_length_m": 0.0375,
+  "printed_pattern_width_mm": 350.0,
+  "printed_pattern_height_mm": 250.0,
+  "page": {
+    "standard": "ISO_A3_LANDSCAPE",
+    "width_mm": 420.0,
+    "height_mm": 297.0,
+    "pattern_offset_left_mm": 35.0,
+    "pattern_offset_top_mm": 23.5,
+    "print_scale_percent": 100.0,
+    "scaling_forbidden": true
+  },
+  "board_coordinate_frame": {
+    "origin": "outer bottom-left corner of the 350 x 250 mm printed chessboard pattern, following the OpenCV ChArUco board convention",
+    "x_axis": "right along the seven-square direction",
+    "y_axis": "up along the five-square direction when viewing the printed face upright",
+    "z_axis": "out of the printed face toward the camera",
+    "units": "meter",
+    "warning": "task_from_board must be physically measured using this canonical board frame; the printed page top-left and raw OpenCV detector frame are not the calibrated board-frame origin"
+  },
+  "opencv_detector_frame_conversion": {
+    "opencv_frame": "outer top-left; +X right; +Y down; +Z into the printed face",
+    "canonical_frame": "outer bottom-left; +X right; +Y up; +Z out of the printed face",
+    "opencv_from_canonical_matrix": [
+      [1.0, 0.0, 0.0, 0.0],
+      [0.0, -1.0, 0.0, 0.25],
+      [0.0, 0.0, -1.0, 0.0],
+      [0.0, 0.0, 0.0, 1.0]
+    ]
+  },
+  "minimum_markers": 6,
+  "minimum_charuco_corners": 12,
+  "physical_verification": [
+    "print on dimensionally stable A3 media at actual size / 100 percent",
+    "measure the full black-white pattern as 350.0 x 250.0 mm before use",
+    "reject the print if either dimension differs by more than 0.5 mm",
+    "mount the sheet flat; do not bend it around the workspace frame"
+  ]
+}

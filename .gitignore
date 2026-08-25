@@ -12,6 +12,7 @@ env/
 # Generated outputs and large artifacts
 outputs/
 backups/
+external/third_party/
 *.mp4
 *.avi
 *.mov

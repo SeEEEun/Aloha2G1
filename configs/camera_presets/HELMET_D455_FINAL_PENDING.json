@@ -1,0 +1,9 @@
+{
+  "schema_version": "camera_preset_pointer_v1",
+  "name": "HELMET_D455_FINAL_PENDING",
+  "status": "CAMERA_NOT_MOUNTED",
+  "camera_config": "configs/helmet_d455_mount_template.json",
+  "render_allowed": false,
+  "rollout_allowed": false,
+  "reason": "EXTRINSIC_NOT_CALIBRATED"
+}

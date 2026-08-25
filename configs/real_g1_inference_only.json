@@ -1,0 +1,18 @@
+{
+  "schema_version": "real_g1_inference_only_v1",
+  "status": "INFERENCE_ONLY_NO_COMMAND_PUBLISHER",
+  "camera_config": "configs/camera_presets/HELMET_D455_FINAL_PENDING.json",
+  "movable_camera_parent": "requires an exact locked parent pose ID or read-only timestamp-aligned --parent-fk-json",
+  "task": "Pick up the doll with the left hand, handoff it to the right hand, and place it in the trash bin.",
+  "state_joint_order_source": "outputs/doll_handoff_dataset_b_final/retargeted_actions/freeze_manifest.json",
+  "policy_checkpoints": {
+    "A": "outputs/policy_a_doll_handoff_trajectory_a_50_lag1_state_v2/checkpoints/020000/pretrained_model",
+    "B": "outputs/policy_b_doll_handoff_proposed_b_50_lag1_state_v2/checkpoints/020000/pretrained_model"
+  },
+  "normalization": "saved dataset-specific policy preprocessor/postprocessor",
+  "raw_action_shape": [50, 28],
+  "command_publisher": "ABSENT",
+  "robot_command_client": "ABSENT",
+  "local_policy_ipc": "authenticated Unix-domain socket only",
+  "mode_switch": "ABSENT"
+}

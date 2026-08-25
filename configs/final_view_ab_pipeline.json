@@ -1,0 +1,48 @@
+{
+  "schema_version": "final_helmet_view_equal_ab_pipeline_v1",
+  "status": "PREPARED_DISABLED_PENDING_PHYSICAL_CALIBRATION",
+  "common_source_manifest": "outputs/doll_handoff_dataset_b_final/final_source_manifest.json",
+  "common_source_manifest_sha256": "8fd073d78cfe2e27075954cd43910b1cac43ccf7f373ea528866a82d3cd04f76",
+  "camera_config": "configs/camera_presets/HELMET_D455_FINAL_PENDING.json",
+  "dataset_variants": {
+    "A": {
+      "source_dataset": "datasets/doll_handoff_trajectory_a_50",
+      "frozen_trajectories": "outputs/dataset_a_final50_retargeting/baseline/trajectories",
+      "final_view_dataset": "datasets/doll_handoff_trajectory_a_g1visual_50",
+      "paired_dataset": "datasets/doll_handoff_trajectory_a_finalview_rehearsal_100",
+      "source_checkpoint": "outputs/policy_a_doll_handoff_trajectory_a_50_lag1_state_v2/checkpoints/020000/pretrained_model"
+    },
+    "B": {
+      "source_dataset": "datasets/doll_handoff_proposed_b_50",
+      "frozen_trajectories": "outputs/doll_handoff_dataset_b_final/retargeted_actions/trajectories",
+      "final_view_dataset": "datasets/doll_handoff_proposed_b_helmet_d455_50",
+      "paired_dataset": "datasets/doll_handoff_proposed_b_finalview_rehearsal_100",
+      "source_checkpoint": "outputs/policy_b_doll_handoff_proposed_b_50_lag1_state_v2/checkpoints/020000/pretrained_model"
+    }
+  },
+  "shared_contract": {
+    "episodes": 50,
+    "frames": 34478,
+    "fps": 30,
+    "rgb_key": "observation.images.cam_high",
+    "state_dimension": 28,
+    "action_dimension": 28,
+    "action_chunk_length": 50,
+    "task": "Pick up the doll with the left hand, handoff it to the right hand, and place it in the trash bin.",
+    "state_semantics": "episode-local q_target[max(t-1,0)] lag-1 source surrogate; measured named q on robot",
+    "visual_adaptation": {
+      "method": "equal 1:1 paired source-RGB/final-helmet-RGB rehearsal",
+      "steps": 1500,
+      "batch_size": 16,
+      "optimizer": "AdamW",
+      "peak_learning_rate": 1e-05,
+      "final_learning_rate": 1e-06,
+      "warmup_steps": 50,
+      "seed": 20260825,
+      "image_augmentation": false
+    },
+    "checkpoint_selection_rule": "among steps 500/1000/1500, minimize macro mean 9-phase source+final-view normalized action RMSE; ties choose fewer steps; then evaluate A/B with identical closed-loop rollout seeds and horizons",
+    "final_render_allowed_before_frozen_camera": false,
+    "real_robot_allowed": false
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "schema_version": "equal_xr_post_training_variant_v1",
+  "status": "DISABLED_PENDING_FINAL_CAMERA_XR_DATA",
+  "policy_variant": "B",
+  "shared_config": "configs/xr_post_training/shared_equal_ab.json",
+  "source_checkpoint": "outputs/policy_b_doll_handoff_proposed_b_50_lag1_state_v2/checkpoints/020000/pretrained_model",
+  "output": "outputs/policy_b_helmet_d455_equal_xr_post_training",
+  "override_fields_allowed": ["policy_variant", "source_checkpoint", "output"],
+  "execution_allowed": false
+}
