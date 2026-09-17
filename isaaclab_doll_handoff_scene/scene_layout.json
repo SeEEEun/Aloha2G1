@@ -1,0 +1,134 @@
+{
+  "schema_version": 2,
+  "task": "doll_handoff",
+  "units": "meters",
+  "coordinate_frame": {
+    "world_origin": "floor point directly below the tabletop front-left corner",
+    "x_axis": "table left to right",
+    "y_axis": "table front/operator side to back",
+    "z_axis": "up"
+  },
+  "table": {
+    "size_xy_m": [0.835, 0.72],
+    "surface_height_m": 0.795,
+    "top_thickness_m": 0.045,
+    "front_edge_world_xy_m": [[0.0, 0.0], [0.835, 0.0]],
+    "source_asset_sha256": "e138bc56452349d24ed3e089faee537da59d4a44026ddeb56758a8effbd916ca",
+    "source": "../isaaclab_magsafe_fixed_scene/generated/table_optical.usda",
+    "status": "AUTHORITATIVE_EXISTING_GEOMETRY_REUSED"
+  },
+  "black_frame": {
+    "nominal_width_m": 0.835,
+    "nominal_depth_m": 0.72,
+    "rail_width_m": 0.025,
+    "rail_height_m": 0.065,
+    "overall_outer_dimensions_xy_m": [0.885, 0.77],
+    "outer_extents_world_xy_m": [[-0.025, -0.025], [0.86, 0.745]],
+    "inner_opening_extents_world_xy_m": [[0.0, 0.0], [0.835, 0.72]],
+    "rails": {
+      "front": {"size_xyz_m": [0.835, 0.025, 0.065], "center_xyz_m": [0.4175, -0.0125, 0.7725]},
+      "back": {"size_xyz_m": [0.835, 0.025, 0.065], "center_xyz_m": [0.4175, 0.7325, 0.7725]},
+      "left": {"size_xyz_m": [0.025, 0.72, 0.065], "center_xyz_m": [-0.0125, 0.36, 0.7725]},
+      "right": {"size_xyz_m": [0.025, 0.72, 0.065], "center_xyz_m": [0.8475, 0.36, 0.7725]}
+    },
+    "source": "authoritative existing table asset; original builder lines 557-566",
+    "status": "AUTHORITATIVE_EXISTING_GEOMETRY_REUSED_EXACTLY"
+  },
+  "task_frame": {
+    "origin_world_xyz_m": [0.0, 0.0, 0.795],
+    "x_axis": "+world X / left-to-right",
+    "y_axis": "+world Y / front-to-back",
+    "z_axis": "+world Z / up"
+  },
+  "doll": {
+    "status": "PROVISIONAL",
+    "dimensions_provenance": "visual proxy estimate; not a purchased-product measurement",
+    "geometry": "low-poly plush-like sphere proxy with visual-only nubs and eyes",
+    "diameter_m": 0.075,
+    "mass_kg": 0.055,
+    "center_world_xy_m": [0.11035161837935448, 0.053192950785160065],
+    "placement_status": "CALIBRATED_FROM_REAL_CAM_HIGH_GLOBAL_MEDIAN_FROZEN_2026-08-21",
+    "placement_provenance": "../outputs/doll_handoff_retargeting/scene_recalibration.json",
+    "initial_table_clearance_m": 0.002,
+    "body_color_rgb": [0.16, 0.58, 0.18],
+    "nub_radius_m": 0.01,
+    "nub_centers_local_xyz_m": [[-0.021, -0.006, 0.031], [0.021, -0.006, 0.031]],
+    "eye_radius_m": 0.004,
+    "eye_centers_local_xyz_m": [[-0.018, -0.035, 0.011], [0.018, -0.035, 0.011]],
+    "eye_color_rgb": [0.025, 0.03, 0.025]
+  },
+  "bin": {
+    "status": "PROVISIONAL",
+    "dimensions_provenance": "visual proxy estimate; not a purchased-product measurement",
+    "geometry": "open rectangular container made only from bottom/front/back/left/right box colliders",
+    "outer_dimensions_xyz_m": [0.19, 0.165, 0.19],
+    "opening_dimensions_xy_m": [0.178, 0.153],
+    "wall_thickness_m": 0.006,
+    "bottom_thickness_m": 0.006,
+    "center_world_xy_m": [0.7382120490074158, 0.09978766366839409],
+    "placement_status": "CALIBRATED_FROM_REAL_CAM_HIGH_GLOBAL_MEDIAN_FROZEN_2026-08-21",
+    "placement_provenance": "../outputs/doll_handoff_retargeting/scene_recalibration.json",
+    "color_rgb": [0.87, 0.86, 0.79],
+    "static": true,
+    "collision_parts": ["Bottom", "FrontWall", "BackWall", "LeftWall", "RightWall"],
+    "top_collider": null,
+    "interior_filler_collider": null
+  },
+  "aloha": {
+    "asset_usd": "/home/jbnu/robot_assets/stationary_aloha/usd_imported/stationary_aloha_imported.usd",
+    "root_position_world_xyz_m": [0.4175, 0.36, 0.756],
+    "root_orientation_world_wxyz": [0.7071067812, 0.0, 0.0, 0.7071067812],
+    "pose": "USD_AUTHORED_STATIC_DEFAULT",
+    "episode_required": false,
+    "imported_fixture_suppressed_in_preview": true
+  },
+  "g1": {
+    "asset_usd": "/home/jbnu/robot_assets_sources/unitree_sim_isaaclab_usds/extracted/assets/robots/g1-29dof-dex3-base-fix-usd/g1_29dof_with_dex3_base_fix.usd",
+    "root_position_world_xyz_m": [0.4175, -0.15, 0.7922728583],
+    "root_orientation_world_wxyz": [0.7071067812, 0.0, 0.0, 0.7071067812],
+    "pelvis_path_below_asset": "pelvis",
+    "pelvis_local_center_xyz_m": [0.0, 0.0, 0.0],
+    "pelvis_to_table_front_target_m": 0.15,
+    "pelvis_to_table_front_tolerance_m": 0.001,
+    "asset_forward_axis": "+X",
+    "world_forward_axis": "+Y",
+    "facing": "toward table",
+    "fixed_base": true,
+    "placement_method": "direct geometry from table-front segment and pelvis/root center; no offset patcher"
+  },
+  "camera": {
+    "resolution_px": [1280, 720],
+    "focal_length_mm": 24.0,
+    "clipping_range_m": [0.01, 100.0],
+    "presets": {
+      "overview": {"eye_world_xyz_m": [0.4175, -1.7, 1.65], "target_world_xyz_m": [0.4175, 0.25, 0.75]},
+      "legacy_overview": {"eye_world_xyz_m": [1.55, -1.65, 1.55], "target_world_xyz_m": [0.42, 0.18, 0.75]},
+      "front": {"eye_world_xyz_m": [0.42, -2.15, 1.05], "target_world_xyz_m": [0.42, 0.2, 0.78]},
+      "side": {"eye_world_xyz_m": [1.9, 0.2, 1.05], "target_world_xyz_m": [0.35, 0.2, 0.78]},
+      "top": {"eye_world_xyz_m": [0.4175, -0.01, 2.7], "target_world_xyz_m": [0.4175, 0.36, 0.795]}
+    }
+  },
+  "lighting": {
+    "dome": {"intensity": 1250.0, "color_rgb": [1.0, 1.0, 1.0]},
+    "key": {"intensity": 2600.0, "radius_m": 0.35, "position_world_xyz_m": [0.2, -0.7, 2.4], "color_rgb": [1.0, 0.96, 0.9]},
+    "fill": {"intensity": 1200.0, "radius_m": 0.3, "position_world_xyz_m": [1.4, 0.8, 1.7], "color_rgb": [0.82, 0.9, 1.0]}
+  },
+  "ground": {
+    "size_xy_m": [4.0, 4.0],
+    "thickness_m": 0.05,
+    "surface_height_m": 0.0,
+    "color_rgb": [0.12, 0.13, 0.15]
+  },
+  "physics_validation": {
+    "gravity_m_s2": 9.81,
+    "dt_s": 0.008333333333333333,
+    "steps": 480,
+    "settle_window_steps": 60,
+    "doll_height_tolerance_m": 0.006,
+    "settle_motion_tolerance_m": 0.002,
+    "diagnostic_sphere_diameter_m": 0.04,
+    "diagnostic_sphere_mass_kg": 0.02,
+    "diagnostic_start_above_bin_rim_m": 0.1,
+    "diagnostic_color_rgb": [1.0, 0.2, 0.1]
+  }
+}

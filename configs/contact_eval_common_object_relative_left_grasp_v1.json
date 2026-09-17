@@ -1,0 +1,33 @@
+{
+  "schema_version": "common_object_relative_left_grasp_v1",
+  "status": "REFERENCE_PREFLIGHT_CANDIDATE",
+  "description": "One common local target-embodiment wrist realization. It activates only after the frozen whole-hand readiness gate and targets an object-relative wrist transform recovered from the independent 3/3 scripted physical validation.",
+  "source_event_log": "/home/jbnu/aloha_g1_dataset/outputs/final_contact_constrained_eval/02_scripted_validation/run_01/event_log.npz",
+  "source_event_log_sha256": "ea5ccd9a1cb864fec1f498a23425f6c5fb456880447df993b400bc6e90891e6e",
+  "source_control_frame": 103,
+  "source_physics_step": 831,
+  "object_from_left_wrist_position_m": [
+    -0.10173423313535535,
+    -0.12397804290485816,
+    0.05636134991890729
+  ],
+  "object_from_left_wrist_quaternion_xyzw": [
+    -0.0884867586435267,
+    0.1468746456281009,
+    0.599596393103085,
+    0.781717402514587
+  ],
+  "entry_transition_frames_at_30hz": 36,
+  "radial_clearance_m": 0.05,
+  "entry_path_phase_fractions": [0.25, 0.70],
+  "entry_path": "current wrist radial retreat, outside-object transfer to canonical radial clearance, canonical approach",
+  "stabilization_dwell_frames_at_30hz": 30,
+  "return_to_method_specific_frames_at_30hz": 30,
+  "ik_position_tolerance_m": 0.0005,
+  "ik_orientation_tolerance_deg": 1.0,
+  "method_independent": true,
+  "episode_independent": true,
+  "object_relative": true,
+  "entry_gate_required": true,
+  "changes_task_success_definition": false
+}

@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "task": "doll_handoff",
+  "layout": "/home/jbnu/aloha_g1_dataset/isaaclab_doll_handoff_scene/scene_layout.json",
+  "scene_usd": "/home/jbnu/aloha_g1_dataset/isaaclab_doll_handoff_scene/generated/doll_handoff_scene.usda",
+  "scene_usd_sha256": "1fab490011ceb51f0eaf7527568d70f679788de8c9abdc2fa621ea1000dbf12d",
+  "table": {
+    "protected_source": "/home/jbnu/aloha_g1_dataset/isaaclab_magsafe_fixed_scene/generated/table_optical.usda",
+    "protected_source_sha256": "e138bc56452349d24ed3e089faee537da59d4a44026ddeb56758a8effbd916ca",
+    "local_sanitized_copy": "/home/jbnu/aloha_g1_dataset/isaaclab_doll_handoff_scene/generated/table_workspace.usda",
+    "local_sanitized_sha256": "efd458b3ea8e95e2c2c2418ce0567363171eb2aa29fb83ff24f8486c4e5bfd2d"
+  },
+  "recording_dependency": null
+}

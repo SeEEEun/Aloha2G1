@@ -1,0 +1,118 @@
+{
+  "schema_version": "aloha_g1_proposed_hand_v2_1",
+  "status": "PROPOSED_DATASET_B_ONLY_OFFLINE_CANDIDATE",
+  "method": "proposed",
+  "hand_mapper": "feasible_semantic_primitive",
+  "arm_trajectory_mutable": false,
+  "wrist_trajectory_mutable": false,
+  "baseline_dataset_a_mutable": false,
+  "diagnostic_exact_contact_ik": {
+    "retained": true,
+    "default_mapper": false,
+    "source": "/home/jbnu/aloha_g1_dataset/outputs/g1_dataset_retargeting_hand_v2",
+    "reason": "SOURCE_TCP_RELATIVE_CONTACT_GEOMETRY_FALLBACK does not support a claim of literal cross-morphology contact-point identity"
+  },
+  "roles": {
+    "left": "phone_thumb_index_pinch",
+    "right": "accessory_thumb_index_pinch",
+    "task_fingers": [
+      "thumb",
+      "index"
+    ],
+    "non_task_finger": "third_middle"
+  },
+  "object_class_geometry": {
+    "source": "/home/jbnu/aloha_g1_dataset/isaaclab_magsafe_fixed_scene/scene_layout.json",
+    "usage": [
+      "TARGET_OBJECT_CLASS_GEOMETRY",
+      "TARGET_SIM_SCENE_DIAGNOSTIC"
+    ],
+    "source_demo_object_pose_usage": false,
+    "left": {
+      "class": "phone",
+      "dimension_field": "phone.size_landscape_xyz[1]",
+      "target_surface_aperture_m": 0.00795
+    },
+    "right": {
+      "class": "magsafe_accessory",
+      "dimension_field": "accessory.main_depth",
+      "target_surface_aperture_m": 0.0035
+    }
+  },
+  "primitive_optimizer": {
+    "active_model_contact_surface": "distal collision mesh selected by nonzero contype/conaffinity",
+    "left_seed_source": "/home/jbnu/aloha_g1_dataset/converted_runs/g1_left_phone_cgap_grasp/selected_left_phone_cgap_grasp_report.json",
+    "right_seed_rule": "active-model bilateral mirror of left task-finger seed by joint name and flexion sign",
+    "optimized_dof_per_side": 5,
+    "max_function_evaluations": 800,
+    "xtol": 1e-11,
+    "ftol": 1e-11,
+    "gtol": 1e-11,
+    "joint_bound_epsilon_rad": 1e-06,
+    "surface_aperture_scale_m": 0.001,
+    "pad_normal_opposition_scale": 0.05,
+    "tool_translation_scale_m": 0.01,
+    "tool_rotation_scale_rad": 0.2,
+    "tool_compatibility_weight": 10.0,
+    "seed_regularization_weight": 0.03,
+    "internal_collision_scale_m": 0.001,
+    "internal_collision_weight": 30.0,
+    "pregrasp_clearance_rule": "twice the active-model index-pad largest half extent",
+    "pregrasp_interpolation_samples": 201,
+    "hold_equals_grasp": true,
+    "open_release_source": "active-model stand/open hand with selected global third neutral"
+  },
+  "third_neutral_search": {
+    "scope": "all 50 frozen Proposed arm trajectories",
+    "coarse_normalized_joint_fractions": [
+      0.000001,
+      0.2500005,
+      0.5,
+      0.7499995,
+      0.999999
+    ],
+    "refine_radius_fraction": 0.125,
+    "refine_points_per_axis": 5,
+    "audit_stride_frames": 30,
+    "include_all_current_v1_third_collision_frames": true,
+    "semantic_transition_context_frames": 2,
+    "full_validation_pareto_candidates": 3,
+    "selection_order": [
+      "same_hand_self_collision_frames",
+      "all_third_collision_frames",
+      "maximum_penetration_m",
+      "normalized_distance_from_active_open",
+      "joint_0",
+      "joint_1"
+    ],
+    "per_episode_state_allowed": false,
+    "per_phase_state_allowed": false
+  },
+  "interpolation": {
+    "method": "causal_fir_quintic_minimum_jerk_step_response",
+    "duration_rule": "shortest global integer frame count that passes existing v1 step, velocity, and acceleration limits over all 50 semantic label sequences",
+    "minimum_duration_sec": 0.2,
+    "sampling_rate_hz": 30.0,
+    "threshold_source": "v1 validation maximum_joint_step_rad, maximum_velocity_rad_s, maximum_acceleration_rad_s2",
+    "instantaneous_jumps_allowed": false
+  },
+  "tool_transform_compatibility": {
+    "translation_threshold_source": "v1 shared IK position_tolerance_m",
+    "rotation_threshold_source": "v1 shared IK orientation_tolerance_rad",
+    "material_change_requires_common_arm_rerun": true
+  },
+  "readiness": {
+    "hand_related_collision_reduction_required": true,
+    "third_collision_minimum_fractional_reduction": 0.5,
+    "third_collision_threshold_provenance": "v2.1 preregistration: substantial means a strict majority of historical third-finger frames eliminated; no earlier project threshold existed",
+    "task_critical_pinch_error_must_be_below_dataset_a": true,
+    "finite_required": true,
+    "joint_limits_required": true,
+    "same_configuration_episode_count": 50
+  },
+  "label_status": "SIMULATION_PLACEHOLDER_HAND_LABELS",
+  "authoritative_for_real_g1": false,
+  "real_robot_command_allowed": false,
+  "physics_stepping": false,
+  "training_allowed": false
+}

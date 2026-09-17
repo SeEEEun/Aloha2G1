@@ -1,0 +1,201 @@
+{
+  "schema_version": "dex3_measured_doll_graspability_sanity_v1",
+  "status": "PREFLIGHT_ONLY_NOT_YET_RUN",
+  "purpose": "Pure policy-free Dex3 graspability sanity check with the measured doll ideally centered in a mechanically defined full three-finger closure",
+  "scope_exclusions": [
+    "ALOHA",
+    "Proposed-B wrist targets",
+    "interaction frames",
+    "handoff",
+    "ACT",
+    "real G1"
+  ],
+  "policy_independent": true,
+  "learned_policy_used_for_calibration": false,
+  "real_robot_allowed": false,
+  "source_scene": "/home/jbnu/aloha_g1_dataset/isaaclab_doll_handoff_scene/generated/doll_handoff_g1_model_preview.usda",
+  "whole_hand_geometry": "/home/jbnu/aloha_g1_dataset/configs/doll_handoff_retargeting/dex3_whole_hand.sim.json",
+  "measurement_contract": {
+    "dimensions_m": [0.12, 0.09, 0.085],
+    "mass_kg": 0.02,
+    "source": "authoritative physical measurement supplied 2026-08-28"
+  },
+  "object": {
+    "mass_kg": 0.02,
+    "center_world_xy_m_by_side": {
+      "left": [0.3, 0.15],
+      "right": [0.535, 0.15]
+    },
+    "table_surface_world_z_m": 0.795,
+    "spawn_clearance_above_table_m": 0.0,
+    "orientation_quaternion_xyzw": [0.0, 0.0, 0.0, 1.0],
+    "visual_dimensions_m": [0.12, 0.09, 0.085],
+    "local_axis_mapping": {
+      "x": "120 mm long horizontal axis and index-middle spread direction",
+      "y": "90 mm short horizontal axis and thumb-vs-index-middle closure direction",
+      "z": "85 mm vertical axis"
+    },
+    "collider": "ROUNDED_CONVEX_OVAL_WITH_SMALL_FLAT_SUPPORT_PATCH",
+    "linear_damping": 0.05,
+    "angular_damping": 0.05,
+    "restitution": 0.0,
+    "contact_offset_m": 0.002,
+    "rest_offset_m": 0.0,
+    "max_depenetration_velocity_m_s": 1.0
+  },
+  "geometry_candidates": [
+    {
+      "name": "MEASURED_100",
+      "dimensions_m": [0.12, 0.09, 0.085],
+      "collision_scale_percent": 100,
+      "selection_order": 1,
+      "semantics": "exact measured rigid geometry; mandatory first test"
+    },
+    {
+      "name": "PLUSH_INSET_95",
+      "dimensions_m": [0.114, 0.0855, 0.08075],
+      "collision_scale_percent": 95,
+      "selection_order": 2,
+      "semantics": "single documented modest uniform collider inset approximating plush compliance; full measured visual geometry is unchanged",
+      "allowed_only_if": "MEASURED_100 fails because rigid contact exclusion prevents a stable enclosing grasp"
+    },
+    {
+      "name": "MEASURED_100_COMPLIANT",
+      "dimensions_m": [0.12, 0.09, 0.085],
+      "collision_scale_percent": 100,
+      "selection_order": 3,
+      "semantics": "one bounded exact-geometry plush-compliance fallback after rigid exact-size and 95-percent inset failures; friction, pose, drive, and all geometry remain unchanged",
+      "allowed_only_if": "MEASURED_100 and PLUSH_INSET_95 both fail to establish sustained three-digit opposition",
+      "material_override": {
+        "compliant_contact_stiffness_n_m": 500.0,
+        "compliant_contact_damping_n_s_m": 5.0
+      }
+    }
+  ],
+  "geometry_selection_rule": "MEASURED_100 first; PLUSH_INSET_95 only after an evidence-backed exact-geometry failure; then exactly one MEASURED_100_COMPLIANT trial after both rigid candidates fail",
+  "material": {
+    "name": "MODERATE_MEASURED_PLUSH_PROXY_SANITY_V1",
+    "static_friction": 0.7,
+    "dynamic_friction": 0.6,
+    "friction_combine_mode": "average",
+    "restitution_combine_mode": "average"
+  },
+  "finger_drive": {
+    "kp": 100.0,
+    "kd": 4.0,
+    "effort_limit_sim": 2.5,
+    "velocity_limit_sim": 12.0,
+    "source": "/home/jbnu/aloha_g1_dataset/tools/policy_b_isaac_control_contract.py:CONTROLLER_CONTRACT.actuators.dex3",
+    "full_close_target_held_during_squeeze_lift_and_hold": true
+  },
+  "joint_order_7d": [
+    "thumb_0",
+    "thumb_1",
+    "thumb_2",
+    "middle_0",
+    "middle_1",
+    "index_0",
+    "index_1"
+  ],
+  "full_close_derivation": {
+    "method": "large-object mechanical power-close synergy: strong distal index/middle flexion, small proximal flexion preserving the 85-90 mm aperture, and active thumb opposition",
+    "not_a_fingertip_target_solve": true,
+    "not_from_proposed_b": true,
+    "all_three_digits": ["thumb", "index", "middle"],
+    "all_seven_joints_commanded": true,
+    "preshape_fraction_open_to_full_close": 0.2,
+    "right_hand_rule": "named mechanical mirror; thumb_0 retains its convention and all other joint signs mirror",
+    "bounded_static_placement_audit": "three object-axis families by a finite 16x25x21 wrist-relative grid; selected the exact-size collision-clear large-object candidate at wrist-relative [190,-60,-20] mm (right y mirrored)"
+  },
+  "hand_states": {
+    "left": {
+      "OPEN": [0.0, 1.04719999, 0.00000001, -0.00000001, -0.00000001, -0.00000001, -0.00000001],
+      "PRESHAPE_S0": [0.02, 1.03775999, 0.07000001, -0.01600001, -0.31000001, -0.01600001, -0.31000001],
+      "POWER_GRASP_S0": [0.1, 1.0, 0.35, -0.08, -1.55, -0.08, -1.55]
+    },
+    "right": {
+      "OPEN": [0.0, -1.04719999, -0.00000001, 0.00000001, 0.00000001, 0.00000001, 0.00000001],
+      "PRESHAPE_S0": [0.02, -1.03775999, -0.07000001, 0.01600001, 0.31000001, 0.01600001, 0.31000001],
+      "POWER_GRASP_S0": [0.1, -1.0, -0.35, 0.08, 1.55, 0.08, 1.55]
+    }
+  },
+  "scripted_arm_placement": {
+    "whole_hand_center_world_xyz_m_by_side": {
+      "left": [0.31997015480676944, 0.16155939956302762, 0.8673626531433742],
+      "right": [0.5550298451932308, 0.13843619421990094, 0.8673788237562414]
+    },
+    "center_source": "whole-hand frames implied by one collision-clear wrist-relative placement: object center is [190,-60,-20] mm from the left wrist and [190,+60,-20] mm from the mirrored right wrist; no fingertip locations enter this construction",
+    "desired_whole_hand_rotation_world_by_side": {
+      "left": [[0.20868599827221454, -0.0000000000000000023598443162432216, 0.9779826962299122], [-0.259070863447223, 0.964274976800298, 0.055281613846691634], [-0.9430442417181915, -0.26490332032042246, 0.20123068614248676]],
+      "right": [[0.21087442373976953, -0.000000000000000011302669062205179, 0.9775131597131669], [0.2589358824392664, 0.9642779555119992, -0.05585904849705676], [-0.942594391134287, 0.2648924772687931, 0.20334155819355593]]
+    },
+    "orientation_semantics": "object long axis is aligned with wrist Z across the palm; object short axis is aligned with wrist Y closure; object height is aligned against wrist X, placing both wrists above the table in a mirrored natural enclosure",
+    "arm_ik_seed_q_rad_by_side": {
+      "left": [-1.3902268783751845, 0.4039223937596219, -1.4394033762851421, 0.8644799374994074, -0.1684611100020645, 0.5289862277207353, -1.320670745602041],
+      "right": [-1.3926146984967793, 0.6743367188189484, -1.7758178529806974, -0.5185638112374982, 0.4017062475300135, 1.1927028059225515, -1.599349826077684]
+    },
+    "lift_offset_world_xyz_m": [0.0, 0.0, 0.05],
+    "arm_placement_reference_hand_profile": "S0",
+    "scripted_ik_position_weight": 3.0,
+    "scripted_ik_orientation_weight": 3.0,
+    "scripted_ik_frame_continuity_weight": 0.01,
+    "pregrasp_retreat_m": 0.0,
+    "candidate_specific_adjustment_allowed": false,
+    "side_specific_adjustment_allowed": false
+  },
+  "historical_clear_open_orientation_sources": {
+    "left": "/home/jbnu/aloha_g1_dataset/outputs/paper_physics_task_eval/environment_calibration/primitives_review1/left_fixed_grasp_primitive.npz",
+    "right": "/home/jbnu/aloha_g1_dataset/outputs/paper_physics_task_eval/environment_calibration/primitives_review1/right_fixed_grasp_primitive.npz",
+    "usage": "arm IK seed only; no historical hand target, proxy, or contact result is reused"
+  },
+  "source_arm_primitives": {
+    "left": "/home/jbnu/aloha_g1_dataset/outputs/dex3_measured_doll_graspability_sanity_v1/scripted_primitives/left_sanity_v1_arm_primitive.npz",
+    "right": "/home/jbnu/aloha_g1_dataset/outputs/dex3_measured_doll_graspability_sanity_v1/scripted_primitives/right_sanity_v1_arm_primitive.npz"
+  },
+  "timing": {
+    "control_fps_hz": 30.0,
+    "physics_dt_s": 0.008333333333333333,
+    "physics_substeps_per_control_frame": 4,
+    "open_hold_s": 0.5,
+    "preshape_transition_s": 1.0,
+    "power_close_s": 2.0,
+    "gravity_retention_s": 1.0,
+    "requested_lift_m": 0.05,
+    "lift_transition_s": 1.0,
+    "elevated_hold_s": 1.0,
+    "end_after_elevated_hold": true,
+    "release_transition_s": 0.0,
+    "post_release_s": 0.0
+  },
+  "simulation": {
+    "gravity_m_s2": 9.81,
+    "device": "cuda:0",
+    "use_fabric": true,
+    "deterministic_seed": 20260828
+  },
+  "gates": {
+    "maximum_initial_penetration_m": 0.0001,
+    "maximum_runtime_penetration_m": 0.003,
+    "meaningful_digit_force_n": 0.015,
+    "minimum_meaningful_digit_contact_s": 0.25,
+    "minimum_digit_normal_impulse_ns": 0.01,
+    "maximum_retention_horizontal_displacement_m": 0.015,
+    "minimum_retention_contact_s": 1.0,
+    "minimum_measured_lift_m": 0.049,
+    "minimum_elevated_hold_s": 1.0,
+    "maximum_table_force_for_elevated_n": 0.02,
+    "minimum_release_no_hand_contact_s": 0.0,
+    "minimum_release_table_contact_s": 0.0,
+    "maximum_object_linear_speed_m_s": 1.0,
+    "maximum_object_angular_speed_rad_s": 50.0,
+    "maximum_object_com_step_m": 0.03
+  },
+  "prohibited": [
+    "fingertip target point optimization",
+    "Proposed-B 7D grasp vector",
+    "attachment",
+    "weld",
+    "magnet",
+    "teleportation during execution"
+  ]
+}

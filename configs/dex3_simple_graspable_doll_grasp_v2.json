@@ -1,0 +1,221 @@
+{
+  "schema_version": "dex3_simple_graspable_doll_proxy_v1",
+  "status": "HAND_ONLY_BILATERAL_CALIBRATION_P14_THREE_DIGIT_PRELOAD",
+  "purpose": "Hand-only correction of palm placement, thumb opposition, and mirrored three-finger full closure for the frozen simple doll proxy",
+  "policy_independent": true,
+  "learned_policy_used_for_calibration": false,
+  "real_robot_allowed": false,
+  "source_scene": "/home/jbnu/aloha_g1_dataset/isaaclab_doll_handoff_scene/generated/doll_handoff_g1_model_preview.usda",
+  "whole_hand_geometry": "/home/jbnu/aloha_g1_dataset/configs/doll_handoff_retargeting/dex3_whole_hand.sim.json",
+  "frozen_doll_contract": {
+    "source_config": "/home/jbnu/aloha_g1_dataset/configs/dex3_simple_graspable_doll_proxy_v1.json",
+    "visual_dimensions_m": [0.12, 0.09, 0.085],
+    "collision_dimensions_m": [0.115, 0.055, 0.07],
+    "mass_kg": 0.02,
+    "static_friction": 0.9,
+    "dynamic_friction": 0.75,
+    "restitution": 0.0,
+    "object_parameters_changed": false
+  },
+  "object": {
+    "mass_kg": 0.02,
+    "center_world_xy_m_by_side": {
+      "left": [0.3, 0.15],
+      "right": [0.535, 0.15]
+    },
+    "table_surface_world_z_m": 0.795,
+    "spawn_clearance_above_table_m": 0.0,
+    "orientation_quaternion_xyzw": [0.0, 0.0, 0.0, 1.0],
+    "visual_dimensions_m": [0.12, 0.09, 0.085],
+    "collider": "ROUNDED_CONVEX_OVAL_WITH_SMALL_FLAT_SUPPORT_PATCH",
+    "linear_damping": 0.35,
+    "angular_damping": 0.35,
+    "restitution": 0.0,
+    "contact_offset_m": 0.0015,
+    "rest_offset_m": 0.0,
+    "max_depenetration_velocity_m_s": 0.5
+  },
+  "geometry_candidates": [
+    {
+      "name": "FROZEN_COMPRESSED_SHORT_55",
+      "dimensions_m": [0.115, 0.055, 0.07],
+      "short_axis_mm": 55,
+      "collision_scale_percent": 61,
+      "selection_order": 1,
+      "additional_plush_contact_tolerance_mm": 0,
+      "semantics": "previously validated compressed plush proxy"
+    },
+    {
+      "name": "INTERMEDIATE_PLUSH_PROXY",
+      "dimensions_m": [0.1175, 0.0725, 0.0775],
+      "short_axis_mm": 72.5,
+      "collision_scale_percent": 81,
+      "selection_order": 2,
+      "additional_plush_contact_tolerance_mm": 0,
+      "semantics": "componentwise midpoint between the previously validated compressed proxy and the frozen visible envelope"
+    },
+    {
+      "name": "VISUAL_MATCHED_PLUSH_PROXY",
+      "dimensions_m": [0.12, 0.09, 0.085],
+      "short_axis_mm": 90,
+      "collision_scale_percent": 100,
+      "selection_order": 3,
+      "additional_plush_contact_tolerance_mm": 0,
+      "semantics": "rigid plush approximation whose collision envelope matches but never exceeds the frozen visible envelope"
+    }
+  ],
+  "material": {
+    "name": "MODERATE_HIGH_FRICTION_COMPRESSED_PLUSH_PROXY_V1",
+    "static_friction": 0.9,
+    "dynamic_friction": 0.75,
+    "friction_combine_mode": "average",
+    "restitution_combine_mode": "average",
+    "contact_damping_source": "rigid-body linear/angular damping and damped Dex3 implicit drive"
+  },
+  "finger_drive": {
+    "kp": 100.0,
+    "kd": 4.0,
+    "effort_limit_sim": 2.5,
+    "velocity_limit_sim": 12.0,
+    "source": "/home/jbnu/aloha_g1_dataset/tools/policy_b_isaac_control_contract.py:CONTROLLER_CONTRACT.actuators.dex3",
+    "full_close_target_held_during_retention_lift_and_hold": true
+  },
+  "articulation_solver": {
+    "position_iterations": 80,
+    "velocity_iterations": 4,
+    "selection_basis": "bounded pre-EVAL enforcement audit: source 32/1 and 64/4 failed the reproduced no-doll B01 hand-table impulse; 80/4, 96/4, and 128/4 passed. The lowest tested passing 80/4 setting was selected to minimize deviation from the previously qualified physical dynamics and was then required to pass the complete non-EVAL qualification.",
+    "scope": "common G1 articulation; identical for ACT-A and ACT-B",
+    "changes_collision_geometry": false,
+    "changes_commands_or_trajectories": false
+  },
+  "joint_order_7d": [
+    "thumb_0",
+    "thumb_1",
+    "thumb_2",
+    "middle_0",
+    "middle_1",
+    "index_0",
+    "index_1"
+  ],
+  "hand_states": {
+    "left": {
+      "OPEN": [0.0, 0.4, 0.00000001, -0.00000001, -0.00000001, -0.00000001, -0.00000001],
+      "PRESHAPE": [0.0375, 0.625, 0.1125, -0.03, -0.5625, -0.00375, -0.55875],
+      "POWER_GRASP_P1": [0.1, 1.05, 0.3, -0.08, -1.5, -0.01, -1.49],
+      "POWER_GRASP_P8": [0.070328, 0.834471, 0.211379, -0.042575, -0.955088, -0.344065, -1.151059],
+      "POWER_GRASP_P9": [0.070328, 0.834471, 0.211379, -0.042575, -1.055088, -0.344065, -1.151059],
+      "POWER_GRASP_P10": [0.070328, 0.834471, 0.211379, -0.042575, -1.055088, -0.344065, -1.151059],
+      "POWER_GRASP_P11": [0.070328, 0.834471, 0.211379, -0.042575, -1.055088, -0.344065, -1.151059],
+      "POWER_GRASP_P12": [0.070328, 0.834471, 0.211379, -0.042575, -1.155088, -0.344065, -1.151059],
+      "POWER_GRASP_P13": [0.070328, 0.834471, 0.211379, -0.042575, -1.155088, -0.344065, -1.151059],
+      "POWER_GRASP_P14": [0.070328, 0.834471, 0.211379, -0.042575, -1.205088, -0.344065, -1.151059]
+    },
+    "right": {
+      "OPEN": [0.0, -0.4, -0.00000001, 0.00000001, 0.00000001, 0.00000001, 0.00000001],
+      "PRESHAPE": [0.0375, -0.625, -0.1125, 0.03, 0.5625, 0.00375, 0.55875],
+      "POWER_GRASP_P1": [0.1, -1.05, -0.3, 0.08, 1.5, 0.01, 1.49],
+      "POWER_GRASP_P8": [0.070328, -0.834471, -0.211379, 0.042575, 0.955088, 0.344065, 1.151059],
+      "POWER_GRASP_P9": [0.070328, -0.834471, -0.211379, 0.042575, 1.055088, 0.344065, 1.151059],
+      "POWER_GRASP_P10": [0.070328, -0.834471, -0.211379, 0.042575, 1.055088, 0.344065, 1.151059],
+      "POWER_GRASP_P11": [0.070328, -0.834471, -0.211379, 0.042575, 1.055088, 0.344065, 1.151059],
+      "POWER_GRASP_P12": [0.070328, -0.834471, -0.211379, 0.042575, 1.155088, 0.344065, 1.151059],
+      "POWER_GRASP_P13": [0.070328, -0.834471, -0.211379, 0.042575, 1.155088, 0.344065, 1.151059],
+      "POWER_GRASP_P14": [0.070328, -0.834471, -0.211379, 0.042575, 1.205088, 0.344065, 1.151059]
+    }
+  },
+  "active_calibration_profile": "P14",
+  "hand_only_change_provenance": {
+    "initial_failure": "fixed S0 placement produced one-sided middle contact and lateral expulsion for all allowed short axes",
+    "starting_profile": "/home/jbnu/aloha_g1_dataset/configs/doll_handoff_graspable_proxy_v2.json:POWER_GRASP_P8",
+    "reason": "P8 is an existing policy-independent mirrored three-digit top-power closure with prior bilateral rigid-proxy evidence",
+    "p9_result": "raising the palm produced three sustained on-table contacts but released all contacts at lift onset; it disproved vertical placement as the overlap correction",
+    "p10_change": "restore the P8 load-retaining height, translate each palm 12 mm outward along the doll long axis to clear the OPEN middle-link overlap, and retain the mirrored 0.100 rad middle_1 preload",
+    "p10_result": "static outward placement reduced initial penetration from 11.4 mm to 1.9 mm and lifted the doll, but weakened centered enclosure and yielded only 38.0 mm COM rise",
+    "p11_change": "OPEN 15 mm outward, mirrored approach to the original centered load-retaining palm during PRESHAPE, then fixed palm through three-finger FULL CLOSE",
+    "p11_result": "zero spawn penetration and stable elevated three-digit contact, but middle preload began only after takeoff and the doll settled 11.7 mm within the enclosure",
+    "p12_change": "add exactly 0.100 rad mirrored middle_1 FULL-CLOSE preload; no palm or doll change",
+    "p12_result": "artifact-free sustained elevated three-digit retention; 39.6 mm doll COM rise for 50 mm declared palm travel due takeoff settling",
+    "p13_change": "raise the common mirrored palm center 5 mm into the measured interval between load-retaining P12 and three-contact P9; command 63 mm palm travel so the retained doll COM, rather than the actuator target, reaches at least 50 mm",
+    "p13_result": "56.5 mm COM lift and 1.0 s elevated retention; middle collider remained touching at zero normal load before lift",
+    "p14_change": "add 0.050 rad mirrored middle_1 preload and increase mirrored OPEN retreat from 15 to 18 mm; no other change",
+    "thumb_opposition_and_full_close_changed": true,
+    "doll_changed": false
+  },
+  "scripted_arm_placement": {
+    "whole_hand_center_world_xyz_m_by_side": {
+      "left": [0.3, 0.15, 0.843],
+      "right": [0.535, 0.15, 0.843]
+    },
+    "center_source": "palm center translated onto each unchanged doll center; z offset and top-power orientation inherited from prior bilateral P8 validation",
+    "orientation_closing_axis_roll_deg": {
+      "left": 90.0,
+      "right": -90.0
+    },
+    "lift_offset_world_xyz_m": [0.0, 0.0, 0.063],
+    "arm_placement_reference_hand_profile": "P1",
+    "scripted_ik_position_weight": 3.0,
+    "scripted_ik_orientation_weight": 3.0,
+    "scripted_ik_frame_continuity_weight": 0.01,
+    "pregrasp_retreat_m": 0.018,
+    "candidate_specific_adjustment_allowed": false,
+    "side_specific_adjustment_allowed": false
+  },
+  "historical_clear_open_orientation_sources": {
+    "left": "/home/jbnu/aloha_g1_dataset/outputs/paper_physics_task_eval/environment_calibration/primitives_review1/left_fixed_grasp_primitive.npz",
+    "right": "/home/jbnu/aloha_g1_dataset/outputs/paper_physics_task_eval/environment_calibration/primitives_review1/right_fixed_grasp_primitive.npz",
+    "usage": "IK initialization only"
+  },
+  "source_arm_primitives": {
+    "left": "/home/jbnu/aloha_g1_dataset/outputs/dex3_simple_graspable_doll_proxy_v1/hand_calibration_v2/p14_three_digit_preload/scripted_primitives/left_simple_v1_arm_primitive.npz",
+    "right": "/home/jbnu/aloha_g1_dataset/outputs/dex3_simple_graspable_doll_proxy_v1/hand_calibration_v2/p14_three_digit_preload/scripted_primitives/right_simple_v1_arm_primitive.npz"
+  },
+  "timing": {
+    "control_fps_hz": 30.0,
+    "physics_dt_s": 0.004166666666666667,
+    "physics_substeps_per_control_frame": 8,
+    "open_hold_s": 0.5,
+    "preshape_transition_s": 1.5,
+    "power_close_s": 1.5,
+    "gravity_retention_s": 1.0,
+    "requested_lift_m": 0.05,
+    "lift_transition_s": 1.5,
+    "elevated_hold_s": 1.0,
+    "end_after_elevated_hold": false,
+    "release_transition_s": 1.5,
+    "post_release_s": 1.0
+  },
+  "simulation": {
+    "gravity_m_s2": 9.81,
+    "device": "cuda:0",
+    "use_fabric": true,
+    "deterministic_seed": 20260830
+  },
+  "gates": {
+    "maximum_initial_penetration_m": 0.0001,
+    "maximum_runtime_penetration_m": 0.003,
+    "meaningful_digit_force_n": 0.015,
+    "minimum_meaningful_digit_contact_s": 0.25,
+    "minimum_digit_normal_impulse_ns": 0.01,
+    "maximum_retention_horizontal_displacement_m": 0.015,
+    "minimum_retention_contact_s": 1.0,
+    "minimum_measured_lift_m": 0.049,
+    "minimum_elevated_hold_s": 1.0,
+    "maximum_table_force_for_elevated_n": 0.02,
+    "minimum_release_no_hand_contact_s": 0.5,
+    "minimum_release_table_contact_s": 0.5,
+    "maximum_object_linear_speed_m_s": 1.0,
+    "maximum_object_angular_speed_rad_s": 50.0,
+    "maximum_object_com_step_m": 0.03
+  },
+  "prohibited": [
+    "doll geometry change",
+    "doll mass change",
+    "material change",
+    "FEM",
+    "attachment",
+    "weld",
+    "magnet",
+    "object-follow logic",
+    "policy"
+  ]
+}

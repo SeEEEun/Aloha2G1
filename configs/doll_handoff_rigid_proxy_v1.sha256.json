@@ -1,0 +1,24 @@
+{
+  "calibration_result_files": [],
+  "config": "/home/jbnu/aloha_g1_dataset/configs/doll_handoff_rigid_proxy_v1.json",
+  "config_sha256": "309659658e2ef91f7e3bfe75a2c305c4e9f5bf4b9b89576da3d0e1e2993feb38",
+  "policy_evaluation_allowed": false,
+  "policy_results_consulted": false,
+  "schema_version": "doll_handoff_rigid_proxy_sha256_manifest_v1",
+  "selected_material_candidate": null,
+  "source_scene_files": {
+    "g1_preview_usd": {
+      "path": "/home/jbnu/aloha_g1_dataset/isaaclab_doll_handoff_scene/generated/doll_handoff_g1_model_preview.usda",
+      "sha256": "770f574db096819dd661b86d2bafdbd99964de7b77718e2013efeb95d1840aaf"
+    },
+    "layout": {
+      "path": "/home/jbnu/aloha_g1_dataset/isaaclab_doll_handoff_scene/scene_layout.json",
+      "sha256": "8e20689ed6f329aec3e4878c9afa2b28e7860e6927ecc4518467b1fb3a8b6354"
+    },
+    "scene_usd": {
+      "path": "/home/jbnu/aloha_g1_dataset/isaaclab_doll_handoff_scene/generated/doll_handoff_scene.usda",
+      "sha256": "1fab490011ceb51f0eaf7527568d70f679788de8c9abdc2fa621ea1000dbf12d"
+    }
+  },
+  "status": "PRECALIBRATION_NOT_FROZEN"
+}

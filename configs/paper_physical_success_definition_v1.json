@@ -1,0 +1,59 @@
+{
+  "schema_version": "paper_physical_success_definition_v1",
+  "status": "PREPOLICY_PHYSICS_FROZEN_CANDIDATE",
+  "experiment_name": "PHYSICS_BASED_POLICY_TRAJECTORY_TASK_EVALUATION",
+  "scope": "physics-based evaluation of teacher-forced ACT-generated G1 trajectories",
+  "control_fps_hz": 30.0,
+  "success_kind": "PHYSICAL_SUCCESS",
+  "physical_phase_taxonomy": [
+    "LEFT_LIFT",
+    "LEFT_HOLD_TRANSPORT",
+    "RIGHT_ACQUISITION",
+    "HANDOFF",
+    "RIGHT_OWNED",
+    "RIGHT_TRANSPORT",
+    "RELEASE"
+  ],
+  "thresholds": {
+    "minimum_hand_object_contact_force_n": 0.25,
+    "maximum_force_for_table_unsupported_n": 0.05,
+    "minimum_bin_contact_force_n": 0.05,
+    "contact_stability_duration_s": 0.1,
+    "hand_approach_distance_m": 0.1,
+    "approach_stability_duration_s": 0.1,
+    "left_lift_com_rise_m": 0.03,
+    "left_lift_persistence_s": 0.5,
+    "left_hold_persistence_s": 0.5,
+    "handoff_retention_after_left_release_s": 0.5,
+    "right_transport_target_persistence_s": 0.2,
+    "release_settle_duration_s": 0.5,
+    "maximum_allowed_contact_penetration_m": 0.003,
+    "maximum_allowed_object_com_step_m": 0.03,
+    "post_release_nonsticky_duration_s": 0.25,
+    "hand_open_joint_max_abs_error_rad": 0.08
+  },
+  "event_definitions": {
+    "LEFT_LIFT_SUCCESS": "left-hand contact AND COM rise >= 0.03 m AND no table support, continuously for >= 0.5 s",
+    "LEFT_HOLD_SUCCESS": "after LEFT_LIFT_SUCCESS, the object stays elevated and table-unsupported with left retention for >= 0.5 s",
+    "HANDOFF_SUCCESS": "right acquisition precedes left release; after left release the object remains elevated, table-unsupported, and right-retained for >= 0.5 s",
+    "RIGHT_TRANSPORT_SUCCESS": "after right ownership the right-retained object enters the frozen bin-approach target volume for >= 0.2 s",
+    "RELEASE_SUCCESS": "the right hand is open, right support is absent, the object enters the frozen bin interior, and remains settled there for >= 0.5 s",
+    "FULL_PHYSICAL_SUCCESS": "LEFT_LIFT_SUCCESS AND HANDOFF_SUCCESS AND RIGHT_TRANSPORT_SUCCESS AND RELEASE_SUCCESS"
+  },
+  "path_efficiency": {
+    "RPL": "combined bilateral whole-hand L_policy / L_reference",
+    "PHYSICAL_SWPE": "FULL_PHYSICAL_SUCCESS * L_reference / max(L_policy, L_reference)",
+    "must_not_be_called": "SPL"
+  },
+  "claim_controls": {
+    "teacher_forced_source_observations": true,
+    "method_specific_reference_state_input": true,
+    "live_isaac_rgb_input": false,
+    "live_isaac_state_policy_input": false,
+    "autonomous_onboard_visual_control": false,
+    "real_robot": false
+  },
+  "same_for_act_a_and_act_b": true,
+  "policy_results_consulted": false,
+  "method_specific_thresholds": false
+}

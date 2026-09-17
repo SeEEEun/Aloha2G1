@@ -63,12 +63,38 @@ class DollHandoffPipeline:
         common_path: str | Path = COMMON_TEMPLATE,
         output_root: str | Path = OUTPUT,
         natural_arm_enabled: bool | None = None,
+        registration_path: str | Path | None = None,
     ):
         self.output = Path(output_root).resolve()
         self.config_output = self.output / "config"
         self.common_path = Path(common_path).resolve()
         self.common = load_common_config(self.common_path)
         self.scene = load_scene(self.common)
+        self.registration_path = (
+            Path(registration_path).resolve() if registration_path is not None else None
+        )
+        self.registration_manifest = (
+            load_json(self.registration_path) if self.registration_path is not None else None
+        )
+        if self.registration_manifest is not None:
+            if self.registration_manifest.get("status") != "PASS":
+                raise RuntimeError("episode registration manifest did not pass")
+            if not bool(self.registration_manifest.get("common_for_A_B")):
+                raise RuntimeError("episode registration is not common for A/B")
+            self.registration_by_source = {
+                str(row["source_name"]): row
+                for row in self.registration_manifest["entries"]
+            }
+            for source, row in self.registration_by_source.items():
+                unhashed = copy.deepcopy(row)
+                expected = str(unhashed.pop("entry_sha256"))
+                actual = _stable_digest(unhashed)
+                if actual != expected:
+                    raise RuntimeError(
+                        f"episode registration entry hash mismatch: {source}"
+                    )
+        else:
+            self.registration_by_source = {}
         self.aloha = ALOHAKinematics(self.common, self.scene)
         self.g1 = G1Kinematics(self.common, self.scene)
         self.sources = SourceRepository(
@@ -141,6 +167,19 @@ class DollHandoffPipeline:
             "shared_hand_transition_frames": self.hand_mapper.transition_frames,
             "natural_arm_redundancy": self.solver.natural_reference_report,
             "implementation_sha256": self.implementation_sha256,
+            "episode_registration": (
+                {
+                    "manifest": str(self.registration_path),
+                    "manifest_sha256": sha256_file(self.registration_path),
+                    "content_sha256": self.registration_manifest.get("content_sha256"),
+                    "semantics": self.registration_manifest.get(
+                        "registration_semantics"
+                    ),
+                    "common_for_A_B": True,
+                }
+                if self.registration_manifest is not None
+                else None
+            ),
         }
         common["runtime_fingerprint"] = _stable_digest(common["resolved"])
 
@@ -148,18 +187,17 @@ class DollHandoffPipeline:
         baseline["resolved"] = {
             "orientation_alignment": {
                 side: self.alignment["sides"][side][
-                    "source_wrist_to_g1_wrist_axis_alignment"
+                    "source_interaction_to_g1_grasp_axis_alignment"
                 ]
                 for side in SIDES
             },
-            "binary_open_q": {
-                side: self.primitives["states"][side]["OPEN"] for side in SIDES
-            },
-            "binary_closed_q": {
-                side: self.primitives["states"][side]["GRASP"] for side in SIDES
-            },
+            "common_hand_states": self.primitives["states"],
+            "common_hand_transition_frames": self.hand_mapper.transition_frames,
             "joint_names": self.primitives["joint_names"],
-            "global_workspace_mapping": self.baseline_workspace_mapping,
+            "fixed_target_tool_to_g1_wrist": self.primitives[
+                "wrist_to_grasp_frame"
+            ],
+            "legacy_global_workspace_mapping_active": False,
             "common_runtime_fingerprint": common["runtime_fingerprint"],
         }
         baseline["runtime_fingerprint"] = _stable_digest(baseline["resolved"])
@@ -185,6 +223,7 @@ class DollHandoffPipeline:
                 "achieved_preshape_enclosure_radius_m"
             ],
             "geometry_at_grasp": self.primitives["geometry_at_grasp"],
+            "common_hand_transition_frames": self.hand_mapper.transition_frames,
             "common_runtime_fingerprint": common["runtime_fingerprint"],
         }
         proposed["runtime_fingerprint"] = _stable_digest(proposed["resolved"])
@@ -243,7 +282,12 @@ class DollHandoffPipeline:
             "registration_derivation": self.common["task_registration"].get(
                 "derivation"
             ),
-            "episode_specific_registration": False,
+            "episode_specific_registration": self.registration_manifest is not None,
+            "episode_registration_manifest": (
+                str(self.registration_path)
+                if self.registration_path is not None
+                else None
+            ),
         }
         atomic_json(self.config_output / "task_frame_report.json", task_frame)
         tool_report = {
@@ -291,15 +335,13 @@ class DollHandoffPipeline:
             "target_task_motion_scale": 1.0,
             "shared_global_scale": 1.0,
             "non_unit_scale_justified": False,
-            "baseline_representation_workspace_normalization": (
-                self.baseline_workspace_mapping
-            ),
+            "baseline_representation_workspace_normalization": "DISABLED",
             "model_workspace_observation": (
-                "The common metric task frame remains 1:1. Fair Baseline A applies "
-                "a separately reported morphology-derived wrist-workspace "
-                "normalization because direct ALOHA wrist origins exceed the active "
-                "G1 wrist reach. Proposed B retains 1:1 interaction-frame positions "
-                "and realizes them through its static target grasp transform."
+                "Both representations use the same 1:1 metric task registration. "
+                "WRIST transfers the registered source task-TCP pose through one "
+                "fixed target-tool-to-G1-wrist transform; INTERACTION supplies the "
+                "registered whole-hand interaction target. No pooled workspace "
+                "normalization or representation-specific reach clipping is active."
             ),
         }
         atomic_json(self.config_output / "model_unit_audit.json", unit_audit)
@@ -310,11 +352,12 @@ class DollHandoffPipeline:
         mapping = self.baseline_workspace_mapping
         mapping_markdown = "\n".join(
             [
-                "# Fair Baseline-A global workspace mapping",
+                "# Legacy Baseline-A workspace mapping diagnostic",
                 "",
-                "The mapping is derived once from pooled source wrist geometry and "
-                "the active ALOHA/G1 morphologies. It does not use doll/bin "
-                "coordinates, ownership events, or smoke success.",
+                "Status: **INACTIVE AFTER SINGLE-VARIABLE RESET**",
+                "",
+                "This historical pooled mapping is computed only to preserve an "
+                "audit trail. It is not read by the WRIST target-generation branch.",
                 "",
                 f"- Method: {mapping['method']}",
                 f"- Task-axis scale XYZ: `{mapping['task_axis_scale_xyz']}`",
@@ -330,12 +373,13 @@ class DollHandoffPipeline:
                 "- Interaction/grasp-frame information: **NO**",
                 "- Common metric task-frame registration changed: **NO**",
                 "",
-                "## A0 diagnosis",
+                "## Historical A0 diagnosis",
                 "",
                 "A0 directly copied metric source wrist origins. Its pooled "
                 "shoulder-radius extrema exceeded the active G1 arm-chain reach, "
                 "and it computed alignment from the source TCP while applying it "
-                "to source wrist rotations. Fair A repairs both global errors.",
+                "to source wrist rotations. The single-variable reset instead uses "
+                "the registered task TCP and one fixed tool-compatibility transform.",
                 "",
                 f"- A0 left shoulder radius: `{mapping['naive_a0_shoulder_radius_m']['left']}`",
                 f"- A0 right shoulder radius: `{mapping['naive_a0_shoulder_radius_m']['right']}`",
@@ -362,14 +406,19 @@ class DollHandoffPipeline:
                 "velocity and acceleration regularization",
                 "collision checker",
                 "numerical gates",
+                "source-derived semantic event timeline",
+                "Dex3 phase labels, commands, limits, and transition smoothing",
             ],
             "only_differences": {
-                "baseline": (
-                    "wrist-level trajectory representation, one morphology-derived "
-                    "global wrist-workspace normalization, and binary hand state"
-                ),
-                "proposed": "interaction frame, bimanual ownership/coordination, semantic whole-hand realization",
+                "baseline": "WRIST spatial target generation",
+                "proposed": "INTERACTION spatial target generation",
             },
+            "single_scientific_switch": {
+                "name": "representation_mode",
+                "baseline_value": "WRIST",
+                "proposed_value": "INTERACTION",
+            },
+            "common_dex3_mapping": True,
             "shared_solver_config": self.common["shared_temporal_ik"],
             "method_specific_solver_parameters": 0,
             "episode_specific_logic": 0,
@@ -399,13 +448,32 @@ No prior task geometry, phase labels, episode anchors, or object-placement const
     def convert(self, method: str, episode_index: int) -> ConversionResult:
         if method not in SUPPORTED_METHODS:
             raise ValueError(method)
+        representation_mode = (
+            "WRIST" if method == "baseline" else "INTERACTION"
+        )
         episode = self.sources.episode(episode_index)
+        registration_entry = None
+        if self.registration_manifest is not None:
+            registration_entry = self.registration_by_source.get(
+                episode.record.source_name
+            )
+            if registration_entry is None:
+                raise RuntimeError(
+                    f"missing common episode registration: {episode.record.source_name}"
+                )
         fk = self.event_auditor.fk_cache.get(episode_index) or self.aloha.fk(
             episode.state
         )
         events = self.event_auditor.events[episode_index]
-        targets = self.representation.build(method, fk, events)
-        hands = self.hand_mapper.map(method, events)
+        targets = self.representation.build(
+            representation_mode,
+            fk,
+            events,
+            registration_entry=registration_entry,
+        )
+        # The representation switch is spatial only.  Dex3 supervision is a
+        # common target-embodiment realization of the one source timeline.
+        hands = self.hand_mapper.map_common(events)
         solver = self.solver.solve(targets)
         geometry = self.g1.trajectory_geometry(
             solver["q"],
@@ -487,6 +555,46 @@ No prior task geometry, phase labels, episode anchors, or object-placement const
             right_hand_phase=np.asarray(result.hands["right_phase"], dtype="U12"),
             ownership_state=np.asarray(result.events.ownership_labels, dtype="U20"),
             method=np.asarray(result.method),
+            representation_mode=np.asarray(
+                result.targets["representation_mode"]
+            ),
+            episode_registration_bound=np.asarray(
+                result.targets["episode_registration_bound"]
+            ),
+            episode_registration_entry_sha256=np.asarray(
+                result.targets.get("episode_registration_entry_sha256", "")
+            ),
+            registered_object_position_world=np.asarray(
+                result.targets.get("registered_object_pose", {}).get(
+                    "position_xyz_m", [np.nan, np.nan, np.nan]
+                ),
+                dtype=np.float64,
+            ),
+            registered_object_quaternion_xyzw=np.asarray(
+                result.targets.get("registered_object_pose", {}).get(
+                    "quaternion_xyzw", [np.nan, np.nan, np.nan, np.nan]
+                ),
+                dtype=np.float64,
+            ),
+            registered_bin_position_world=np.asarray(
+                result.targets.get("registered_bin_pose", {}).get(
+                    "position_xyz_m", [np.nan, np.nan, np.nan]
+                ),
+                dtype=np.float64,
+            ),
+            registered_bin_quaternion_xyzw=np.asarray(
+                result.targets.get("registered_bin_pose", {}).get(
+                    "quaternion_xyzw", [np.nan, np.nan, np.nan, np.nan]
+                ),
+                dtype=np.float64,
+            ),
+            registered_table_task_origin_world=np.asarray(
+                result.targets.get(
+                    "registered_table_task_origin_xyz_m",
+                    self.scene["task_frame"]["origin_world_xyz_m"],
+                ),
+                dtype=np.float64,
+            ),
             source_episode_id=np.asarray(episode.record.stable_episode_id),
             source_directory_name=np.asarray(episode.record.source_name),
             source_motion_key=np.asarray(self.common["source_channels"]["motion_key"]),
@@ -578,6 +686,13 @@ No prior task geometry, phase labels, episode anchors, or object-placement const
         manifest = {
             "schema_version": "doll_handoff_retargeted_episode_v1",
             "method": result.method,
+            "representation_mode": result.targets["representation_mode"],
+            "episode_registration_bound": result.targets[
+                "episode_registration_bound"
+            ],
+            "episode_registration_entry_sha256": result.targets.get(
+                "episode_registration_entry_sha256"
+            ),
             "episode_index": episode.record.episode_index,
             "stable_episode_id": episode.record.stable_episode_id,
             "source_name": episode.record.source_name,
@@ -811,12 +926,10 @@ No prior task geometry, phase labels, episode anchors, or object-placement const
             }
             for method in METHODS
         }
-        for key, path in self.config_paths.items():
-            value = copy.deepcopy(self.resolved_configs[key])
-            value["status"] = "AWAITING_HUMAN_SMOKE_REVIEW"
-            value["smoke_execution"] = smoke_rows
-            value["smoke_execution_integrity_pass"] = True
-            atomic_json(path, value)
+        # Configuration files are content-addressed by every trajectory.  Never
+        # mutate them after export merely to record smoke outcomes; doing so
+        # would leave every archive pointing at a stale hash.  Mutable run
+        # status belongs only in the separate candidate manifest below.
         manifest = {
             "status": "AWAITING_HUMAN_SMOKE_REVIEW_NOT_FROZEN",
             "smoke_episode_indices": smoke,

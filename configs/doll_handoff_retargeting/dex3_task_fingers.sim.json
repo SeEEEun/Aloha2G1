@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "status": "VERIFIED_FROM_ACTIVE_MODEL_GEOMETRY_FOR_SIMULATION",
+  "calibration_status": "SIM_ONLY_NOT_REAL_DEX3_CALIBRATED",
+  "active_model": "/home/jbnu/mujoco_menagerie/unitree_g1/g1_with_hands.xml",
+  "active_model_sha256": "2d41a3c6783fbf9e17349608d9c2222d970163b1db315ce9f30c4a97631fc078",
+  "task_digits": ["thumb", "index"],
+  "non_task_digit": "middle",
+  "left": {
+    "A": {
+      "digit_chain": "thumb",
+      "joint_names": ["left_hand_thumb_0_joint", "left_hand_thumb_1_joint", "left_hand_thumb_2_joint"],
+      "distal_link": "left_hand_thumb_2_link",
+      "local_position_xyz_m": [0.006681383091650914, -0.029792676574194786, 0.000006585596875417019],
+      "local_normal": [1.0, 0.0, 0.0],
+      "pad_half_extent_m": [0.001999569398233049, 0.02477659790900315, 0.012999936436933448]
+    },
+    "B": {
+      "digit_chain": "index",
+      "joint_names": ["left_hand_index_0_joint", "left_hand_index_1_joint"],
+      "distal_link": "left_hand_index_1_link",
+      "local_position_xyz_m": [0.05021218895371525, 0.001228833713269696, -0.000029845193230669556],
+      "local_normal": [1.0, 0.0, 0.0],
+      "pad_half_extent_m": [0.0019929339114063555, 0.0041744962284203475, 0.008544835208552908]
+    },
+    "C": {
+      "digit_chain": "middle",
+      "joint_names": ["left_hand_middle_0_joint", "left_hand_middle_1_joint"],
+      "distal_link": "left_hand_middle_1_link",
+      "local_position_xyz_m": [0.05021218895371525, 0.001228833713269696, -0.000029845193230669556],
+      "local_normal": [1.0, 0.0, 0.0],
+      "pad_half_extent_m": [0.0019929339114063555, 0.0041744962284203475, 0.008544835208552908]
+    }
+  },
+  "right": {
+    "A": {
+      "digit_chain": "index",
+      "joint_names": ["right_hand_index_0_joint", "right_hand_index_1_joint"],
+      "distal_link": "right_hand_index_1_link",
+      "local_position_xyz_m": [0.05021218895371525, -0.001228833713269696, 0.00002984519323066765],
+      "local_normal": [1.0, 0.0, 0.0],
+      "pad_half_extent_m": [0.0019929339114063555, 0.0041744962284203475, 0.008544835208552908]
+    },
+    "B": {
+      "digit_chain": "thumb",
+      "joint_names": ["right_hand_thumb_0_joint", "right_hand_thumb_1_joint", "right_hand_thumb_2_joint"],
+      "distal_link": "right_hand_thumb_2_link",
+      "local_position_xyz_m": [0.006681383091650914, 0.029792676574194786, -0.000006585596875417019],
+      "local_normal": [1.0, 0.0, 0.0],
+      "pad_half_extent_m": [0.001999569398233049, 0.02477659790900315, 0.012999936436933448]
+    },
+    "C": {
+      "digit_chain": "middle",
+      "joint_names": ["right_hand_middle_0_joint", "right_hand_middle_1_joint"],
+      "distal_link": "right_hand_middle_1_link",
+      "local_position_xyz_m": [0.05021218895371525, -0.001228833713269696, 0.00002984519323066765],
+      "local_normal": [1.0, 0.0, 0.0],
+      "pad_half_extent_m": [0.0019929339114063555, 0.0041744962284203475, 0.008544835208552908]
+    }
+  },
+  "derivation": "Task-digit link, joint, pad-center and pad-normal values were resolved from the named collision geometry of the active simulation model; A/B labels are geometry identifiers only."
+}

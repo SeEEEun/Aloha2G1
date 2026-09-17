@@ -39,7 +39,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=20260824)
     parser.add_argument(
         "--causal-stitching-method",
-        choices=("naive", "rtc"),
+        choices=("naive", "rtc", "crossfade"),
         default="naive",
         help="Model-side causal plan stitching. Raw unconditioned chunks are always returned separately.",
     )
@@ -49,6 +49,14 @@ def parse_args() -> argparse.Namespace:
         "--rtc-prefix-attention-schedule",
         choices=("exp", "linear"),
         default="exp",
+    )
+    parser.add_argument(
+        "--fixed-flow-noise",
+        action="store_true",
+        help=(
+            "Reuse one seed-derived flow-noise tensor for every inference. This is a "
+            "diagnostic sampling mode; every resulting raw chunk remains logged."
+        ),
     )
     return parser.parse_args()
 
@@ -65,6 +73,16 @@ def atomic_json(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
     temporary.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    os.replace(temporary, path)
+
+
+def atomic_npy(path: Path, value: np.ndarray) -> None:
+    """Persist a NumPy array without exposing a partially written artifact."""
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    with temporary.open("wb") as stream:
+        np.save(stream, value, allow_pickle=False)
     os.replace(temporary, path)
 
 
@@ -121,6 +139,25 @@ def main() -> int:
     load_seconds = time.perf_counter() - load_started
     socket_path.parent.mkdir(parents=True, exist_ok=True)
     listener = Listener(str(socket_path), family="AF_UNIX", authkey=AUTHKEY)
+    fixed_noise: torch.Tensor | None = None
+    fixed_noise_record: dict[str, Any] | None = None
+    if args.fixed_flow_noise:
+        fixed_noise = policy.model.sample_noise(
+            (1, 50, int(policy.config.max_action_dim)), next(policy.parameters()).device
+        ).detach().clone()
+        fixed_noise_array = fixed_noise.float().cpu().numpy()
+        fixed_noise_path = ready_path.parent / "episode_persistent_flow_noise.npy"
+        atomic_npy(fixed_noise_path, fixed_noise_array)
+        fixed_noise_record = {
+            "path": str(fixed_noise_path),
+            "seed": int(args.seed),
+            "shape": list(fixed_noise_array.shape),
+            "dtype": str(fixed_noise_array.dtype),
+            "sha256": hashlib.sha256(fixed_noise_array.tobytes()).hexdigest(),
+            "file_sha256": sha256_file(fixed_noise_path),
+            "lifetime": "EPISODE_PERSISTENT_REUSED_FOR_EVERY_INFERENCE",
+            "best_action_mode_guaranteed": False,
+        }
     ready = {
         "status": "READY",
         "pid": os.getpid(),
@@ -134,15 +171,24 @@ def main() -> int:
         "real_robot_transport_available": False,
         "causal_stitching": {
             "method": args.causal_stitching_method,
+            "model_side_rtc_enabled": rtc_config is not None,
+            "runner_side_crossfade_expected": args.causal_stitching_method == "crossfade",
             "execution_horizon": args.execution_horizon,
             "rtc_guidance_weight": args.rtc_guidance_weight if rtc_config else None,
             "rtc_prefix_attention_schedule": args.rtc_prefix_attention_schedule if rtc_config else None,
-            "simulation_inference_delay_frames": 0,
+            "simulation_inference_delay_frames": "REQUEST_SUPPLIED_PER_INFERENCE",
             "simulation_inference_delay_reason": (
-                "The synchronous Isaac runner advances no simulation/control frames while inference blocks."
+                "Latency-aware RTC audits pass the measured causal queue delay explicitly; "
+                "non-RTC calls use zero."
             ),
             "future_observations_used": False,
             "raw_unconditioned_chunk_retained": True,
+            "flow_noise_mode": (
+                "FIXED_SEED_DERIVED_TENSOR_REUSED"
+                if args.fixed_flow_noise
+                else "FRESH_SEQUENTIAL_SEED_STREAM"
+            ),
+            "episode_persistent_flow_noise": fixed_noise_record,
         },
     }
     atomic_json(ready_path, ready)
@@ -164,12 +210,17 @@ def main() -> int:
             rgb = np.asarray(request["rgb"])
             state = np.asarray(request["state"], dtype=np.float32)
             task = request["task"]
+            inference_delay = int(request.get("inference_delay", 0))
             if rgb.shape != EXPECTED_RGB_SHAPE or rgb.dtype != np.uint8:
                 raise RuntimeError(f"RGB must be uint8 {EXPECTED_RGB_SHAPE}; got {rgb.dtype} {rgb.shape}")
             if state.shape != EXPECTED_STATE_SHAPE or not np.isfinite(state).all():
                 raise RuntimeError(f"state must be finite {EXPECTED_STATE_SHAPE}; got {state.shape}")
             if not isinstance(task, str) or not task.strip():
                 raise RuntimeError("task must be one non-empty string")
+            if not 0 <= inference_delay < EXPECTED_ACTION_SHAPE[1]:
+                raise RuntimeError(
+                    "inference_delay must be an integer number of action rows in 0..49"
+                )
             image_tensor = (
                 torch.from_numpy(np.ascontiguousarray(rgb))
                 .permute(2, 0, 1)
@@ -184,9 +235,14 @@ def main() -> int:
             }
             processed = preprocessor(raw)
             action_device = processed["observation.state"].device
-            noise = policy.model.sample_noise(
-                (1, 50, int(policy.config.max_action_dim)), action_device
-            )
+            if args.fixed_flow_noise:
+                if fixed_noise is None:
+                    raise RuntimeError("episode-persistent flow noise was not initialized")
+                noise = fixed_noise.clone()
+            else:
+                noise = policy.model.sample_noise(
+                    (1, 50, int(policy.config.max_action_dim)), action_device
+                )
             previous_remaining_plan = (
                 previous_stitched_action[args.execution_horizon :].copy()
                 if previous_stitched_action is not None
@@ -220,7 +276,7 @@ def main() -> int:
                     stitched_normalized = policy.predict_action_chunk(
                         processed,
                         noise=noise,
-                        inference_delay=0,
+                        inference_delay=inference_delay,
                         prev_chunk_left_over=previous_remaining_normalized,
                         execution_horizon=args.execution_horizon,
                     )
@@ -256,6 +312,9 @@ def main() -> int:
                     "inference_seconds": inference_seconds,
                     "raw_inference_seconds": raw_inference_seconds,
                     "rtc_inference_seconds": rtc_inference_seconds,
+                    "rtc_inference_delay_frames": (
+                        inference_delay if rtc_config is not None else 0
+                    ),
                     "request_total_seconds": time.perf_counter() - started,
                     "input_rgb_sha256": hashlib.sha256(rgb.tobytes()).hexdigest(),
                     "input_state_sha256": hashlib.sha256(state.tobytes()).hexdigest(),
@@ -265,6 +324,14 @@ def main() -> int:
                     "previous_remaining_plan_rows": int(len(previous_remaining_plan)),
                     "raw_and_stitched_identical": bool(np.array_equal(action, stitched_action)),
                     "prediction_tensor_after_internal_padding_slicing": [1, 50, 28],
+                    "flow_noise_mode": (
+                        "FIXED_SEED_DERIVED_TENSOR_REUSED"
+                        if args.fixed_flow_noise
+                        else "FRESH_SEQUENTIAL_SEED_STREAM"
+                    ),
+                    "flow_noise_sha256": hashlib.sha256(
+                        noise.detach().float().cpu().numpy().tobytes()
+                    ).hexdigest(),
                 }
             )
             request_index += 1

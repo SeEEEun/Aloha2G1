@@ -1,0 +1,405 @@
+{
+  "schema_version": "doll_handoff_measured_proxy_v3",
+  "status": "MEASURED_DOLL_SINGLE_HAND_GRASP_BLOCKED_NOT_FROZEN",
+  "scientific_description": "graspable rigid proxy approximating the measured compact geometry and low mass of the plush object",
+  "policy_independent": true,
+  "learned_policy_used_for_calibration": false,
+  "real_robot_allowed": false,
+  "source_scene": "/home/jbnu/aloha_g1_dataset/isaaclab_doll_handoff_scene/generated/doll_handoff_g1_model_preview.usda",
+  "whole_hand_geometry": "/home/jbnu/aloha_g1_dataset/configs/doll_handoff_retargeting/dex3_whole_hand.sim.json",
+  "measurement_contract": {
+    "major_diameter_m": 0.12,
+    "minor_diameter_m": 0.09,
+    "vertical_height_m": 0.085,
+    "mass_kg": 0.02,
+    "source": "physical measurement supplied on 2026-08-28",
+    "supersedes": "all previous 60-75 mm proxy size assumptions"
+  },
+  "axis_mapping": {
+    "local_x": "LONG_HORIZONTAL_120_MM; world X in the Doll-Handoff reset pose",
+    "local_y": "SHORT_HORIZONTAL_90_MM; world Y and primary thumb-vs-index-middle closing direction",
+    "local_z": "VERTICAL_85_MM; world Z",
+    "orientation_quaternion_xyzw": [0.0, 0.0, 0.0, 1.0]
+  },
+  "historical_proxies": {
+    "sphere_75mm": "SUPERSEDED_BY_MEASURED_DOLL_GEOMETRY",
+    "narrow_capsule": "SUPERSEDED_BY_MEASURED_DOLL_GEOMETRY",
+    "proxy_v2_60_to_70mm_ovals": "SUPERSEDED_BY_MEASURED_DOLL_GEOMETRY",
+    "handoff_H1_YAW60_DX30_DZ15": "SUPERSEDED_BY_MEASURED_DOLL_GEOMETRY"
+  },
+  "object": {
+    "mass_kg": 0.02,
+    "center_world_xy_m": [0.4175, 0.28],
+    "table_surface_world_z_m": 0.795,
+    "spawn_clearance_above_table_m": 0.0,
+    "visual_dimensions_m": [0.12, 0.09, 0.085],
+    "collider": "ROUNDED_CONVEX_OVAL_WITH_SMALL_FLAT_SUPPORT_PATCH",
+    "visual_and_collision_same_prim": true,
+    "bottom_support_patch": {
+      "construction": "lowest two ellipsoid latitude rings are coplanar with the exact lower Z extent",
+      "reason": "stable convex table support without a hidden fixture"
+    },
+    "linear_damping": 0.05,
+    "angular_damping": 0.05,
+    "restitution": 0.0,
+    "contact_offset_m": 0.002,
+    "rest_offset_m": 0.0,
+    "max_depenetration_velocity_m_s": 1.0
+  },
+  "geometry_candidates": [
+    {
+      "name": "MEASURED_100",
+      "dimensions_m": [0.12, 0.09, 0.085],
+      "collision_scale_percent": 100,
+      "selection_order": 1,
+      "allowed_only_if": "PRIMARY_TEST"
+    },
+    {
+      "name": "MEASURED_95",
+      "dimensions_m": [0.114, 0.0855, 0.08075],
+      "collision_scale_percent": 95,
+      "selection_order": 2,
+      "allowed_only_if": "100_PERCENT_RIGID_CONTACT_EXCLUSION_IS_UNREALISTIC"
+    },
+    {
+      "name": "MEASURED_90",
+      "dimensions_m": [0.108, 0.081, 0.0765],
+      "collision_scale_percent": 90,
+      "selection_order": 3,
+      "allowed_only_if": "100_AND_95_PERCENT_RIGID_CONTACT_EXCLUSION_IS_UNREALISTIC"
+    }
+  ],
+  "geometry_search_limit": 3,
+  "geometry_selection_rule": "FIRST_SCALE_IN_100_95_90_ORDER_PASSING_IDENTICAL_LEFT_AND_RIGHT_SCRIPTED_GATES",
+  "material": {
+    "name": "MODERATE_MEASURED_PLUSH_PROXY_V3",
+    "static_friction": 0.7,
+    "dynamic_friction": 0.6,
+    "friction_combine_mode": "average",
+    "restitution_combine_mode": "average",
+    "selection_scope": "fixed before any learned-policy evaluation"
+  },
+  "finger_drive": {
+    "kp": 100.0,
+    "kd": 4.0,
+    "effort_limit_sim": 2.5,
+    "velocity_limit_sim": 12.0,
+    "source": "/home/jbnu/aloha_g1_dataset/tools/policy_b_isaac_control_contract.py:CONTROLLER_CONTRACT.actuators.dex3"
+  },
+  "joint_order_7d": [
+    "thumb_0",
+    "thumb_1",
+    "thumb_2",
+    "middle_0",
+    "middle_1",
+    "index_0",
+    "index_1"
+  ],
+  "hand_states": {
+    "left": {
+      "OPEN": [0.0, 0.4, 1e-08, -1e-08, -1e-08, -1e-08, -1e-08],
+      "PRESHAPE": [0.0370101, 0.4957918, 0.0630831, -0.0556464, -0.1399638, -0.0352725, -0.1059399],
+      "POWER_GRASP_P0": [0.229781, 0.823252, 0.294974, -0.013165, -0.204763, -0.003111, -0.042688],
+      "POWER_GRASP_P1": [0.1, 1.05, 0.3, -0.08, -1.5, -0.01, -1.49],
+      "POWER_GRASP_P2": [0.123367, 0.719306, 0.210277, -0.185488, -0.466546, -0.117575, -0.353133],
+      "PRESHAPE_P3": [0.0432699, 0.5921767, 0.2270859, -0.0458334, -0.1618308, -0.0256887, -0.1268169],
+      "POWER_GRASP_P3": [0.144233, 1.040589, 0.756953, -0.152778, -0.539436, -0.085629, -0.422723],
+      "PRESHAPE_P4": [0.1119336, 0.4522492, 0.0420468, -0.0475881, -0.183198, -0.0498426, -0.1183656],
+      "POWER_GRASP_P4": [0.373112, 0.574164, 0.140156, -0.158627, -0.61066, -0.166142, -0.394552],
+      "PRESHAPE_P5": [0.0144233, 0.4640589, 0.0756953, -0.0152778, -0.0539436, -0.0085629, -0.0422723],
+      "POWER_GRASP_P5": [0.144233, 1.040589, 0.756953, -0.152778, -0.539436, -0.085629, -0.422723],
+      "PRESHAPE_P6": [0.012115367264342768, 0.44535155857626035, 0.037027605831370256, -0.013868574335684777, -0.04689116012247524, -0.03609908849342102, -0.08345727427200905],
+      "POWER_GRASP_P6": [0.08076911509561846, 0.7023437238417357, 0.2468506488758017, -0.09245710557123184, -0.31260767748316826, -0.24066053328947346, -0.5563817718133938],
+      "PRESHAPE_P7": [0.03217489722936602, 0.4913408109942172, 0.134977506561268, -0.00899324502292184, -0.05788327903546278, -0.033151085300649454, -0.09073032431503579],
+      "POWER_GRASP_P7": [0.21449931486244014, 1.0089387399614482, 0.8998499870751201, -0.05995491015281228, -0.38588847023641853, -0.22100717867099634, -0.6048687721002387],
+      "PRESHAPE_P8": [0.005917662247817578, 0.4765480925378605, 0.15280209863747304, -0.00890048616881611, -0.05808854167116297, -0.028274381316040584, -0.10289007922628839],
+      "POWER_GRASP_P8": [0.039451081652117186, 0.91032061691907, 1.018680600916487, -0.059336517792107406, -0.38725688780775314, -0.18849581877360388, -0.6859338048419227],
+      "PRESHAPE_P9": [0.024349516370123673, 0.4921233103312876, 0.12512477843470207, -0.009063505146255806, -0.06379560906833248, -0.044827627341033405, -0.1294699202557458],
+      "POWER_GRASP_P9": [0.16233010913415782, 1.014155402208584, 0.834165132898014, -0.0604233109750387, -0.4253040037888833, -0.29885079227355604, -0.8631327450383055],
+      "PRESHAPE_P10": [0.02023548922688176, 0.4350061846681681, 0.029711379151428942, -0.004490940296073138, -0.016195695755645792, -0.018536833551326674, -0.052216531681129975],
+      "POWER_GRASP_P10": [0.20235489226881756, 0.7500618466816806, 0.2971137015142894, -0.04490931296073138, -0.16195686755645788, -0.18536824551326672, -0.5221652268112997],
+      "PRESHAPE_P11": [0.013493002986712839, 0.4327562004923038, 0.030527107796877926, -0.007432073070405834, -0.02437689300026496, -0.026521075138273866, -0.05266435274653323],
+      "POWER_GRASP_P11": [0.13493002986712838, 0.7275620049230379, 0.3052709879687792, -0.07432064070405833, -0.24376884000264956, -0.26521066138273863, -0.5266434374653323],
+      "PRESHAPE_P12": [0.016906253021956755, 0.4350489178922815, 0.03554249114004455, -0.008265096884594533, -0.02758539654119469, -0.06495495622981307, -0.02048496712427777],
+      "POWER_GRASP_P12": [0.16906253021956755, 0.7504891789228147, 0.35542482140044546, -0.08265087884594532, -0.2758538754119469, -0.6495494722981308, -0.20484958124277766],
+      "PRESHAPE_P13": [0.0071506898280667, 0.4603710752312973, 0.0868609703718009, -0.004965604760713233, -0.03515452489581561, -0.06633053142301794, -0.018133974709100244],
+      "POWER_GRASP_P13": [0.071506898280667, 1.0037107523129725, 0.868609613718009, -0.04965595760713233, -0.351545158958156, -0.6633052242301795, -0.18133965709100242],
+      "PRESHAPE_P14": [-0.0025392002911731482, 0.4457339468615731, 0.09475593924839788, -0.004472214298730355, -0.036275393170609196, -0.06652378189546568, -0.017861970673114878],
+      "POWER_GRASP_P14": [-0.02539200291173148, 0.8573394686157304, 0.9475593024839789, -0.04472205298730355, -0.36275384170609193, -0.6652377289546568, -0.17861961673114873],
+      "HOLD": "SAME_AS_SELECTED_POWER_GRASP",
+      "RELEASE": "SAME_AS_OPEN"
+    },
+    "right": {
+      "OPEN": [0.0, -0.4, -1e-08, 1e-08, 1e-08, 1e-08, 1e-08],
+      "PRESHAPE": [0.0370101, -0.4957918, -0.0630831, 0.0556464, 0.1399638, 0.0352725, 0.1059399],
+      "POWER_GRASP_P0": [0.229781, -0.823252, -0.294974, 0.013165, 0.204763, 0.003111, 0.042688],
+      "POWER_GRASP_P1": [0.1, -1.05, -0.3, 0.08, 1.5, 0.01, 1.49],
+      "POWER_GRASP_P2": [0.123367, -0.719306, -0.210277, 0.185488, 0.466546, 0.117575, 0.353133],
+      "PRESHAPE_P3": [0.0432699, -0.5921767, -0.2270859, 0.0458334, 0.1618308, 0.0256887, 0.1268169],
+      "POWER_GRASP_P3": [0.144233, -1.040589, -0.756953, 0.152778, 0.539436, 0.085629, 0.422723],
+      "PRESHAPE_P4": [0.1119336, -0.4522492, -0.0420468, 0.0475881, 0.183198, 0.0498426, 0.1183656],
+      "POWER_GRASP_P4": [0.373112, -0.574164, -0.140156, 0.158627, 0.61066, 0.166142, 0.394552],
+      "PRESHAPE_P5": [0.0144233, -0.4640589, -0.0756953, 0.0152778, 0.0539436, 0.0085629, 0.0422723],
+      "POWER_GRASP_P5": [0.144233, -1.040589, -0.756953, 0.152778, 0.539436, 0.085629, 0.422723],
+      "PRESHAPE_P6": [0.012115367264342768, -0.44535155857626035, -0.037027605831370256, 0.013868574335684777, 0.04689116012247524, 0.03609908849342102, 0.08345727427200905],
+      "POWER_GRASP_P6": [0.08076911509561846, -0.7023437238417357, -0.2468506488758017, 0.09245710557123184, 0.31260767748316826, 0.24066053328947346, 0.5563817718133938],
+      "PRESHAPE_P7": [0.03217489722936602, -0.4913408109942172, -0.134977506561268, 0.00899324502292184, 0.05788327903546278, 0.033151085300649454, 0.09073032431503579],
+      "POWER_GRASP_P7": [0.21449931486244014, -1.0089387399614482, -0.8998499870751201, 0.05995491015281228, 0.38588847023641853, 0.22100717867099634, 0.6048687721002387],
+      "PRESHAPE_P8": [0.005917662247817578, -0.4765480925378605, -0.15280209863747304, 0.00890048616881611, 0.05808854167116297, 0.028274381316040584, 0.10289007922628839],
+      "POWER_GRASP_P8": [0.039451081652117186, -0.91032061691907, -1.018680600916487, 0.059336517792107406, 0.38725688780775314, 0.18849581877360388, 0.6859338048419227],
+      "PRESHAPE_P9": [0.024349516370123673, -0.4921233103312876, -0.12512477843470207, 0.009063505146255806, 0.06379560906833248, 0.044827627341033405, 0.1294699202557458],
+      "POWER_GRASP_P9": [0.16233010913415782, -1.014155402208584, -0.834165132898014, 0.0604233109750387, 0.4253040037888833, 0.29885079227355604, 0.8631327450383055],
+      "PRESHAPE_P10": [0.02023548922688176, -0.4350061846681681, -0.029711379151428942, 0.004490940296073138, 0.016195695755645792, 0.018536833551326674, 0.052216531681129975],
+      "POWER_GRASP_P10": [0.20235489226881756, -0.7500618466816806, -0.2971137015142894, 0.04490931296073138, 0.16195686755645788, 0.18536824551326672, 0.5221652268112997],
+      "PRESHAPE_P11": [0.013493002986712839, -0.4327562004923038, -0.030527107796877926, 0.007432073070405834, 0.02437689300026496, 0.026521075138273866, 0.05266435274653323],
+      "POWER_GRASP_P11": [0.13493002986712838, -0.7275620049230379, -0.3052709879687792, 0.07432064070405833, 0.24376884000264956, 0.26521066138273863, 0.5266434374653323],
+      "PRESHAPE_P12": [0.016906253021956755, -0.4350489178922815, -0.03554249114004455, 0.008265096884594533, 0.02758539654119469, 0.06495495622981307, 0.02048496712427777],
+      "POWER_GRASP_P12": [0.16906253021956755, -0.7504891789228147, -0.35542482140044546, 0.08265087884594532, 0.2758538754119469, 0.6495494722981308, 0.20484958124277766],
+      "PRESHAPE_P13": [0.0071506898280667, -0.4603710752312973, -0.0868609703718009, 0.004965604760713233, 0.03515452489581561, 0.06633053142301794, 0.018133974709100244],
+      "POWER_GRASP_P13": [0.071506898280667, -1.0037107523129725, -0.868609613718009, 0.04965595760713233, 0.351545158958156, 0.6633052242301795, 0.18133965709100242],
+      "PRESHAPE_P14": [-0.0025392002911731482, -0.4457339468615731, -0.09475593924839788, 0.004472214298730355, 0.036275393170609196, 0.06652378189546568, 0.017861970673114878],
+      "POWER_GRASP_P14": [-0.02539200291173148, -0.8573394686157304, -0.9475593024839789, 0.04472205298730355, 0.36275384170609193, 0.6652377289546568, 0.17861961673114873],
+      "HOLD": "SAME_AS_SELECTED_POWER_GRASP",
+      "RELEASE": "SAME_AS_OPEN"
+    }
+  },
+  "grasp_profile_order": ["P0", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13", "P14"],
+  "active_calibration_profile": null,
+  "p0_derivation": {
+    "geometry": "MEASURED_100",
+    "object_axis_grasped": "local/world Y short horizontal axis, 90 mm",
+    "common_tool_center_offset_from_object_center_mm": [0.0, -30.0, 0.0],
+    "kinematic_contact_target_m": -0.0005,
+    "left_distal_contact_m": [-0.00053, -0.000458, -0.00056],
+    "right_distal_contact_m": [-0.000468, -0.000543, -0.000441],
+    "left_minimum_power_clearance_m": -0.00056,
+    "right_minimum_power_clearance_m": -0.000543,
+    "left_minimum_preshape_clearance_m": 0.000248,
+    "right_minimum_preshape_clearance_m": 0.000157,
+    "mirroring": "thumb_0 unchanged; all other right-hand joint signs mirror the named left-hand joints",
+    "policy_used": false
+  },
+  "p2_derivation": {
+    "parent": "P0",
+    "reason": "the first PhysX P0 trial exposed a 5.904 mm USD reset overlap at the measured object's long-axis end despite ideal-MuJoCo clearance; the reset impulse reached 17.725 N and 1.609 m/s, so P0 was rejected before retention",
+    "geometry": "MEASURED_100",
+    "mirrored_tool_center_offsets_from_object_center_mm": {
+      "left": [-20.0, -30.0, 0.0],
+      "right": [20.0, -30.0, 0.0]
+    },
+    "kinematic_open_clearance_m": {
+      "left": 0.017977,
+      "right": 0.017644
+    },
+    "kinematic_preshape_clearance_m": {
+      "left": 0.014081,
+      "right": 0.014064
+    },
+    "left_distal_contact_m": [-0.000513, -0.000489, -0.00051],
+    "right_distal_contact_m": [-0.000487, -0.000511, -0.00049],
+    "selection": "smallest mirrored long-axis offset in the bounded 20/30/40 mm audit that provides a large bilateral USD-envelope margin while retaining balanced three-digit contact",
+    "policy_used": false
+  },
+  "p3_derivation": {
+    "parent": "P2",
+    "geometry_and_arm_placement_changed": false,
+    "only_scope": "bounded whole-hand joint solution at the same mirrored long-axis palm centers",
+    "reason": "P2 had stable artifact-free USD contact but only index carried load during retention; the alternate predeclared exact-distance solution increases thumb opposition/flexion and closes both opposing fingers while retaining 8.45 mm preshape clearance",
+    "left_distal_contact_m": [-0.000516, -0.00049, -0.00051],
+    "right_distal_contact_m": [-0.000484, -0.000511, -0.00049],
+    "policy_used": false
+  },
+  "p4_derivation": {
+    "parent": "P3",
+    "geometry_material_gains_changed": false,
+    "mirrored_tool_center_offsets_from_object_center_mm": {
+      "left": [-20.0, -10.0, 0.0],
+      "right": [20.0, -10.0, 0.0]
+    },
+    "reason": "P3 proved transient three-digit contact but the retained object shifted 5.3 mm toward +X and unloaded thumb/middle; centering the same grasp 20 mm toward +Y places thumb and index-middle on opposite surfaces of the local 90 mm section",
+    "kinematic_open_clearance_m": {
+      "left": 0.013375,
+      "right": 0.013363
+    },
+    "kinematic_preshape_clearance_m": {
+      "left": 0.008265,
+      "right": 0.008265
+    },
+    "left_distal_contact_m": [-0.000756, -0.000746, -0.000754],
+    "right_distal_contact_m": [-0.000744, -0.000754, -0.000746],
+    "policy_used": false
+  },
+  "p5_derivation": {
+    "parent_geometry_and_arm": "P4",
+    "power_joint_source": "P3 transient-three-contact solution",
+    "reason": "direct pad FK, checked after P4, places the P3 thumb/index/middle centers at y=0.238/0.321/0.307 m when combined with the P4 centered arm, straddling the measured short-axis surfaces near y=0.246/0.314 m; P4's alternate thumb articulation instead moved its pad to y=0.216 m and never contacted",
+    "preshape_fraction_open_to_power": 0.1,
+    "geometry_material_gains_changed": false,
+    "policy_used": false
+  },
+  "p6_derivation": {
+    "parent": "measured-object diagonal-spread topology audit",
+    "reason": "direct fingertip FK showed the inherited top-grasp frame placed the index-middle spread nearly along world Z and could not create opposing load. P6 rolls the mirrored hand frames only 75 degrees, leaving a horizontal long-axis spread component so index and middle contact spatially separated regions while thumb opposes them across the 90 mm short axis.",
+    "geometry": "MEASURED_100",
+    "mirrored_tool_center_offsets_from_object_center_mm": {
+      "left": [-20.0, -20.0, 20.0],
+      "right": [20.0, -20.0, 20.0]
+    },
+    "orientation_closing_axis_roll_deg": {
+      "left": 75.0,
+      "right": -75.0
+    },
+    "preshape_fraction_open_to_power": 0.15,
+    "left_distal_contact_m": [-0.0007349494134810728, -0.0007355241803546878, -0.0007534655942566256],
+    "right_distal_contact_m": [-0.0007649129240938245, -0.0007649839203289124, -0.0007465269586881945],
+    "minimum_open_or_preshape_object_clearance_m": 0.011546445731330323,
+    "minimum_open_or_preshape_table_clearance_m": 0.0075434554240724205,
+    "profile_design": "/home/jbnu/aloha_g1_dataset/outputs/doll_handoff_measured_proxy_v3/design_audit/tilt75_x20_yminus20_z20_profile_exact.json",
+    "geometry_material_gains_changed": false,
+    "policy_used": false
+  },
+  "p7_p8_derivation": {
+    "parent_pose": "P6",
+    "scope": "the two remaining predeclared mirrored whole-hand solutions from the same exact-distance solve",
+    "reason": "P6 was artifact-free but index alone carried gravity after the object settled; P7 and P8 are the bounded remaining joint-space alternatives at identical geometry, palm pose, material, gains, and timing",
+    "source": "/home/jbnu/aloha_g1_dataset/outputs/doll_handoff_measured_proxy_v3/design_audit/tilt75_x20_yminus20_z20_profile_exact.json",
+    "policy_used": false
+  },
+  "p9_derivation": {
+    "parent_pose": "P6 identical world-space palm placement",
+    "geometry": "MEASURED_95 collider with full 120x90x85 mm visual",
+    "reason": "first and only bounded plush-compression fallback after all three 100-percent exact-contact profiles unloaded thumb and middle; the collider is uniformly inset and bottom-aligned while mass, material, gains, arm pose, and timing remain unchanged",
+    "source": "/home/jbnu/aloha_g1_dataset/outputs/doll_handoff_measured_proxy_v3/design_audit/tilt75_x20_yminus20_same_world_pose_measured95_profile.json",
+    "policy_used": false
+  },
+  "p10_derivation": {
+    "parent": "P9",
+    "geometry": "MEASURED_95 collider with full 120x90x85 mm visual",
+    "reason": "P9 produced all three contacts but expelled the rigid collider 34 mm along +X. P10 is the single bounded centering correction: mirrored long-axis palm offsets are reduced from 20 to 10 mm, and exact contact depth is reduced from 0.75 to 0.15 mm to avoid a 19 N transient on a 20 g object.",
+    "mirrored_tool_center_offsets_from_visual_object_center_mm": {
+      "left": [-10.0, -20.0, 20.0],
+      "right": [10.0, -20.0, 20.0]
+    },
+    "source": "/home/jbnu/aloha_g1_dataset/outputs/doll_handoff_measured_proxy_v3/design_audit/tilt75_x10_yminus20_same_world_pose_measured95_shallow_profile.json",
+    "geometry_material_gains_changed": false,
+    "policy_used": false
+  },
+  "p11_derivation": {
+    "parent": "P10",
+    "geometry": "MEASURED_95 collider with full 120x90x85 mm visual",
+    "reason": "P10's 10 mm centering offset exposed a 3.49 mm USD reset overlap. P11 is the predeclared midpoint between collision-clear P9 at 20 mm and overlapping P10 at 10 mm, with the same shallow 0.15 mm exact contact target.",
+    "mirrored_tool_center_offsets_from_visual_object_center_mm": {
+      "left": [-15.0, -20.0, 20.0],
+      "right": [15.0, -20.0, 20.0]
+    },
+    "source": "/home/jbnu/aloha_g1_dataset/outputs/doll_handoff_measured_proxy_v3/design_audit/tilt75_x15_yminus20_same_world_pose_measured95_shallow_profile.json",
+    "geometry_material_gains_changed": false,
+    "policy_used": false
+  },
+  "p12_derivation": {
+    "parent_pose": "P11 identical world-space mirrored arm placement",
+    "geometry": "MEASURED_90 collider with full 120x90x85 mm visual",
+    "reason": "last declared plush-compression fallback after 100 and 95 percent rigid colliders could not maintain opposing thumb/index/middle load. P12 uses the least-flexed exact three-digit solution and a 2.5 s close to avoid impulsive ejection.",
+    "source": "/home/jbnu/aloha_g1_dataset/outputs/doll_handoff_measured_proxy_v3/design_audit/tilt75_x15_yminus20_same_world_pose_measured90_profile.json",
+    "geometry_material_gains_changed": false,
+    "policy_used": false
+  },
+  "p13_p14_derivation": {
+    "parent_pose_and_geometry": "P12",
+    "scope": "two remaining precomputed mirrored whole-hand solutions from the same final 90-percent exact-distance solve",
+    "reason": "P12 was artifact-free but only index sustained load; P13 and P14 close thumb opposition more strongly while every non-hand parameter remains fixed",
+    "source": "/home/jbnu/aloha_g1_dataset/outputs/doll_handoff_measured_proxy_v3/design_audit/tilt75_x15_yminus20_same_world_pose_measured90_profile.json",
+    "policy_used": false
+  },
+  "grasp_adjustment_scope": "one measured-object whole-hand profile and exact named-joint mirror; no learned-policy or episode-specific values",
+  "scripted_arm_placement": {
+    "whole_hand_center_world_xyz_m": [0.4175, 0.25, 0.8375],
+    "whole_hand_center_world_xyz_m_by_side": {
+      "left": [0.4025, 0.26, 0.8575],
+      "right": [0.4325, 0.26, 0.8575]
+    },
+    "center_source": "final 95-percent midpoint candidate: visual object center plus left/right [minus/plus 15,-20,+20] mm; selected between collision-clear P9 and overlapping P10",
+    "candidate_specific_adjustment_allowed": false,
+    "side_specific_adjustment_allowed": false,
+    "lift_offset_world_xyz_m": [0.0, 0.0, 0.05],
+    "orientation_design": "mirrored 75-degree diagonal power frame; thumb opposition closes across the measured short-axis section while the index-middle spread retains a long-axis horizontal component",
+    "orientation_closing_axis_roll_deg": {
+      "left": 75.0,
+      "right": -75.0
+    },
+    "arm_placement_reference_hand_profile": "P1",
+    "scripted_ik_position_weight": 3.0,
+    "scripted_ik_orientation_weight": 3.0,
+    "scripted_ik_frame_continuity_weight": 0.01,
+    "pregrasp_retreat_m": 0.0,
+    "pregrasp_retreat_semantics": "fixed-arm enclosure after collision-clear OPEN and PRESHAPE"
+  },
+  "historical_clear_open_orientation_sources": {
+    "left": "/home/jbnu/aloha_g1_dataset/outputs/paper_physics_task_eval/environment_calibration/primitives_review1/left_fixed_grasp_primitive.npz",
+    "right": "/home/jbnu/aloha_g1_dataset/outputs/paper_physics_task_eval/environment_calibration/primitives_review1/right_fixed_grasp_primitive.npz",
+    "usage": "IK seed only; no historical proxy geometry or contact result is reused"
+  },
+  "source_arm_primitives": {
+    "left": "/home/jbnu/aloha_g1_dataset/outputs/doll_handoff_measured_proxy_v3/scripted_primitives/P12_measured90/left_v3_arm_primitive.npz",
+    "right": "/home/jbnu/aloha_g1_dataset/outputs/doll_handoff_measured_proxy_v3/scripted_primitives/P12_measured90/right_v3_arm_primitive.npz",
+    "usage": "one policy-independent mirrored centered-diagonal placement and 5 cm vertical lift"
+  },
+  "timing": {
+    "control_fps_hz": 30.0,
+    "physics_dt_s": 0.008333333333333333,
+    "physics_substeps_per_control_frame": 4,
+    "open_hold_s": 0.5,
+    "preshape_transition_s": 1.5,
+    "power_close_s": 2.5,
+    "gravity_retention_s": 1.0,
+    "requested_lift_m": 0.05,
+    "lift_transition_s": 1.5,
+    "elevated_hold_s": 0.5,
+    "release_transition_s": 0.75,
+    "post_release_s": 0.5
+  },
+  "simulation": {
+    "gravity_m_s2": 9.81,
+    "device": "cuda:0",
+    "use_fabric": true,
+    "deterministic_seed": 20260828
+  },
+  "gates": {
+    "maximum_initial_penetration_m": 0.0001,
+    "maximum_runtime_penetration_m": 0.003,
+    "meaningful_digit_force_n": 0.015,
+    "minimum_meaningful_digit_contact_s": 0.25,
+    "minimum_digit_normal_impulse_ns": 0.01,
+    "maximum_retention_horizontal_displacement_m": 0.015,
+    "minimum_retention_contact_s": 1.0,
+    "minimum_measured_lift_m": 0.045,
+    "minimum_elevated_hold_s": 0.5,
+    "maximum_table_force_for_elevated_n": 0.02,
+    "minimum_release_no_hand_contact_s": 0.25,
+    "minimum_release_table_contact_s": 0.25,
+    "maximum_object_linear_speed_m_s": 1.0,
+    "maximum_object_angular_speed_rad_s": 50.0,
+    "maximum_object_com_step_m": 0.03
+  },
+  "calibration_outcome": {
+    "left_single_hand_grasp": "FAIL",
+    "right_single_hand_grasp": "NOT_RUN_BY_HARD_GATE",
+    "handoff": "NOT_RUN_BY_HARD_GATE",
+    "scripted_full_task": "NOT_RUN_BY_HARD_GATE",
+    "gui_validation": "NOT_CREATED_BY_HARD_GATE",
+    "environment_frozen": false,
+    "best_artifact_free_candidate": "MEASURED_90/P12",
+    "best_measured_object_rise_m": 0.005067706108093262,
+    "blocking_condition": "thumb and middle did not maintain meaningful opposing load during gravity retention; object remained table-supported",
+    "act_a_b_physics_run": false
+  },
+  "prohibited": [
+    "magnet",
+    "fixed_joint",
+    "weld",
+    "hidden_attachment",
+    "object_follow_constraint",
+    "policy_specific_parameter",
+    "policy_output_modification"
+  ]
+}

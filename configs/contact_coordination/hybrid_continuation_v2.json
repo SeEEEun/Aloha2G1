@@ -1,0 +1,27 @@
+{
+  "schema": "hybrid_continuation_evidence_contract_v2",
+  "status": "DEVELOPMENT_ONLY_NOT_FROZEN",
+  "prior_run": "outputs/contact_coordination_hybrid/20260907T073437Z",
+  "run": "outputs/contact_coordination_hybrid/20260907T083735Z",
+  "selection": "bootstrap/SELECTION.json",
+  "source_conditioned_full_task_required_before_DEV": true,
+  "complete_articulation_calibration_required": true,
+  "primary_execution_block_on_incomplete_calibration": true,
+  "source_transform_convention": "T_AB maps B into A",
+  "quaternion_order": "XYZW",
+  "hardware_allowed": false,
+  "ACT_VLA_training": "NOT_RUN_BY_DESIGN",
+  "retained_physical_development": {
+    "short_acquisition_diagnostics": 1,
+    "full_task_attempts": 3,
+    "unchanged_command_telemetry_diagnostics": 1
+  },
+  "planned_DEV_instances": {
+    "WRIST_REFERENCE": 35,
+    "INTERACTION_OURS": 35,
+    "OURS_NO_COUPLING": 10
+  },
+  "automatic_identical_infrastructure_retries": 0,
+  "unresolved_requirement": "Geometrically qualified contact calibration with full named measured articulation state, followed by source-conditioned handoff withdrawal and transport validation",
+  "budget_note": "All actual TRAIN solver budgets and seed banks are saved per attempt; no frozen equal total study budget is claimed."
+}

@@ -1,0 +1,29 @@
+{
+  "schema_version": "common_whole_hand_physical_readiness_gate_v1",
+  "status": "PREDECLARED_BEFORE_REFERENCE_PHYSICS_AND_ACT_RERUN",
+  "description": "Representation-neutral geometric entry gate for the common target-embodiment LEFT grasp realization. It intentionally does not use wrist distance.",
+  "required_semantic_intent": [
+    "PRESHAPE",
+    "CLOSING",
+    "CLOSED"
+  ],
+  "whole_hand_center_to_doll_center_max_m": 0.090,
+  "each_digit_pad_sampled_positive_surface_gap_max_m": 0.080,
+  "closing_axis_to_object_short_axis_unsigned_max_deg": 65.0,
+  "require_thumb_side_and_index_middle_side_access": true,
+  "require_joint_limits_valid": true,
+  "require_no_invalid_robot_collision": true,
+  "wrist_distance_used": false,
+  "wrist_distance_threshold_m": null,
+  "gate_does_not_count_as_task_success": true,
+  "final_task_success_definition_changed": false,
+  "common_for_methods": [
+    "Fair-A",
+    "Proposed-B",
+    "ACT-A40",
+    "ACT-B40"
+  ],
+  "episode_independent": true,
+  "method_independent": true,
+  "selection_provenance": "Frozen before ACT EVAL10 rerun after reference-level preflight showed the prior 65/40/55 closure-neighborhood gate activated only after open-hand contact had already displaced the free object. The 90/80/65 bounds define the pre-contact Dex3 graspable-palm approach volume, enclose all frozen Proposed-B reference approaches, and remain below the Fair-A reference whole-hand minimum distance of 114 mm. No ACT outcome or task-success threshold was used."
+}

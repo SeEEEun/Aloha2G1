@@ -1,0 +1,29 @@
+{
+  "schema_version": "doll_handoff_baseline_v2",
+  "method": "baseline",
+  "method_name": "Trajectory-Centric Wrist-Level Retargeting",
+  "representation": "trajectory-centric registered ALOHA task-TCP 6D converted to G1 wrist by one fixed tool transform",
+  "source_position_frame": "ALOHA task TCP derived from link-6 by the fixed authoritative link6-to-TCP transform",
+  "source_orientation_frame": "ALOHA task TCP with one pooled static axis compatibility alignment per side",
+  "target_frame": "G1 wrist origin",
+  "workspace_mapping_policy": {
+    "method": "metric episode-registered TCP pose followed only by fixed target-tool-to-G1-wrist coordinate conversion",
+    "neutral_anchor": "none",
+    "task_x_scale": 1.0,
+    "task_yz_scale": 1.0,
+    "orientation_deviation_scale": 1.0,
+    "orientation_mapping": "preserve registered source TCP orientation through one fixed axis compatibility transform",
+    "outer_reach_fraction": 1.0,
+    "outer_reach_fraction_reason": "no representation-specific reach projection; infeasibility is handled by the common solver contract",
+    "object_coordinates_used": false,
+    "event_or_phase_inputs_used": false,
+    "episode_specific_parameters": false
+  },
+  "physical_whole_hand_grasp_frame_target_optimized": false,
+  "bimanual_midpoint_optimized": false,
+  "bimanual_relative_vector_optimized": false,
+  "handoff_coordination_objective": false,
+  "hand_mapping": "common semantic OPEN/PRESHAPE/GRASP/HOLD/RELEASE mapping shared byte-for-byte with B",
+  "whole_hand_policy": "common target-embodiment Dex3 realization outside the spatial representation switch",
+  "sim_hand_calibration": "SIM_ONLY_NOT_REAL_DEX3_CALIBRATED"
+}

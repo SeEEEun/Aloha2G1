@@ -1,0 +1,320 @@
+#usda 1.0
+(
+    defaultPrim = "DollHandoffScene"
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "DollHandoffScene" (
+    customData = {
+        string layout = "scene_layout.json"
+        string task = "doll_handoff"
+    }
+)
+{
+    def Xform "Table" (
+        prepend references = @table_workspace.usda@
+    )
+    {
+    }
+
+    def "Looks"
+    {
+        def Material "DollGreen"
+        {
+            token outputs:surface.connect = </DollHandoffScene/Looks/DollGreen/PreviewSurface.outputs:surface>
+
+            def Shader "PreviewSurface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (0.16, 0.58, 0.18)
+                float inputs:roughness = 0.82
+                token outputs:surface
+            }
+        }
+
+        def Material "DollEyes"
+        {
+            token outputs:surface.connect = </DollHandoffScene/Looks/DollEyes/PreviewSurface.outputs:surface>
+
+            def Shader "PreviewSurface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (0.025, 0.03, 0.025)
+                float inputs:roughness = 0.62
+                token outputs:surface
+            }
+        }
+
+        def Material "BinOffWhite"
+        {
+            token outputs:surface.connect = </DollHandoffScene/Looks/BinOffWhite/PreviewSurface.outputs:surface>
+
+            def Shader "PreviewSurface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (0.87, 0.86, 0.79)
+                float inputs:roughness = 0.72
+                token outputs:surface
+            }
+        }
+
+        def Material "Ground"
+        {
+            token outputs:surface.connect = </DollHandoffScene/Looks/Ground/PreviewSurface.outputs:surface>
+
+            def Shader "PreviewSurface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (0.12, 0.13, 0.15)
+                float inputs:roughness = 0.9
+                token outputs:surface
+            }
+        }
+    }
+
+    def Cube "Ground" (
+        prepend apiSchemas = ["MaterialBindingAPI", "PhysicsCollisionAPI"]
+    )
+    {
+        rel material:binding = </DollHandoffScene/Looks/Ground>
+        double size = 1
+        float3 xformOp:scale = (4, 4, 0.05)
+        double3 xformOp:translate = (0.4175, 0, -0.025)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }
+
+    def Xform "TaskFrame" (
+        customData = {
+            string axes = "+X right, +Y back, +Z up"
+        }
+    )
+    {
+        double3 xformOp:translate = (0, 0, 0.795)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Xform "Doll" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        customData = {
+            string dimensions_status = "PROVISIONAL"
+        }
+    )
+    {
+        float physics:mass = 0.055
+        double3 xformOp:translate = (0.11035161837935448, 0.053192950785160065, 0.8345)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+
+        def Sphere "Body" (
+            prepend apiSchemas = ["MaterialBindingAPI", "PhysicsCollisionAPI"]
+        )
+        {
+            rel material:binding = </DollHandoffScene/Looks/DollGreen>
+            double radius = 0.0375
+        }
+
+        def Sphere "Nub1" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            rel material:binding = </DollHandoffScene/Looks/DollGreen>
+            double radius = 0.01
+            double3 xformOp:translate = (-0.021, -0.006, 0.031)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Sphere "Nub2" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            rel material:binding = </DollHandoffScene/Looks/DollGreen>
+            double radius = 0.01
+            double3 xformOp:translate = (0.021, -0.006, 0.031)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Sphere "Eye1" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            rel material:binding = </DollHandoffScene/Looks/DollEyes>
+            double radius = 0.004
+            double3 xformOp:translate = (-0.018, -0.035, 0.011)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Sphere "Eye2" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            rel material:binding = </DollHandoffScene/Looks/DollEyes>
+            double radius = 0.004
+            double3 xformOp:translate = (0.018, -0.035, 0.011)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+    }
+
+    def Xform "TrashBin" (
+        customData = {
+            string container = "open_top_five_part_static_bin"
+            string dimensions_status = "PROVISIONAL"
+        }
+    )
+    {
+        double3 xformOp:translate = (0.7382120490074158, 0.09978766366839409, 0.795)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+
+        def Cube "Bottom" (
+            prepend apiSchemas = ["MaterialBindingAPI", "PhysicsCollisionAPI"]
+        )
+        {
+            rel material:binding = </DollHandoffScene/Looks/BinOffWhite>
+            double size = 1
+            float3 xformOp:scale = (0.19, 0.165, 0.006)
+            double3 xformOp:translate = (0, 0, 0.003)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+
+        def Cube "FrontWall" (
+            prepend apiSchemas = ["MaterialBindingAPI", "PhysicsCollisionAPI"]
+        )
+        {
+            rel material:binding = </DollHandoffScene/Looks/BinOffWhite>
+            double size = 1
+            float3 xformOp:scale = (0.19, 0.006, 0.184)
+            double3 xformOp:translate = (0, -0.0795, 0.098)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+
+        def Cube "BackWall" (
+            prepend apiSchemas = ["MaterialBindingAPI", "PhysicsCollisionAPI"]
+        )
+        {
+            rel material:binding = </DollHandoffScene/Looks/BinOffWhite>
+            double size = 1
+            float3 xformOp:scale = (0.19, 0.006, 0.184)
+            double3 xformOp:translate = (0, 0.0795, 0.098)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+
+        def Cube "LeftWall" (
+            prepend apiSchemas = ["MaterialBindingAPI", "PhysicsCollisionAPI"]
+        )
+        {
+            rel material:binding = </DollHandoffScene/Looks/BinOffWhite>
+            double size = 1
+            float3 xformOp:scale = (0.006, 0.153, 0.184)
+            double3 xformOp:translate = (-0.092, 0, 0.098)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+
+        def Cube "RightWall" (
+            prepend apiSchemas = ["MaterialBindingAPI", "PhysicsCollisionAPI"]
+        )
+        {
+            rel material:binding = </DollHandoffScene/Looks/BinOffWhite>
+            double size = 1
+            float3 xformOp:scale = (0.006, 0.153, 0.184)
+            double3 xformOp:translate = (0.092, 0, 0.098)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+    }
+
+    def "Frames"
+    {
+        def Xform "TableFrontEdgeCenter"
+        {
+            double3 xformOp:translate = (0.4175, 0, 0.795)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Xform "DollInitialCenter"
+        {
+            double3 xformOp:translate = (0.11035161837935448, 0.053192950785160065, 0.8345)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Xform "TrashBinCenter"
+        {
+            double3 xformOp:translate = (0.7382120490074158, 0.09978766366839409, 0.89)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Xform "TrashBinOpeningCenter"
+        {
+            double3 xformOp:translate = (0.7382120490074158, 0.09978766366839409, 0.9850000000000001)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+    }
+
+    def "Lights"
+    {
+        def DomeLight "Dome"
+        {
+            color3f inputs:color = (1, 1, 1)
+            float inputs:intensity = 1250
+        }
+
+        def SphereLight "Key"
+        {
+            color3f inputs:color = (1, 0.96, 0.9)
+            float inputs:intensity = 2600
+            float inputs:radius = 0.35
+            double3 xformOp:translate = (0.2, -0.7, 2.4)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def SphereLight "Fill"
+        {
+            color3f inputs:color = (0.82, 0.9, 1)
+            float inputs:intensity = 1200
+            float inputs:radius = 0.3
+            double3 xformOp:translate = (1.4, 0.8, 1.7)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+    }
+
+    def "Cameras"
+    {
+        def Camera "overview"
+        {
+            float2 clippingRange = (0.01, 100)
+            float focalLength = 24
+            matrix4d xformOp:transform = ( (1, 0, -0, 0), (0, 0.41905817746174695, 0.9079593845004518, 0), (0, -0.9079593845004518, 0.41905817746174695, 0), (0.4175, -1.6999999999999997, 1.65, 1) )
+            uniform token[] xformOpOrder = ["xformOp:transform"]
+        }
+
+        def Camera "legacy_overview"
+        {
+            float2 clippingRange = (0.01, 100)
+            float focalLength = 24
+            matrix4d xformOp:transform = ( (0.8508591309699253, 0.5253938896153091, 2.775557561562892e-17, 0), (-0.18316514094891928, 0.29663027251019664, 0.9372625099574234, -0), (0.4924319956971381, -0.7974783647130642, 0.34862442173248703, 0), (1.55, -1.6499999999999997, 1.5499999999999998, 1) )
+            uniform token[] xformOpOrder = ["xformOp:transform"]
+        }
+
+        def Camera "front"
+        {
+            float2 clippingRange = (0.01, 100)
+            float focalLength = 24
+            matrix4d xformOp:transform = ( (1, 0, -0, 0), (0, 0.11414271406273331, 0.9934643631386046, 0), (0, -0.9934643631386046, 0.11414271406273331, 0), (0.42, -2.15, 1.0499999999999998, 1) )
+            uniform token[] xformOpOrder = ["xformOp:transform"]
+        }
+
+        def Camera "side"
+        {
+            float2 clippingRange = (0.01, 100)
+            float focalLength = 24
+            matrix4d xformOp:transform = ( (0, 1, -0, 0), (-0.17160939919826357, 0, 0.985165069471513, -0), (0.9851650694715129, -0, 0.17160939919826354, 0), (1.9, 0.2, 1.0499999999999998, 1) )
+            uniform token[] xformOpOrder = ["xformOp:transform"]
+        }
+
+        def Camera "top"
+        {
+            float2 clippingRange = (0.01, 100)
+            float focalLength = 24
+            matrix4d xformOp:transform = ( (1, 0, -0, 0), (0, 0.9816555961202005, 0.19066276670051135, 0), (0, -0.19066276670051135, 0.9816555961202005, 0), (0.4174999999999999, -0.009999999999999952, 2.7, 1) )
+            uniform token[] xformOpOrder = ["xformOp:transform"]
+        }
+    }
+}
+

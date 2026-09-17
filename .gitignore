@@ -33,3 +33,93 @@ isaac-sim/
 .vscode/
 .idea/
 .DS_Store
+
+# Raw recordings / datasets
+raw_recording/
+raw_recordings/
+recordings/
+data/raw/
+datasets/raw/
+
+# Large experiment outputs
+outputs/
+logs/
+
+# Videos
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# Large numpy / model artifacts
+*.npy
+*.npz
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.pkl
+
+# ROS / bag data
+*.bag
+*.db3
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.7z
+
+# Cache / temp
+__pycache__/
+*.pyc
+.cache/
+tmp/
+
+# ============================================================
+# Local research data / large generated artifacts
+# ============================================================
+
+# Raw ALOHA recordings
+/raw_recordings/
+
+# Generated experiment outputs
+/outputs/
+/isaaclab_doll_handoff_scene/outputs/
+
+# Generated datasets
+/datasets/
+
+# Logs
+/logs/
+
+# Videos
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# Large arrays / checkpoints / models
+*.npy
+*.npz
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.pkl
+
+# ROS recordings
+*.bag
+*.db3
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.7z
+
+# Python/cache/temp
+__pycache__/
+*.pyc
+.cache/
+tmp/

@@ -1,0 +1,522 @@
+#usda 1.0
+(
+    defaultPrim = "World"
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "World" (
+    customData = {
+        string task = "doll_handoff"
+    }
+)
+{
+    def Xform "DollHandoffEnvironment" (
+        prepend references = @doll_handoff_scene.usda@
+    )
+    {
+        over "Doll" (
+            prepend apiSchemas = ["PhysxContactReportAPI"]
+        )
+        {
+            float physxContactReport:threshold = 0
+        }
+    }
+
+    def Xform "G1" (
+        customData = {
+            bool static_preview = 1
+            string task = "doll_handoff"
+        }
+    )
+    {
+        quatd xformOp:orient = (0.7071067812, 0, 0, 0.7071067812)
+        double3 xformOp:translate = (0.4175, -0.15, 0.7922728583)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient"]
+
+        def Xform "Asset" (
+            prepend references = @/home/jbnu/robot_assets_sources/unitree_sim_isaaclab_usds/extracted/assets/robots/g1-29dof-dex3-base-fix-usd/g1_29dof_with_dex3_base_fix.usd@
+        )
+        {
+            over "pelvis" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "imu_in_pelvis" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "left_hip_pitch_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "left_hip_roll_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "left_hip_yaw_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "left_knee_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "left_ankle_pitch_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "left_ankle_roll_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "pelvis_contour_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "right_hip_pitch_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "right_hip_roll_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "right_hip_yaw_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "right_knee_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "right_ankle_pitch_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "right_ankle_roll_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "waist_yaw_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "waist_roll_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "torso_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "d435_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "head_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "imu_in_torso" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "left_shoulder_pitch_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "left_shoulder_roll_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "left_shoulder_yaw_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "left_elbow_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "left_wrist_roll_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "left_wrist_pitch_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "left_wrist_yaw_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "left_hand_camera_base_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "left_hand_palm_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "left_hand_index_0_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "left_hand_index_1_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "left_hand_middle_0_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "left_hand_middle_1_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "left_hand_thumb_0_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "left_hand_thumb_1_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "left_hand_thumb_2_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "logo_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "mid360_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "right_shoulder_pitch_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "right_shoulder_roll_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "right_shoulder_yaw_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "right_elbow_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "right_wrist_roll_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "right_wrist_pitch_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "right_wrist_yaw_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "right_hand_camera_base_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "right_hand_palm_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "right_hand_index_0_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "right_hand_index_1_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "right_hand_middle_0_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "right_hand_middle_1_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "right_hand_thumb_0_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "right_hand_thumb_1_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+
+            over "right_hand_thumb_2_link" (
+                prepend apiSchemas = ["PhysxContactReportAPI"]
+            )
+            {
+                float physxContactReport:threshold = 0
+            }
+        }
+    }
+}
+
+def "Render" (
+    hide_in_stage_window = true
+    no_delete = true
+)
+{
+    def "OmniverseKit"
+    {
+        def "HydraTextures" (
+            hide_in_stage_window = true
+            no_delete = true
+        )
+        {
+            def RenderProduct "omni_kit_widget_viewport_ViewportTexture_0" (
+                prepend apiSchemas = ["OmniRtxSettingsCommonAdvancedAPI_1", "OmniRtxSettingsRtAdvancedAPI_1", "OmniRtxSettingsPtAdvancedAPI_1", "OmniRtxPostColorGradingAPI_1", "OmniRtxPostChromaticAberrationAPI_1", "OmniRtxPostBloomPhysicalAPI_1", "OmniRtxPostMatteObjectAPI_1", "OmniRtxPostCompositingAPI_1", "OmniRtxPostDofAPI_1", "OmniRtxPostMotionBlurAPI_1", "OmniRtxPostTvNoiseAPI_1", "OmniRtxPostTonemapIrayReinhardAPI_1", "OmniRtxPostDebugSettingsAPI_1", "OmniRtxDebugSettingsAPI_1"]
+                hide_in_stage_window = true
+                no_delete = true
+            )
+            {
+                rel camera = </OmniverseKit_Persp>
+                token omni:rtx:ambientOcclusion:denoiserMode = "none"
+                token omni:rtx:background:source:texture:textureMode = "repeatMirrored"
+                token omni:rtx:background:source:type = "domeLight"
+                bool omni:rtx:debug:view:pixelDebug:enableFixedTextPos = 1
+                token omni:rtx:directLighting:sampledLighting:denoisingTechnique = "None"
+                bool omni:rtx:dlss:frameGeneration = 0
+                float3 omni:rtx:domeLight:rotationAxis = (0, 0, 1)
+                bool omni:rtx:indirectDiffuse:denoiser:enabled = 0
+                bool omni:rtx:material:db:syncLoads = 1
+                token omni:rtx:post:dlss:execMode = "performance"
+                bool omni:rtx:post:registeredCompositing:invertColorCorrection = 1
+                bool omni:rtx:post:registeredCompositing:invertToneMap = 1
+                bool omni:rtx:pt:adaptiveSampling:filterError = 0
+                uint omni:rtx:pt:adaptiveSampling:fixedSppIterations = 2
+                int omni:rtx:pt:clampSpp = 64
+                uint omni:rtx:pt:limits:maxBounces = 3
+                uint omni:rtx:pt:limits:maxGlossyBounces = 3
+                uint omni:rtx:pt:maxSamplesPerLaunch = 1000000
+                uint omni:rtx:pt:mgpu:maxPixelsPerRegionExponent = 12
+                int omni:rtx:pt:samplesPerIteration = 64
+                uint omni:rtx:pt:samplesPerPixel = 64
+                bool omni:rtx:reflections:denoiser:enabled = 0
+                token omni:rtx:rendermode = "RealTimePathTracing"
+                color3f omni:rtx:rt:ambientLight:color = (0.1, 0.1, 0.1)
+                float omni:rtx:rt:ambientLight:intensity = 1
+                bool omni:rtx:rt:ambientocclusion:enabled = 0
+                bool omni:rtx:rt:cached:enabled = 0
+                bool omni:rtx:rt:demoire = 0
+                uint omni:rtx:rt:directLighting:samples = 1
+                bool omni:rtx:rt:indirectdiffuse:enabled = 0
+                bool omni:rtx:rt:lightcache:spatialCache:dontResolveConflicts = 1
+                bool omni:rtx:rt:reflections:enabled = 0
+                bool omni:rtx:rt:refractions:enabled = 0
+                int omni:rtx:rt:sss:samples = 1
+                uint omni:rtx:rtpt:maxVolumeBounces = 15
+                float omni:rtx:rtpt:modulatingRoughnessThreshold = 0.08
+                bool omni:rtx:scene:hydra:materialSyncLoads = 1
+                uint omni:rtx:viewTile:limit = 1000000
+                rel orderedVars = </Render/Vars/LdrColor>
+                custom bool overrideClipRange = 0
+                uniform int2 resolution = (1280, 720)
+            }
+        }
+    }
+
+    def RenderSettings "OmniverseGlobalRenderSettings" (
+        prepend apiSchemas = ["OmniRtxSettingsGlobalRtAdvancedAPI_1", "OmniRtxSettingsGlobalPtAdvancedAPI_1"]
+        no_delete = true
+    )
+    {
+        rel products = </Render/OmniverseKit/HydraTextures/omni_kit_widget_viewport_ViewportTexture_0>
+    }
+
+    def "Vars"
+    {
+        def RenderVar "LdrColor" (
+            hide_in_stage_window = true
+            no_delete = true
+        )
+        {
+            uniform string sourceName = "LdrColor"
+            uniform token sourceType = "raw"
+        }
+    }
+}
+
+over "OmniverseKit_Persp" (
+    prepend apiSchemas = ["OmniRtxCameraAutoExposureAPI_1", "OmniRtxCameraExposureAPI_1"]
+)
+{
+    float exposure:fStop = 5
+    float exposure:responsivity = 1.1026709
+    float exposure:time = 0.02
+}
+

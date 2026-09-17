@@ -27,6 +27,8 @@ import numpy as np
 
 from isaaclab.app import AppLauncher
 from common_deployment_safety_projection import NamedJointDeploymentSafetyProjector
+from common_causal_action_stitching import CommonCausalActionStitcher
+from common_jerk_limited_otg import CommonJerkLimitedOTG
 from policy_b_isaac_control_contract import (
     CONTROL_FPS,
     PHYSICS_DT,
@@ -103,9 +105,15 @@ parser.add_argument("--output-root", type=Path, default=OUTPUT_ROOT)
 parser.add_argument("--execution-horizon", type=int, default=DEFAULT_HORIZON)
 parser.add_argument(
     "--causal-stitching-method",
-    choices=("naive", "rtc"),
+    choices=("naive", "rtc", "crossfade"),
     default="naive",
     help="Common causal execution adapter; raw unconditioned policy chunks remain separately logged.",
+)
+parser.add_argument(
+    "--crossfade-window-frames",
+    type=int,
+    default=5,
+    help="Dataset-motion-derived minimum-jerk window (used only for causal crossfade).",
 )
 parser.add_argument(
     "--rtc-guidance-weight",
@@ -119,6 +127,29 @@ parser.add_argument(
     default="exp",
     help="Official LeRobot RTC prefix-attention schedule.",
 )
+parser.add_argument(
+    "--rtc-inference-delay-frames",
+    type=int,
+    default=0,
+    help=(
+        "Causal latency compensation for RTC. At each replan these rows remain "
+        "committed from the previous plan and the matching new-plan rows are discarded."
+    ),
+)
+parser.add_argument(
+    "--jerk-limited-otg-config",
+    type=Path,
+    default=None,
+    help=(
+        "Optional frozen common 28D Ruckig config. The selected causal-plan endpoint "
+        "is realized from measured q/dq/ddq without changing any raw policy chunk."
+    ),
+)
+parser.add_argument(
+    "--fixed-flow-noise",
+    action="store_true",
+    help="Diagnostic deterministic flow sampling; raw chunks remain separately logged.",
+)
 parser.add_argument("--stage2-inference-calls", type=int, default=10)
 parser.add_argument("--stage3-inference-calls", type=int, default=90)
 parser.add_argument("--stage4-inference-calls", type=int, default=160)
@@ -131,6 +162,25 @@ parser.add_argument(
 )
 parser.add_argument("--settle-seconds", type=float, default=1.0)
 parser.add_argument("--seed", type=int, default=20260824)
+parser.add_argument(
+    "--capture-inference-indices",
+    default="",
+    help=(
+        "Comma-separated inference-call indices whose exact policy RGB and measured "
+        "float32 state are losslessly preserved for fixed-observation audits. "
+        "Logging only; it does not alter execution."
+    ),
+)
+parser.add_argument(
+    "--fixed-observation-metadata",
+    type=Path,
+    default=None,
+    help=(
+        "Single-chunk diagnostic only: use the exact frozen RGB/state recorded in "
+        "this metadata JSON for policy inference and initialize Isaac from that "
+        "state. No replanning is performed."
+    ),
+)
 parser.add_argument(
     "--checkpoint-override",
     type=Path,
@@ -178,8 +228,24 @@ parser.add_argument(
 )
 AppLauncher.add_app_launcher_args(parser)
 args = parser.parse_args()
-if not 1 <= args.execution_horizon <= 8:
-    parser.error("--execution-horizon must be in the conservative range 1..8")
+try:
+    CAPTURE_INFERENCE_INDICES = {
+        int(value.strip())
+        for value in args.capture_inference_indices.split(",")
+        if value.strip()
+    }
+except ValueError as error:
+    parser.error(f"invalid --capture-inference-indices: {error}")
+if any(index < 0 for index in CAPTURE_INFERENCE_INDICES):
+    parser.error("--capture-inference-indices values must be non-negative")
+if args.fixed_observation_metadata is not None and args.stage != "object-free-single":
+    parser.error("--fixed-observation-metadata requires --stage object-free-single")
+if not 1 <= args.execution_horizon <= 16:
+    parser.error("--execution-horizon must be in the audited range 1..16")
+if not 0 <= args.rtc_inference_delay_frames <= args.execution_horizon:
+    parser.error("--rtc-inference-delay-frames must be in 0..execution-horizon")
+if args.causal_stitching_method != "rtc" and args.rtc_inference_delay_frames:
+    parser.error("--rtc-inference-delay-frames is valid only for RTC")
 if args.stage == "full-motion" and not args.simulation_diagnostic_rollout:
     parser.error("full-motion is an Isaac-only simulation diagnostic mode")
 if args.kinematic_visual_doll and args.stage != "full-motion":
@@ -429,6 +495,10 @@ def prerequisite_gate(output_root: Path) -> None:
     prerequisite = PREREQUISITES.get(args.stage)
     if prerequisite is None:
         return
+    if args.stage == "object-free-single" and args.fixed_observation_metadata is not None:
+        # This is an isolated no-object, one-chunk representation audit.  It does
+        # not claim or advance the progressive Stage-0/Stage-1 qualification.
+        return
     if args.simulation_diagnostic_rollout and args.stage == "object-free-multichunk":
         strict_stage1_diagnostic_authorization()
         return
@@ -547,6 +617,7 @@ class PolicyBridge:
         execution_horizon: int,
         rtc_guidance_weight: float,
         rtc_prefix_attention_schedule: str,
+        fixed_flow_noise: bool,
     ):
         self.checkpoint = checkpoint
         self.stage_dir = stage_dir
@@ -584,6 +655,7 @@ class PolicyBridge:
                 str(rtc_guidance_weight),
                 "--rtc-prefix-attention-schedule",
                 rtc_prefix_attention_schedule,
+                *(["--fixed-flow-noise"] if fixed_flow_noise else []),
             ],
             cwd=ROOT,
             stdout=self.log_stream,
@@ -603,7 +675,7 @@ class PolicyBridge:
         self.connection = Client(str(self.socket_path), family="AF_UNIX", authkey=AUTHKEY)
 
     def infer(
-        self, rgb: np.ndarray, state: np.ndarray
+        self, rgb: np.ndarray, state: np.ndarray, *, inference_delay: int = 0
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray, dict[str, Any]]:
         self.connection.send(
             {
@@ -611,6 +683,7 @@ class PolicyBridge:
                 "rgb": np.ascontiguousarray(rgb, dtype=np.uint8),
                 "state": np.ascontiguousarray(state, dtype=np.float32),
                 "task": TASK,
+                "inference_delay": int(inference_delay),
             }
         )
         response = self.connection.recv()
@@ -652,6 +725,72 @@ def branch_flags(q: np.ndarray, absolute: float, multiplier: float) -> np.ndarra
         local = float(np.median(norms[max(0, index - 10) : min(len(norms), index + 9)]))
         flags[index] = norms[index - 1] > max(absolute, multiplier * max(local, 1e-6))
     return flags
+
+
+def look_at_ros_camera_quaternion_xyzw(
+    eye_world_xyz: np.ndarray, target_world_xyz: np.ndarray
+) -> np.ndarray:
+    """Return world-from-ROS-optical-camera quaternion for a diagnostic view."""
+
+    eye = np.asarray(eye_world_xyz, dtype=np.float64)
+    target = np.asarray(target_world_xyz, dtype=np.float64)
+    forward = target - eye
+    forward /= np.linalg.norm(forward)
+    world_up = np.asarray([0.0, 0.0, 1.0], dtype=np.float64)
+    right = np.cross(forward, world_up)
+    if np.linalg.norm(right) < 1e-8:
+        world_up = np.asarray([0.0, 1.0, 0.0], dtype=np.float64)
+        right = np.cross(forward, world_up)
+    right /= np.linalg.norm(right)
+    down = np.cross(forward, right)
+    down /= np.linalg.norm(down)
+    rotation = np.column_stack((right, down, forward))
+    trace = float(np.trace(rotation))
+    if trace > 0.0:
+        scale = math.sqrt(trace + 1.0) * 2.0
+        quaternion = np.asarray(
+            [
+                (rotation[2, 1] - rotation[1, 2]) / scale,
+                (rotation[0, 2] - rotation[2, 0]) / scale,
+                (rotation[1, 0] - rotation[0, 1]) / scale,
+                0.25 * scale,
+            ],
+            dtype=np.float64,
+        )
+    else:
+        diagonal = np.diag(rotation)
+        index = int(np.argmax(diagonal))
+        if index == 0:
+            scale = math.sqrt(1.0 + rotation[0, 0] - rotation[1, 1] - rotation[2, 2]) * 2.0
+            quaternion = np.asarray(
+                [
+                    0.25 * scale,
+                    (rotation[0, 1] + rotation[1, 0]) / scale,
+                    (rotation[0, 2] + rotation[2, 0]) / scale,
+                    (rotation[2, 1] - rotation[1, 2]) / scale,
+                ]
+            )
+        elif index == 1:
+            scale = math.sqrt(1.0 + rotation[1, 1] - rotation[0, 0] - rotation[2, 2]) * 2.0
+            quaternion = np.asarray(
+                [
+                    (rotation[0, 1] + rotation[1, 0]) / scale,
+                    0.25 * scale,
+                    (rotation[1, 2] + rotation[2, 1]) / scale,
+                    (rotation[0, 2] - rotation[2, 0]) / scale,
+                ]
+            )
+        else:
+            scale = math.sqrt(1.0 + rotation[2, 2] - rotation[0, 0] - rotation[1, 1]) * 2.0
+            quaternion = np.asarray(
+                [
+                    (rotation[0, 2] + rotation[2, 0]) / scale,
+                    (rotation[1, 2] + rotation[2, 1]) / scale,
+                    0.25 * scale,
+                    (rotation[1, 0] - rotation[0, 1]) / scale,
+                ]
+            )
+    return quaternion / np.linalg.norm(quaternion)
 
 
 class NumericalSafety:
@@ -1503,7 +1642,71 @@ def main() -> int:
     checkpoint, checkpoint_hash, checkpoint_step = frozen_checkpoint()
     names, lower, upper, freeze = frozen_interfaces()
     projector, projection_config, projection_config_hash = frozen_projection(names)
-    init_q, init_report = initial_condition(names)
+    jerk_limited_otg = (
+        CommonJerkLimitedOTG.from_path(args.jerk_limited_otg_config)
+        if args.jerk_limited_otg_config is not None
+        else None
+    )
+    if jerk_limited_otg is not None and jerk_limited_otg.names != names:
+        raise RuntimeError("common jerk-limited OTG joint order does not match Dataset B")
+    jerk_limited_otg_config_hash = (
+        sha256_file(args.jerk_limited_otg_config.resolve())
+        if args.jerk_limited_otg_config is not None
+        else None
+    )
+    fixed_observation_rgb: np.ndarray | None = None
+    fixed_observation_state: np.ndarray | None = None
+    fixed_observation_record: dict[str, Any] | None = None
+    if args.fixed_observation_metadata is not None:
+        metadata_path = args.fixed_observation_metadata.resolve()
+        metadata = read_json(metadata_path)
+        rgb_path = Path(metadata["rgb_path"]).resolve()
+        state_path = Path(metadata["state_path"]).resolve()
+        if sha256_file(rgb_path) != metadata["rgb_sha256"]:
+            raise RuntimeError(f"fixed-observation RGB hash mismatch: {rgb_path}")
+        if sha256_file(state_path) != metadata["state_sha256"]:
+            raise RuntimeError(f"fixed-observation state hash mismatch: {state_path}")
+        if metadata["task"] != TASK:
+            raise RuntimeError("fixed-observation task does not match the frozen task string")
+        bgr = cv2.imread(str(rgb_path), cv2.IMREAD_COLOR)
+        if bgr is None or bgr.shape != (480, 640, 3):
+            raise RuntimeError(f"fixed-observation RGB is malformed: {rgb_path}")
+        fixed_observation_rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
+        with np.load(state_path, allow_pickle=False) as archive:
+            fixed_observation_state = archive["measured_state"].astype(np.float64)
+            fixed_names = archive["joint_names"].astype(str).tolist()
+        if fixed_observation_state.shape != (28,) or not np.isfinite(
+            fixed_observation_state
+        ).all():
+            raise RuntimeError("fixed-observation state is not finite 28D")
+        if fixed_names != names:
+            raise RuntimeError("fixed-observation named-joint order differs from Dataset B")
+        init_q = fixed_observation_state.copy()
+        init_report = {
+            "definition": "exact measured 28D state from frozen Policy-B observation",
+            "purpose": "single fixed-noise raw-chunk replay without replanning",
+            "joint_names": names,
+            "q_rad": init_q,
+            "fixed_observation_metadata": str(metadata_path),
+            "fixed_observation_metadata_sha256": sha256_file(metadata_path),
+            "rgb_path": str(rgb_path),
+            "rgb_sha256": metadata["rgb_sha256"],
+            "state_path": str(state_path),
+            "state_sha256": metadata["state_sha256"],
+            "policy_generated_actions_only_after_initialization": True,
+        }
+        fixed_observation_record = {
+            "metadata": str(metadata_path),
+            "metadata_sha256": sha256_file(metadata_path),
+            "rgb": str(rgb_path),
+            "rgb_sha256": metadata["rgb_sha256"],
+            "state": str(state_path),
+            "state_sha256": metadata["state_sha256"],
+            "task": metadata["task"],
+            "policy_input_is_byte_exact_frozen_rgb_and_float32_state": True,
+        }
+    else:
+        init_q, init_report = initial_condition(names)
     initial_projection = projector.project(init_q[None, :], inference_index=None)
     init_q = initial_projection.deployment_safe_action[0]
     init_report["simulation_deployment_safety"] = initial_projection.summary
@@ -1675,24 +1878,32 @@ def main() -> int:
         else None
     )
 
-    policy_spawn = sim_utils.PinholeCameraCfg.from_intrinsic_matrix(
-        DEPLOYMENT_CAMERA.intrinsic_matrix.reshape(-1).tolist(),
-        width=DEPLOYMENT_CAMERA.width,
-        height=DEPLOYMENT_CAMERA.height,
-        clipping_range=DEPLOYMENT_CAMERA.clipping_range_m,
-        lock_camera=True,
-    )
+    def camera_spawn() -> Any:
+        return sim_utils.PinholeCameraCfg.from_intrinsic_matrix(
+            DEPLOYMENT_CAMERA.intrinsic_matrix.reshape(-1).tolist(),
+            width=DEPLOYMENT_CAMERA.width,
+            height=DEPLOYMENT_CAMERA.height,
+            clipping_range=DEPLOYMENT_CAMERA.clipping_range_m,
+            lock_camera=True,
+        )
+
     cameras = {
-        "policy": Camera(
+        key: Camera(
             CameraCfg(
-                prim_path="/World/PolicyDeploymentCamera",
+                prim_path=f"/World/{prim_name}",
                 update_period=0.0,
                 width=DEPLOYMENT_CAMERA.width,
                 height=DEPLOYMENT_CAMERA.height,
                 data_types=["rgb"],
-                spawn=policy_spawn,
+                spawn=camera_spawn(),
             )
-        ),
+        )
+        for key, prim_name in {
+            "policy": "PolicyDeploymentCamera",
+            "overview": "ExecutionDiagnosticOverviewCamera",
+            "top": "ExecutionDiagnosticTopCamera",
+            "side": "ExecutionDiagnosticSideCamera",
+        }.items()
     }
     sim.reset()
     isaac_names = list(robot.data.joint_names)
@@ -1705,6 +1916,17 @@ def main() -> int:
     cameras["policy"].set_world_poses(
         camera_position[None], camera_quaternion[None], convention="ros"
     )
+    diagnostic_presets = layout["camera"]["presets"]
+    for diagnostic_name in ("overview", "top", "side"):
+        preset = diagnostic_presets[diagnostic_name]
+        eye = np.asarray(preset["eye_world_xyz_m"], dtype=np.float32)
+        target_point = np.asarray(preset["target_world_xyz_m"], dtype=np.float32)
+        orientation = look_at_ros_camera_quaternion_xyzw(eye, target_point).astype(
+            np.float32
+        )
+        cameras[diagnostic_name].set_world_poses(
+            eye[None], orientation[None], convention="ros"
+        )
     target = robot.data.default_joint_pos.torch.clone().to(robot.device, dtype=torch.float32)
     zero = torch.zeros_like(target)
     target[0, ids] = torch.as_tensor(init_q, device=robot.device, dtype=torch.float32)
@@ -1736,6 +1958,7 @@ def main() -> int:
                 if name == "policy"
                 else image.copy()
             )
+        result["source_like"] = result["policy"].copy()
         return result
 
     def measured_state() -> np.ndarray:
@@ -1746,6 +1969,23 @@ def main() -> int:
 
     def measured_velocity() -> np.ndarray:
         return robot.data.joint_vel.torch[0, ids].detach().cpu().numpy().astype(np.float64)
+
+    def causal_measured_acceleration_estimate(
+        measured_velocity_history: list[np.ndarray], horizon: int
+    ) -> np.ndarray:
+        """Estimate dq/dt from past measured velocities with no future samples."""
+
+        count = min(max(2, int(horizon)), len(measured_velocity_history))
+        if count < 2:
+            return np.zeros(28, dtype=np.float64)
+        history = np.asarray(measured_velocity_history[-count:], dtype=np.float64)
+        time_axis = np.arange(count, dtype=np.float64) / CONTROL_FPS
+        centered_time = time_axis - float(np.mean(time_axis))
+        denominator = float(np.dot(centered_time, centered_time))
+        value = np.sum(centered_time[:, None] * history, axis=0) / denominator
+        if value.shape != (28,) or not np.isfinite(value).all():
+            raise RuntimeError("causal measured acceleration estimate is malformed")
+        return value
 
     steps_per_control = int(round((1.0 / CONTROL_FPS) / PHYSICS_DT))
 
@@ -1815,6 +2055,7 @@ def main() -> int:
             args.execution_horizon,
             args.rtc_guidance_weight,
             args.rtc_prefix_attention_schedule,
+            args.fixed_flow_noise,
         )
         checkpoint_ready = bridge.ready
         adapter_root = stage_dir if args.stage == "full-motion" else output_root
@@ -1864,12 +2105,64 @@ def main() -> int:
                     if args.causal_stitching_method == "rtc"
                     else None
                 ),
-                "simulation_inference_delay_frames": 0,
+                "crossfade_window_frames": (
+                    args.crossfade_window_frames
+                    if args.causal_stitching_method == "crossfade"
+                    else None
+                ),
+                "crossfade_window_derivation": (
+                    "ceil of Dataset-B p95 jerk-derived transition duration for the measured M0 maximum old/new plan discrepancy; 5 frames at 30 Hz"
+                    if args.causal_stitching_method == "crossfade"
+                    else None
+                ),
+                "simulation_inference_delay_frames": (
+                    args.rtc_inference_delay_frames
+                    if args.causal_stitching_method == "rtc"
+                    else 0
+                ),
+                "execution_semantics": (
+                    "LOGICALLY_ASYNC_LATENCY_AWARE_ACTION_QUEUE"
+                    if args.causal_stitching_method == "rtc"
+                    and args.rtc_inference_delay_frames
+                    else "SYNCHRONOUS_PREFIX_COMMITMENT"
+                ),
                 "causal": True,
                 "future_observations_or_policy_calls_used": False,
                 "raw_policy_chunks_preserved": True,
+                "flow_noise_mode": (
+                    "FIXED_SEED_DERIVED_TENSOR_REUSED"
+                    if args.fixed_flow_noise
+                    else "FRESH_SEQUENTIAL_SEED_STREAM"
+                ),
                 "episode_phase_or_task_specific_logic": False,
                 "policy_independent_interface": True,
+                "real_hardware_authorized": False,
+            },
+            "jerk_limited_online_trajectory_generation": {
+                "enabled": jerk_limited_otg is not None,
+                "implementation": (
+                    "Ruckig community Python online position OTG"
+                    if jerk_limited_otg is not None
+                    else None
+                ),
+                "config": (
+                    str(args.jerk_limited_otg_config.resolve())
+                    if args.jerk_limited_otg_config is not None
+                    else None
+                ),
+                "config_sha256": jerk_limited_otg_config_hash,
+                "current_state": (
+                    "ISAAC_MEASURED_Q_DQ_PLUS_CAUSAL_COMMITTED_PREFIX_DQ_SLOPE_DDQ"
+                    if jerk_limited_otg is not None
+                    else None
+                ),
+                "target": (
+                    "DEPLOYMENT_SAFE_SELECTED_CAUSAL_PLAN_COMMITTED_ENDPOINT"
+                    if jerk_limited_otg is not None
+                    else None
+                ),
+                "raw_policy_chunks_modified": False,
+                "fail_closed": True if jerk_limited_otg is not None else None,
                 "real_hardware_authorized": False,
             },
             "policy_worker": checkpoint_ready,
@@ -1933,6 +2226,11 @@ def main() -> int:
                 if source_rgb_paths
                 else {"active": False}
             ),
+            "fixed_observation_single_chunk_diagnostic": (
+                fixed_observation_record
+                if fixed_observation_record is not None
+                else {"active": False}
+            ),
         }
 
         if args.stage == "inference":
@@ -1941,12 +2239,21 @@ def main() -> int:
             np.save(stage_dir / "input_state.npy", initial_measured.astype(np.float32))
             (
                 policy_raw_action,
-                stitched_execution_plan,
+                model_stitched_plan,
                 previous_remaining_plan,
                 inference,
             ) = bridge.infer(
                 initial_images["policy"], initial_measured
             )
+            stitching = causal_stitcher.stitch(
+                raw_policy_chunk=policy_raw_action,
+                model_stitched_plan=model_stitched_plan,
+                previous_remaining_plan=previous_remaining_plan,
+                last_commanded_action=None,
+                measured_qpos=initial_measured,
+            )
+            stitched_execution_plan = stitching.stitched_execution_plan
+            stitching_records.append({"inference_index": 0, **stitching.audit})
             projection = projector.project(stitched_execution_plan, inference_index=0)
             hard_limit_projected_action = projection.hard_limit_projected_action
             deployment_safe_action = projection.deployment_safe_action
@@ -2151,6 +2458,11 @@ def main() -> int:
             enabled=not args.no_video,
         )
         recorder.add(initial_images, f"{args.stage} | initial measured state")
+        causal_stitcher = CommonCausalActionStitcher(
+            args.causal_stitching_method,
+            crossfade_window_frames=args.crossfade_window_frames,
+        )
+        stitching_records: list[dict[str, Any]] = []
         policy_raw_executed: list[np.ndarray] = []
         stitched_execution_executed: list[np.ndarray] = []
         hard_limit_projected_executed: list[np.ndarray] = []
@@ -2162,11 +2474,17 @@ def main() -> int:
         inference_rows: list[dict[str, Any]] = []
         inference_timestamps_s: list[float] = []
         policy_raw_chunks: list[np.ndarray] = []
+        model_stitched_policy_chunks: list[np.ndarray] = []
+        causal_selected_plan_chunks: list[np.ndarray] = []
         stitched_execution_chunks: list[np.ndarray] = []
         previous_remaining_plans: list[np.ndarray] = []
         previous_remaining_plan_lengths: list[int] = []
         hard_limit_projected_chunks: list[np.ndarray] = []
         deployment_safe_chunks: list[np.ndarray] = []
+        otg_velocity_chunks: list[np.ndarray] = []
+        otg_acceleration_chunks: list[np.ndarray] = []
+        otg_target_positions: list[np.ndarray] = []
+        otg_records: list[dict[str, Any]] = []
         projection_records: list[dict[str, Any]] = []
         hard_limit_projection_records: list[dict[str, Any]] = []
         deployment_margin_projection_records: list[dict[str, Any]] = []
@@ -2197,6 +2515,8 @@ def main() -> int:
             stitched_execution_plan: np.ndarray,
             previous_remaining_plan: np.ndarray,
             inference_index: int,
+            *,
+            archived_raw_policy_chunk: np.ndarray | None = None,
         ) -> tuple[np.ndarray, np.ndarray, dict[str, Any]]:
             projection = projector.project(
                 stitched_execution_plan,
@@ -2414,7 +2734,13 @@ def main() -> int:
                 "executed_prefix_hard_gate": prefix_gate,
                 "unexecuted_suffix_warning": suffix_warning,
             }
-            policy_raw_chunks.append(policy_raw_action.copy())
+            policy_raw_chunks.append(
+                (
+                    policy_raw_action
+                    if archived_raw_policy_chunk is None
+                    else archived_raw_policy_chunk
+                ).copy()
+            )
             stitched_execution_chunks.append(stitched_execution_plan.copy())
             previous_remaining_plans.append(previous_remaining_plan.copy())
             previous_remaining_plan_lengths.append(len(previous_remaining_plan))
@@ -2600,14 +2926,30 @@ def main() -> int:
                 flush=True,
             )
         elif args.stage == "object-free-single":
+            policy_input_rgb = (
+                fixed_observation_rgb
+                if fixed_observation_rgb is not None
+                else initial_images["policy"]
+            )
+            policy_input_state = (
+                fixed_observation_state
+                if fixed_observation_state is not None
+                else initial_measured
+            )
             (
                 policy_raw_action,
                 stitched_execution_plan,
                 previous_remaining_plan,
                 inference,
             ) = bridge.infer(
-                initial_images["policy"], initial_measured
+                policy_input_rgb, policy_input_state
             )
+            if fixed_observation_record is not None:
+                save_rgb(stage_dir / "fixed_policy_input_rgb.png", policy_input_rgb)
+                np.save(
+                    stage_dir / "fixed_policy_input_state.npy",
+                    policy_input_state.astype(np.float32),
+                )
             hard_limit_projected_action, deployment_safe_action, audit = prepare_chunk(
                 initial_measured,
                 policy_raw_action,
@@ -2635,9 +2977,21 @@ def main() -> int:
                 "full-motion": args.full_motion_inference_calls,
             }[args.stage]
             previous_raw_chunk: np.ndarray | None = None
+            previous_model_stitched_chunk: np.ndarray | None = None
+            previous_causal_selected_plan: np.ndarray | None = None
             previous_stitched_chunk: np.ndarray | None = None
             previous_hard_chunk: np.ndarray | None = None
             previous_chunk: np.ndarray | None = None
+            # The online trajectory generator owns a persistent command-reference
+            # state.  It is seeded from measured feedback exactly once, then advanced
+            # only by commands that have actually been committed.  Re-seeding a new
+            # trajectory from lagging measured q at every policy call creates a
+            # reference jump equal to the controller tracking error, defeating the
+            # continuity guarantee that the OTG is meant to provide.  Measured q/dq
+            # remain mandatory feedback for runtime gates and tracking-error audits.
+            otg_reference_position: np.ndarray | None = None
+            otg_reference_velocity: np.ndarray | None = None
+            otg_reference_acceleration: np.ndarray | None = None
             goal_reached = False
             for inference_index in range(max_calls):
                 inference_timestamp_s = len(commanded) / CONTROL_FPS
@@ -2649,17 +3003,175 @@ def main() -> int:
                     if source_rgb_paths
                     else current_images["policy"]
                 )
+                if inference_index in CAPTURE_INFERENCE_INDICES:
+                    observation_dir = stage_dir / "fixed_inference_observations"
+                    rgb_path = observation_dir / f"inference_{inference_index:04d}_rgb.png"
+                    state_path = observation_dir / f"inference_{inference_index:04d}_state.npz"
+                    save_rgb(rgb_path, policy_rgb)
+                    atomic_npz(
+                        state_path,
+                        measured_state=current_state.astype(np.float32),
+                        joint_names=np.asarray(names),
+                    )
+                    atomic_json(
+                        observation_dir / f"inference_{inference_index:04d}.json",
+                        {
+                            "inference_index": inference_index,
+                            "simulation_timestamp_s": inference_timestamp_s,
+                            "rgb_path": str(rgb_path),
+                            "rgb_sha256": sha256_file(rgb_path),
+                            "rgb_shape": list(policy_rgb.shape),
+                            "rgb_dtype": str(policy_rgb.dtype),
+                            "state_path": str(state_path),
+                            "state_sha256": sha256_file(state_path),
+                            "state_dtype_at_policy_interface": "float32",
+                            "state_joint_names": names,
+                            "task": TASK,
+                            "checkpoint": str(checkpoint),
+                            "checkpoint_model_sha256": checkpoint_hash,
+                            "camera": DEPLOYMENT_CAMERA.name,
+                            "logging_only_no_execution_semantics_changed": True,
+                        },
+                    )
                 (
                     policy_raw_action,
-                    stitched_execution_plan,
-                    previous_remaining_plan,
+                    model_stitched_plan,
+                    worker_previous_remaining_plan,
                     inference,
                 ) = bridge.infer(
-                    policy_rgb, current_state
+                    policy_rgb,
+                    current_state,
+                    inference_delay=(
+                        args.rtc_inference_delay_frames
+                        if args.causal_stitching_method == "rtc"
+                        and previous_chunk is not None
+                        else 0
+                    ),
+                )
+                previous_remaining_plan = (
+                    previous_chunk[args.execution_horizon :].copy()
+                    if args.causal_stitching_method == "crossfade"
+                    and previous_chunk is not None
+                    else worker_previous_remaining_plan
+                )
+                stitching = causal_stitcher.stitch(
+                    raw_policy_chunk=policy_raw_action,
+                    model_stitched_plan=model_stitched_plan,
+                    previous_remaining_plan=previous_remaining_plan,
+                    last_commanded_action=commanded[-1] if commanded else None,
+                    measured_qpos=current_state,
+                )
+                stitched_execution_plan = stitching.stitched_execution_plan.copy()
+                raw_execution_reference = policy_raw_action.copy()
+                rtc_committed_previous_rows = 0
+                if (
+                    args.causal_stitching_method == "rtc"
+                    and previous_chunk is not None
+                    and args.rtc_inference_delay_frames
+                ):
+                    rtc_committed_previous_rows = args.rtc_inference_delay_frames
+                    previous_start = args.execution_horizon
+                    previous_stop = previous_start + rtc_committed_previous_rows
+                    if (
+                        previous_raw_chunk is None
+                        or previous_stitched_chunk is None
+                        or previous_stop > len(previous_stitched_chunk)
+                    ):
+                        raise RuntimeError(
+                            "RTC latency queue lacks the prior committed rows required "
+                            "during inference"
+                        )
+                    # Faithful ActionQueue semantics: commands already in flight while
+                    # inference runs cannot be overwritten.  New RTC rows representing
+                    # that elapsed interval are discarded; only the uncommitted future
+                    # comes from the new policy call.
+                    raw_execution_reference[:rtc_committed_previous_rows] = (
+                        previous_raw_chunk[previous_start:previous_stop]
+                    )
+                    stitched_execution_plan[:rtc_committed_previous_rows] = (
+                        previous_stitched_chunk[previous_start:previous_stop]
+                    )
+                causal_selected_plan = stitched_execution_plan.copy()
+                model_stitched_policy_chunks.append(model_stitched_plan.copy())
+                causal_selected_plan_chunks.append(causal_selected_plan.copy())
+                if jerk_limited_otg is not None:
+                    committed_endpoint_index = args.execution_horizon - 1
+                    target_projection = projector.project(
+                        causal_selected_plan[
+                            committed_endpoint_index : committed_endpoint_index + 1
+                        ],
+                        inference_index=inference_index,
+                    )
+                    otg_target = target_projection.deployment_safe_action[0]
+                    current_velocity = measured_velocity()
+                    current_acceleration = causal_measured_acceleration_estimate(
+                        actual_velocity, args.execution_horizon
+                    )
+                    otg_seed_source = "PERSISTENT_LAST_COMMITTED_REFERENCE"
+                    if otg_reference_position is None:
+                        otg_reference_position = current_state.copy()
+                        otg_reference_velocity = current_velocity.copy()
+                        otg_reference_acceleration = current_acceleration.copy()
+                        otg_seed_source = "INITIAL_MEASURED_Q_DQ_CAUSAL_DDQ"
+                    assert otg_reference_velocity is not None
+                    assert otg_reference_acceleration is not None
+                    otg_result = jerk_limited_otg.generate(
+                        current_position=otg_reference_position,
+                        current_velocity=otg_reference_velocity,
+                        current_acceleration=otg_reference_acceleration,
+                        target_position=otg_target,
+                        steps=50,
+                    )
+                    stitched_execution_plan = otg_result.position
+                    otg_velocity_chunks.append(otg_result.velocity.copy())
+                    otg_acceleration_chunks.append(otg_result.acceleration.copy())
+                    otg_target_positions.append(otg_target.copy())
+                    otg_records.append(
+                        {
+                            "inference_index": inference_index,
+                            "committed_endpoint_row": committed_endpoint_index,
+                            "target_projection": target_projection.summary,
+                            "reference_seed_source": otg_seed_source,
+                            "measured_position_at_replan_rad": current_state,
+                            "measured_velocity_at_replan_rad_s": current_velocity,
+                            "causal_measured_acceleration_at_replan_rad_s2": current_acceleration,
+                            "reference_minus_measured_position_rad": (
+                                otg_reference_position - current_state
+                            ),
+                            "maximum_reference_tracking_error_rad": float(
+                                np.max(np.abs(otg_reference_position - current_state))
+                            ),
+                            **otg_result.audit,
+                        }
+                    )
+                stitching_audit = dict(stitching.audit)
+                stitching_audit.update(
+                    {
+                        "rtc_inference_delay_frames": rtc_committed_previous_rows,
+                        "committed_prefix_overwritten": False,
+                        "committed_prefix_source": (
+                            "PREVIOUS_PLAN_ROWS_EXECUTED_DURING_INFERENCE"
+                            if rtc_committed_previous_rows
+                            else "CURRENT_PLAN"
+                        ),
+                        "raw_new_policy_chunk_preserved_separately": True,
+                        "jerk_limited_otg_applied_after_plan_selection": (
+                            jerk_limited_otg is not None
+                        ),
+                        "queue_semantics": (
+                            "LOGICALLY_ASYNC_LATENCY_AWARE_ACTION_QUEUE"
+                            if args.causal_stitching_method == "rtc"
+                            else "SYNCHRONOUS_PREFIX_COMMITMENT"
+                        ),
+                    }
+                )
+                stitching_records.append(
+                    {"inference_index": inference_index, **stitching_audit}
                 )
                 inference = dict(inference)
                 inference["simulation_timestamp_s"] = inference_timestamp_s
                 inference["measured_state_rad"] = current_state
+                inference["committed_previous_plan_rows"] = rtc_committed_previous_rows
                 if source_rgb_paths:
                     source_frame_index = min(len(commanded), len(source_rgb_paths) - 1)
                     inference.update(
@@ -2678,10 +3190,11 @@ def main() -> int:
                     )
                 hard_limit_projected_action, deployment_safe_action, audit = prepare_chunk(
                     current_state,
-                    policy_raw_action,
+                    raw_execution_reference,
                     stitched_execution_plan,
                     previous_remaining_plan,
                     inference_index,
+                    archived_raw_policy_chunk=policy_raw_action,
                 )
                 inference_rows.append(inference)
                 if commanded:
@@ -2717,13 +3230,19 @@ def main() -> int:
                     replanned_future_differences.append(replanned_rmse)
                     worker_remaining_consistent = bool(
                         len(previous_remaining_plan) > 0
+                        and previous_model_stitched_chunk is not None
                         and np.array_equal(
                             previous_remaining_plan[0].astype(np.float32),
-                            previous_stitched_chunk[offset].astype(np.float32),
+                            previous_model_stitched_chunk[offset].astype(np.float32),
                         )
                     )
                     old_plan_vs_new_raw_delta = (
-                        policy_raw_action[0] - previous_stitched_chunk[offset]
+                        policy_raw_action[0]
+                        - (
+                            previous_model_stitched_chunk[offset]
+                            if previous_model_stitched_chunk is not None
+                            else previous_stitched_chunk[offset]
+                        )
                     )
                     boundary_record = {
                         "replan_index": inference_index,
@@ -2758,6 +3277,16 @@ def main() -> int:
                         "previous_chunk_stitched_planned_action_rad": previous_stitched_chunk[
                             offset
                         ],
+                        "previous_model_stitched_planned_action_rad": (
+                            previous_model_stitched_chunk[offset]
+                            if previous_model_stitched_chunk is not None
+                            else None
+                        ),
+                        "previous_causal_selected_planned_action_rad": (
+                            previous_causal_selected_plan[offset]
+                            if previous_causal_selected_plan is not None
+                            else None
+                        ),
                         "new_chunk_stitched_first_action_rad": stitched_execution_plan[0],
                         "stitched_boundary_delta_rad": stitched_boundary_delta,
                         "stitched_boundary_delta_rad_by_joint": {
@@ -2858,12 +3387,18 @@ def main() -> int:
                 horizon = args.execution_horizon
                 execution_start = len(actual)
                 goal_reached = execute_rows(
-                    policy_raw_action[:horizon],
+                    raw_execution_reference[:horizon],
                     stitched_execution_plan[:horizon],
                     hard_limit_projected_action[:horizon],
                     deployment_safe_action[:horizon],
                     inference_index,
                 )
+                if jerk_limited_otg is not None and len(commanded) > execution_start:
+                    committed_count = len(commanded) - execution_start
+                    committed_row = committed_count - 1
+                    otg_reference_position = otg_result.position[committed_row].copy()
+                    otg_reference_velocity = otg_result.velocity[committed_row].copy()
+                    otg_reference_acceleration = otg_result.acceleration[committed_row].copy()
                 if boundary_record is not None and len(actual) > execution_start:
                     sequence = np.vstack(
                         (initial_measured, np.asarray(actual, dtype=np.float64))
@@ -2904,7 +3439,9 @@ def main() -> int:
                             "boundary": boundary_record,
                         }
                         goal_reached = True
-                previous_raw_chunk = policy_raw_action
+                previous_raw_chunk = raw_execution_reference
+                previous_model_stitched_chunk = model_stitched_plan
+                previous_causal_selected_plan = causal_selected_plan
                 previous_stitched_chunk = stitched_execution_plan
                 previous_hard_chunk = hard_limit_projected_action
                 previous_chunk = deployment_safe_action
@@ -2949,7 +3486,7 @@ def main() -> int:
             checks["exactly_one_inference"] = len(inference_rows) == 1
         if args.stage in {"object-free-multichunk", "full-motion"}:
             checks["repeated_inference"] = len(inference_rows) >= 2
-            checks["short_causal_prefix"] = args.execution_horizon <= 8
+            checks["bounded_audited_causal_prefix"] = args.execution_horizon <= 16
             checks["strictly_causal_chunk_replacement"] = True
             checks["chunk_boundary_command_jump"] = all(
                 all(row["strict_pre_execution_checks"].values())
@@ -3016,12 +3553,24 @@ def main() -> int:
             future_suffix_warnings,
         )
         atomic_json(stage_dir / "inference_timestamps.json", inference_rows)
+        atomic_json(stage_dir / "causal_stitching_records.json", stitching_records)
+        atomic_json(stage_dir / "jerk_limited_otg_records.json", otg_records)
         if args.stage == "full-motion":
             atomic_json(stage_dir / "object_observation_trace.json", task_rows)
         raw_chunk_array = np.asarray(policy_raw_chunks, dtype=np.float32).reshape(-1, 50, 28)
         stitched_chunk_array = np.asarray(
             stitched_execution_chunks, dtype=np.float32
         ).reshape(-1, 50, 28)
+        model_stitched_chunk_array = (
+            np.asarray(model_stitched_policy_chunks, dtype=np.float32).reshape(-1, 50, 28)
+            if model_stitched_policy_chunks
+            else stitched_chunk_array.copy()
+        )
+        causal_selected_chunk_array = (
+            np.asarray(causal_selected_plan_chunks, dtype=np.float32).reshape(-1, 50, 28)
+            if causal_selected_plan_chunks
+            else stitched_chunk_array.copy()
+        )
         previous_remaining_array = np.zeros(
             (len(previous_remaining_plans), 50, 28), dtype=np.float32
         )
@@ -3035,14 +3584,62 @@ def main() -> int:
         deployment_chunk_array = np.asarray(
             deployment_safe_chunks, dtype=np.float32
         ).reshape(-1, 50, 28)
+        committed_prefix_array = np.zeros_like(deployment_chunk_array)
+        committed_prefix_length = min(args.execution_horizon, 50)
+        committed_prefix_array[:, :committed_prefix_length] = deployment_chunk_array[
+            :, :committed_prefix_length
+        ]
+        fused_uncommitted_array = np.zeros_like(deployment_chunk_array)
+        fused_uncommitted_length = 50 - committed_prefix_length
+        if fused_uncommitted_length:
+            fused_uncommitted_array[:, :fused_uncommitted_length] = causal_selected_chunk_array[
+                :, committed_prefix_length:
+            ]
         atomic_npz(
             stage_dir / "inference_chunks.npz",
             policy_raw_action=raw_chunk_array,
             raw_policy_chunk=raw_chunk_array,
+            model_stitched_policy_plan=model_stitched_chunk_array,
+            causal_selected_plan=causal_selected_chunk_array,
             previous_remaining_plan=previous_remaining_array,
             previous_remaining_plan_length=np.asarray(
                 previous_remaining_plan_lengths, dtype=np.int64
             ),
+            previous_plan=previous_remaining_array,
+            committed_prefix=committed_prefix_array,
+            committed_prefix_length=np.full(
+                len(deployment_chunk_array), committed_prefix_length, dtype=np.int64
+            ),
+            committed_from_previous_plan_length=np.asarray(
+                [row.get("committed_previous_plan_rows", 0) for row in inference_rows],
+                dtype=np.int64,
+            ),
+            fused_uncommitted_plan=fused_uncommitted_array,
+            fused_uncommitted_plan_length=np.full(
+                len(deployment_chunk_array), fused_uncommitted_length, dtype=np.int64
+            ),
+            final_command_reference=deployment_chunk_array,
+            jerk_limited_otg_position_reference=(
+                stitched_chunk_array
+                if jerk_limited_otg is not None
+                else np.empty((0, 50, 28), dtype=np.float32)
+            ),
+            jerk_limited_otg_velocity_reference=(
+                np.asarray(otg_velocity_chunks, dtype=np.float32).reshape(-1, 50, 28)
+                if otg_velocity_chunks
+                else np.empty((0, 50, 28), dtype=np.float32)
+            ),
+            jerk_limited_otg_acceleration_reference=(
+                np.asarray(otg_acceleration_chunks, dtype=np.float32).reshape(-1, 50, 28)
+                if otg_acceleration_chunks
+                else np.empty((0, 50, 28), dtype=np.float32)
+            ),
+            jerk_limited_otg_target_position=(
+                np.asarray(otg_target_positions, dtype=np.float32).reshape(-1, 28)
+                if otg_target_positions
+                else np.empty((0, 28), dtype=np.float32)
+            ),
+            committed_prefix_overwritten=np.asarray(False),
             stitched_execution_plan=stitched_chunk_array,
             hard_limit_projected_action=hard_chunk_array,
             deployment_safe_action=deployment_chunk_array,
@@ -3235,6 +3832,8 @@ def main() -> int:
             "method_description": (
                 "official LeRobot RTC causal prefix-guided inpainting"
                 if args.causal_stitching_method == "rtc"
+                else "state-aligned causal minimum-jerk crossfade"
+                if args.causal_stitching_method == "crossfade"
                 else "naive causal short-horizon replacement"
             ),
             "execution_horizon_frames": args.execution_horizon,
@@ -3351,7 +3950,9 @@ def main() -> int:
                 default=0.0,
             ),
             "never_executed_without_a_new_observation": True,
-            "hard_gate": False if args.stage == "full-motion" else None,
+            "hard_gate": False
+            if args.stage in {"object-free-multichunk", "full-motion"}
+            else None,
             "records": str(stage_dir / "future_suffix_warnings.json"),
         }
         executed_prefix_safety_summary = {
@@ -3500,6 +4101,11 @@ def main() -> int:
             "videos": recorder.paths,
             "trace": str(stage_dir / "rollout_trace.npz"),
             "inference_chunks": str(stage_dir / "inference_chunks.npz"),
+            "raw_policy_chunks_key": "raw_policy_chunk",
+            "previous_remaining_plan_key": "previous_remaining_plan",
+            "stitched_execution_plan_key": "stitched_execution_plan",
+            "commanded_action_key": "commanded_action",
+            "measured_qpos_key": "measured_qpos",
             "projection_records": str(stage_dir / "projection_records.json"),
             "hard_limit_projection_records": str(
                 stage_dir / "hard_limit_projection_records.json"
@@ -3508,6 +4114,9 @@ def main() -> int:
                 stage_dir / "deployment_margin_projection_records.json"
             ),
             "inference_timestamps": str(stage_dir / "inference_timestamps.json"),
+            "causal_stitching_records": str(
+                stage_dir / "causal_stitching_records.json"
+            ),
             "executed_prefix_safety_events": str(
                 stage_dir / "executed_prefix_safety_events.json"
             ),

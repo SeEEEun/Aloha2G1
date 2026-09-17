@@ -1,0 +1,94 @@
+{
+  "schema_version": "doll_handoff_common_g1_feasibility_resolver_v1",
+  "scope": "COMMON_BASELINE_AND_PROPOSED_TARGET_G1_BACKEND",
+  "task_independent": true,
+  "offline_only": true,
+  "dataset_packaging_allowed": false,
+  "policy_training_allowed": false,
+  "real_robot_command_allowed": false,
+  "source_target_mutation_allowed": false,
+  "ownership_timing_mutation_allowed": false,
+  "scene_mutation_allowed": false,
+  "episode_specific_parameters_allowed": false,
+  "phase_specific_cartesian_parameters_allowed": false,
+  "frozen_input": {
+    "root": "outputs/doll_handoff_retargeting/proposed_b_50_review_2026-08-21",
+    "implementation_sha256": "36fd0c2dfda0a5b0b0ed8b63a88f5d311d7267eaa1479d2d70b97dd8dd0f093a",
+    "trajectory_file_set_sha256": "c46c619afe83cb955564a9f6792eb9737fa4eca37ea158307b76a266b79f1da8",
+    "cartesian_target_array_set_sha256": "76bdca77b78e0b2f4b86e40bbd3a12a4984ea409aa382caa46fe954e59abb792",
+    "common_natural_arm_solver_sha256": "3ea0fe575b33278f9407e5ee956dbe6d8d3d0ba35797c3f415dd9b31aaae0ff2"
+  },
+  "unchanged_acceptance": {
+    "strict_position_tolerance_m": 0.01,
+    "physical_position_tolerance_m": 0.015,
+    "maximum_joint_step_rad": 0.15,
+    "maximum_velocity_rad_s": 4.5,
+    "maximum_acceleration_rad_s2": 130.0,
+    "branch_absolute_step_norm_rad": 0.18,
+    "branch_local_multiplier": 8.0,
+    "collision_penetration_tolerance_m": 0.00001
+  },
+  "constrained_tracking": {
+    "algorithm": "deterministic_bidirectional_box_constrained_task_tracking",
+    "activation_position_error_m": 0.01,
+    "activation_padding_frames": 8,
+    "bidirectional_passes": 2,
+    "maximum_function_evaluations": 80,
+    "position_residual_scale_per_m": 1000.0,
+    "frozen_q_residual_scale": 0.02,
+    "neighbor_q_residual_scale": 0.01,
+    "nominal_q_residual_scale": 0.002,
+    "joint_step_numerical_interior_rad": 0.0001,
+    "branch_step_numerical_interior_rad": 0.0001,
+    "acceleration_numerical_interior_rad_s2": 0.1,
+    "minimum_improvement_m": 1e-7
+  },
+  "orientation_policy": {
+    "source_orientation_is_immutable": true,
+    "new_orientation_slack_activated": false,
+    "reason": "frozen Proposed B already marks the spherical-object embodiment gauge as non-gating; frame evidence does not identify full orientation as the shared hard blocker",
+    "task_critical_axis": "whole-hand grasp-frame X bearing axis",
+    "morphologically_irrelevant_axis": "axial twist about grasp-frame X for an approximately spherical doll",
+    "so3_projection": "NONE"
+  },
+  "collision_repair": {
+    "algorithm": "signed_distance_anchor_projection_with_minimum_acceleration_windows",
+    "clearance_m": 0.00001,
+    "maximum_anchor_iterations": 500,
+    "maximum_pair_discovery_passes": 6,
+    "maximum_event_iterations": 10,
+    "window_padding_candidates_frames": [16, 32, 48],
+    "correction_scale_schedule": [1.0, 0.75, 0.5, 0.25],
+    "window_deviation_weight": 1.0,
+    "window_velocity_weight": 50.0,
+    "window_acceleration_weight": 500.0,
+    "anchor_weight": 100000000.0,
+    "boundary_zero_weight": 10000000000.0,
+    "source_position_objective_scale_per_m": 1000.0,
+    "frozen_q_deviation_weight": 0.02,
+    "nominal_q_deviation_weight": 0.001,
+    "repair_only_global_hard_segments": true
+  },
+  "nearest_target_projection": {
+    "algorithm": "closed_form_nearest_point_to_source_inside_realized_strict_tolerance_ball",
+    "strict_tolerance_interior_m": 0.0099,
+    "orientation_change_allowed": false,
+    "bimanual_relation_is_reported_separately": true
+  },
+  "representative_gate": {
+    "episodes": [2, 3, 11, 26, 24],
+    "selection": {
+      "2": "IK-only workspace/temporal cluster",
+      "3": "combined IK plus torso-clearance cluster",
+      "11": "deep sustained distal-hand geometry cluster",
+      "26": "torso-only branch/clearance cluster",
+      "24": "previously clean control"
+    },
+    "minimum_hard_source_residual_reduction_fraction": 0.25,
+    "minimum_hard_collision_frame_reduction_fraction": 0.5,
+    "maximum_control_mean_source_error_regression_m": 0.00025,
+    "maximum_aggregate_mean_source_error_regression_m": 0.00025,
+    "ownership_timing_change_allowed": false,
+    "source_target_change_allowed": false
+  }
+}

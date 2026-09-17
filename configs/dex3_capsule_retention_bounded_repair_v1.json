@@ -1,0 +1,155 @@
+{
+  "schema_version": "dex3_capsule_retention_bounded_repair_v1",
+  "experiment_name": "GRASP_RETENTION_UNDER_GRAVITY",
+  "status": "CAPSULE_GEOMETRY_FROZEN_FOR_RETENTION_DIAGNOSTIC",
+  "purpose": "Policy-independent bounded diagnosis and repair of bilateral Dex3 rigid-capsule retention under gravity.",
+  "policy_evaluation_allowed": false,
+  "learned_policy_used": false,
+  "real_robot_allowed": false,
+  "source_contact_config": "/home/jbnu/aloha_g1_dataset/configs/dex3_rigid_proxy_contact_diagnostic_v1.json",
+  "source_contact_config_sha256": "5024def29c9404735720a1eba9b6cc92a35c8274d3c80898e11abc1ea45443e5",
+  "frozen_geometry": {
+    "name": "capsule_contact_fit_v2",
+    "type": "capsule",
+    "radius_m": 0.018,
+    "cylinder_height_m": 0.0436,
+    "major_axis_world_xyz": [0.0, 0.449, 0.893],
+    "source": "Best bilateral capsule from the completed low-level contact diagnostic; geometry is not a variable in this task.",
+    "visual_and_collision_same_prim": true
+  },
+  "object": {
+    "mass_kg": 0.055,
+    "gravity_m_s2": 9.81,
+    "gravitational_load_n": 0.53955,
+    "restitution": 0.0
+  },
+  "conditions": {
+    "baseline": {
+      "category": "BASELINE_DIAGNOSIS",
+      "allowed_when": "Always run first; no parameter differs from the successful three-finger closure diagnostic.",
+      "material": {
+        "name": "BASELINE_055_045",
+        "static_friction": 0.55,
+        "dynamic_friction": 0.45,
+        "friction_combine_mode": "average",
+        "restitution_combine_mode": "average"
+      },
+      "finger_drive": {
+        "kp": 100.0,
+        "kd": 4.0,
+        "effort_limit_sim": 2.5,
+        "velocity_limit_sim": 12.0
+      }
+    },
+    "friction_medium_high": {
+      "category": "FRICTION_ONLY",
+      "allowed_when": "INSUFFICIENT_FRICTION",
+      "material": {
+        "name": "MEDIUM_HIGH_075_065",
+        "static_friction": 0.75,
+        "dynamic_friction": 0.65,
+        "friction_combine_mode": "average",
+        "restitution_combine_mode": "average"
+      },
+      "finger_drive": {
+        "kp": 100.0,
+        "kd": 4.0,
+        "effort_limit_sim": 2.5,
+        "velocity_limit_sim": 12.0
+      }
+    },
+    "friction_high": {
+      "category": "FRICTION_ONLY",
+      "allowed_when": "INSUFFICIENT_FRICTION",
+      "material": {
+        "name": "HIGH_095_080",
+        "static_friction": 0.95,
+        "dynamic_friction": 0.8,
+        "friction_combine_mode": "average",
+        "restitution_combine_mode": "average"
+      },
+      "finger_drive": {
+        "kp": 100.0,
+        "kd": 4.0,
+        "effort_limit_sim": 2.5,
+        "velocity_limit_sim": 12.0
+      }
+    },
+    "drive_small_step": {
+      "category": "DRIVE_ONLY",
+      "allowed_when": "INSUFFICIENT_NORMAL_FORCE",
+      "material": {
+        "name": "BASELINE_055_045",
+        "static_friction": 0.55,
+        "dynamic_friction": 0.45,
+        "friction_combine_mode": "average",
+        "restitution_combine_mode": "average"
+      },
+      "finger_drive": {
+        "kp": 125.0,
+        "kd": 4.0,
+        "effort_limit_sim": 3.0,
+        "velocity_limit_sim": 12.0
+      }
+    },
+    "combined_smallest": {
+      "category": "COMBINED_SINGLE_CANDIDATE",
+      "allowed_when": "MIXED",
+      "material": {
+        "name": "MEDIUM_HIGH_075_065",
+        "static_friction": 0.75,
+        "dynamic_friction": 0.65,
+        "friction_combine_mode": "average",
+        "restitution_combine_mode": "average"
+      },
+      "finger_drive": {
+        "kp": 125.0,
+        "kd": 4.0,
+        "effort_limit_sim": 3.0,
+        "velocity_limit_sim": 12.0
+      }
+    }
+  },
+  "grasp_execution": {
+    "grasp_target": "Unchanged frozen authoritative GRASP target in each scripted primitive.",
+    "arm_pose_during_close_and_retention": "Unchanged and fixed.",
+    "no_gravity_post_close_s": 0.25,
+    "gravity_retention_s": 1.25,
+    "lift_height_m": 0.05,
+    "lift_hold_s": 0.5
+  },
+  "gates": {
+    "minimum_gravity_retention_s": 1.0,
+    "maximum_retained_com_drop_m": 0.005,
+    "minimum_lift_m": 0.045,
+    "minimum_elevated_hold_s": 0.5,
+    "maximum_contact_penetration_m": 0.003,
+    "maximum_object_linear_speed_m_s": 1.0,
+    "maximum_object_angular_speed_rad_s": 50.0,
+    "maximum_object_com_step_m": 0.03,
+    "minimum_contact_force_n": 0.05
+  },
+  "classification_rule": {
+    "normal_force_sufficiency_ratio": "baseline_static_friction * total_contact_normal_force / gravitational_load",
+    "insufficient_normal_force": "The bilateral stable-contact median ratio is below 1.0, or the implicit drives saturate with persistent GRASP-target error before slip.",
+    "insufficient_friction": "The bilateral stable-contact ratio is at least 1.0 with small GRASP-target error, but sustained tangential slip precedes loss.",
+    "unfavorable_contact_geometry": "Normal/friction capacity is adequate but contact normals or active-link topology cannot oppose gravity; geometry remains frozen and no repair is authorized.",
+    "mixed": "Both force/drive insufficiency and sustained tangential slip are evidenced."
+  },
+  "bounded_repair_policy": {
+    "INSUFFICIENT_NORMAL_FORCE": ["drive_small_step"],
+    "INSUFFICIENT_FRICTION": ["friction_medium_high", "friction_high"],
+    "UNFAVORABLE_CONTACT_GEOMETRY": [],
+    "MIXED": ["combined_smallest"]
+  },
+  "prohibited": [
+    "sphere_or_ellipsoid_revisit",
+    "geometry_change",
+    "arm_pose_change",
+    "policy_specific_parameter",
+    "magnet",
+    "fixed_joint",
+    "weld",
+    "hidden_attachment"
+  ]
+}

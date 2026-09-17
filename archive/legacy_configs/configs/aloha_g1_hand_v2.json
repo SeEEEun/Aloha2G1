@@ -1,0 +1,71 @@
+{
+  "schema_version": "aloha_g1_hand_v2",
+  "status": "PROPOSED_DATASET_B_ONLY_OFFLINE_DIAGNOSTIC",
+  "method": "proposed",
+  "hand_mapper": "interaction_ik",
+  "side": "left",
+  "arm_trajectory_mutable": false,
+  "wrist_trajectory_mutable": false,
+  "baseline_dataset_a_mutable": false,
+  "source_representation": {
+    "mode": "SOURCE_TCP_RELATIVE_CONTACT_GEOMETRY_FALLBACK",
+    "contact_surface": "named ALOHA tip-box inner-face center",
+    "object_pose_required": false,
+    "object_relative_label_allowed_without_authoritative_pose": false
+  },
+  "contact_mapping": {
+    "contact_A_target": "left Dex3 thumb",
+    "contact_B_target": "left Dex3 index",
+    "contact_offset_scale_source": "v1 immutable global workspace uniform_scale",
+    "condition_on_achieved_frozen_wrist": true,
+    "per_episode_transform_allowed": false,
+    "per_frame_cartesian_residual_allowed": false
+  },
+  "dex3_ik": {
+    "reference_primitive": "LEFT_PHONE_GRASP",
+    "third_finger_policy": "ACTIVE_MODEL_OPEN_NEUTRAL_FIXED",
+    "optimized_roles": [
+      "left_A_thumb",
+      "left_B_index"
+    ],
+    "optimized_dof": 5,
+    "output_dof": 7,
+    "max_function_evaluations": 500,
+    "xtol": 1e-11,
+    "ftol": 1e-11,
+    "gtol": 1e-11,
+    "bound_epsilon_rad": 1e-6,
+    "contact_position_scale_m": 0.01,
+    "collision_penetration_scale_m": 0.005,
+    "regularization_scale_rad": 1.0,
+    "contact_weight": 1.0,
+    "orientation_weight": 0.01,
+    "reference_regularization_weight": 0.001,
+    "joint_limit_margin_rad": 0.01,
+    "joint_limit_margin_weight": 0.001,
+    "collision_weight": 2.0,
+    "temporal_velocity_weight": 0.02,
+    "temporal_acceleration_weight": 0.01,
+    "contact_feasible_mean_error_m": 0.01,
+    "meaningful_relative_contact_improvement": 0.1
+  },
+  "temporal_window": {
+    "start": "pregrasp_start",
+    "end": "hold_start_plus_fixed_frames",
+    "early_hold_frames": 15,
+    "sampling_rate_hz": 30.0
+  },
+  "smoke_selection": {
+    "source_metric": "v1 Proposed prohibited_arm_self_collision_count",
+    "low": "minimum with episode ID tie-break",
+    "median": "closest to 50-episode numeric median with episode ID tie-break",
+    "high": "maximum with episode ID tie-break",
+    "per_episode_weight_tuning": false
+  },
+  "execution_constraints": {
+    "offline_only": true,
+    "physics_stepping": false,
+    "real_robot_commands": false,
+    "training": false
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "schema_version": "aloha_g1_common_arm_v2_search",
+  "offline_only": true,
+  "training_allowed": false,
+  "physics_sweep_allowed": false,
+  "real_robot_command_allowed": false,
+  "base_retargeting_config": "outputs/g1_dataset_retargeting_v1/config/aloha_g1_retargeting_v1.json",
+  "authoritative_dataset_root": "lerobot_magsafe_50_cam_high_v3",
+  "hand_v2_1": {
+    "candidate": "outputs/g1_dataset_retargeting_hand_v2_1/config/proposed_hand_v2_1_candidate.json",
+    "readiness": "outputs/g1_dataset_retargeting_hand_v2_1/summary/integration_readiness.json",
+    "tool_compatibility": "outputs/g1_dataset_retargeting_hand_v2_1/summary/tool_transform_compatibility.json",
+    "required_conclusion": "PROPOSED_HAND_V2_1_READY_FOR_COMMON_ARM_RERUN"
+  },
+  "deterministic_split": {
+    "algorithm": "sha256-lowest-first",
+    "salt": "aloha-g1-arm-v2-split",
+    "calibration_episode_count": 40,
+    "validation_episode_count": 10
+  },
+  "anchor_search": {
+    "compact_q_source": "base_retargeting_config.nominal_g1_arm_q",
+    "wide_q_source": "converted_runs/magsafe_20260723_162750/dynamic_bimanual_spacing/g1_dynamic_bimanual_full_trajectory.npz",
+    "wide_q_key": "g1_arm_task_q[0]",
+    "wide_q_source_sha256": "694127ab24f269dec6c963d54ebdffffec93a1270864e67ea9ccde976e09e9aa",
+    "anchor_interpolation_fractions": [0.0, 0.5, 1.0],
+    "requested_common_translation_m": [
+      [0.0, 0.0, 0.0],
+      [0.04, 0.0, 0.0]
+    ],
+    "uniform_scales": [0.42, 0.38, 0.34, 0.30],
+    "rotation_correction_allowed": false,
+    "representative_frames_per_episode": 12,
+    "full_calibration_finalist_count": 2,
+    "static_anchor_iterations": 300,
+    "static_probe_iterations": 80,
+    "static_position_tolerance_m": 0.005,
+    "static_orientation_tolerance_rad": 0.75,
+    "selection_priority": [
+      "maximize_min_a_b_ik_success",
+      "minimize_joint_limit_violations",
+      "minimize_arm_only_collision_frames",
+      "minimize_wrist_error",
+      "preserve_source_displacement",
+      "preserve_proposed_bimanual_semantics",
+      "minimize_workspace_distortion",
+      "stay_close_to_geometry_derived_mapping"
+    ]
+  },
+  "shared_solver_v2": {
+    "change_from_v1": "acceptance-aware best-state retention only",
+    "position_orientation_acceptance_precedes_submillimetre_position_ranking": true,
+    "iteration_budget_changed": false,
+    "weights_changed": false,
+    "tolerances_changed": false,
+    "joint_limits_changed": false,
+    "temporal_regularization_changed": false,
+    "branch_policy": "previous-q causal seed; bounded update; deterministic acceptance-aware best effort"
+  },
+  "arm_collision_diagnostic": {
+    "hand_condition": "shared active-model OPEN posture",
+    "finger_involved_pairs_excluded_from_arm_candidate_selection": true,
+    "arm_categories": [
+      "ARM_TORSO",
+      "CROSS_ARM",
+      "WRIST_OR_PALM_TORSO",
+      "OTHER"
+    ]
+  },
+  "readiness": {
+    "locked_validation_max_success_gap": 0.05,
+    "require_overall_a_ik_improvement": true,
+    "require_overall_b_ik_improvement": true,
+    "require_all_finite": true,
+    "require_zero_joint_limit_violations": true,
+    "require_no_episode_or_frame_specific_logic": true,
+    "strict_gates_are_inherited_from_v1": true,
+    "training_label_ready_requires_all_strict_pass": true
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "task": "doll_handoff_to_trash_bin",
+  "units": "meters",
+  "source_scene": {
+    "path": "/home/jbnu/aloha_g1_dataset/isaaclab_magsafe_fixed_scene",
+    "base_usd_relative": "generated/magsafe_magnetic_scene_v2.usda",
+    "reuse": [
+      "table",
+      "black edge frame",
+      "camera",
+      "lighting",
+      "ALOHA/G1 preview infrastructure"
+    ]
+  },
+  "coordinate_frame": {
+    "world_origin": "existing scene: floor point below tabletop front-left corner",
+    "table_surface_origin_world": [
+      0.0,
+      0.0,
+      0.795
+    ],
+    "x_axis": "table left to right",
+    "y_axis": "table front/operator side to back",
+    "z_axis": "up",
+    "task_origin_world": [
+      0.025,
+      0.025,
+      0.795
+    ],
+    "task_origin_definition": "inner lower-left corner of the existing black tabletop frame",
+    "task_x_axis": "+world X",
+    "task_y_axis": "+world Y",
+    "task_z_axis": "+world Z"
+  },
+  "table": {
+    "size_x": 0.835,
+    "size_y": 0.72,
+    "surface_height": 0.795,
+    "edge_rail_width": 0.025,
+    "inner_workspace_size_x": 0.785,
+    "inner_workspace_size_y": 0.67,
+    "provenance": "reused from existing authoritative scene_layout.json"
+  },
+  "doll": {
+    "product_url": "https://www.daisomall.co.kr/pd/pdr/SCR_PDR_0001?pdNo=1080123&recmYn=N",
+    "model_interpretation": "green tennis-ball-shaped plush/toy visible in user photos",
+    "geometry": "sphere with two white seam rings; sphere collision",
+    "diameter": 0.075,
+    "mass_kg": 0.055,
+    "task_xy": [
+      0.14,
+      0.065
+    ],
+    "world_xy": [
+      0.165,
+      0.09
+    ],
+    "status": "PROVISIONAL_FROM_PHOTOS_PRODUCT_PAGE_BLOCKED",
+    "notes": "Photo-scaled against the existing 0.835 m tabletop. Replace diameter/mass after direct measurement if needed."
+  },
+  "trash_bin": {
+    "product_url": "https://www.daisomall.co.kr/pd/pdr/SCR_PDR_0001?pdNo=1042541",
+    "geometry": "open tapered rectangular bin: four wall meshes + bottom; no top collider",
+    "top_outer_size_xy": [
+      0.19,
+      0.165
+    ],
+    "bottom_outer_size_xy": [
+      0.16,
+      0.135
+    ],
+    "height": 0.19,
+    "wall_thickness": 0.004,
+    "bottom_thickness": 0.005,
+    "task_xy": [
+      0.65,
+      0.13
+    ],
+    "world_xy": [
+      0.675,
+      0.155
+    ],
+    "static": true,
+    "status": "PROVISIONAL_FROM_PHOTOS_PRODUCT_PAGE_BLOCKED",
+    "notes": "Open interior is modeled for later drop physics. Dimensions are photo estimates until measured."
+  },
+  "g1": {
+    "pelvis_to_table_front_gap_m": 0.15,
+    "table_front_world_y": 0.0,
+    "requested_pelvis_world_y": -0.15,
+    "x_center_world": 0.4175,
+    "z": "preserve existing G1 root height",
+    "patch_policy": "replace only the copied scene's existing 0.20 m G1 forward/root offset if a unique root-related literal is found; never patch the source MagSafe scene"
+  },
+  "render": {
+    "camera_eye": [
+      1.1,
+      -0.82,
+      1.34
+    ],
+    "camera_target": [
+      0.42,
+      0.36,
+      0.86
+    ],
+    "provenance": "reused from existing scene layout"
+  }
+}

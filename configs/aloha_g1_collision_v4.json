@@ -1,0 +1,60 @@
+{
+  "schema_version": "aloha_g1_collision_v4_search",
+  "offline_only": true,
+  "training_allowed": false,
+  "physics_sweep_allowed": false,
+  "real_robot_command_allowed": false,
+  "global_mapping_change_allowed": false,
+  "hand_change_allowed": false,
+  "acceptance_threshold_change_allowed": false,
+  "audit_before_tuning_required": true,
+  "candidate_selection_priority": [
+    "minimize_total_prohibited_collision_frames_across_a_b",
+    "maximize_min_a_b_valid_rate",
+    "maximize_matched_a_intersection_b",
+    "minimize_task_position_degradation",
+    "minimize_b_interaction_degradation",
+    "minimize_q_deviation_from_v3",
+    "minimize_orientation_slack_increase",
+    "minimize_temporal_disturbance"
+  ],
+  "global_candidates": [
+    {
+      "candidate_id": "clearance_00001_window_008",
+      "d_safe_m": 0.00001,
+      "collision_barrier_strength": 500.0,
+      "window_padding_frames": 8
+    },
+    {
+      "candidate_id": "clearance_00001_window_016",
+      "d_safe_m": 0.00001,
+      "collision_barrier_strength": 500.0,
+      "window_padding_frames": 16
+    },
+    {
+      "candidate_id": "clearance_00050_window_016",
+      "d_safe_m": 0.0005,
+      "collision_barrier_strength": 500.0,
+      "window_padding_frames": 16
+    }
+  ],
+  "shared_repair_parameters": {
+    "algorithm": "hard_signed_distance_keyframe_projection_with_minimum_acceleration_local_window_and_strict_trajectory_acceptance",
+    "deviation_from_v3_weight": 0.2,
+    "nominal_posture_weight": 0.0005,
+    "local_previous_q_weight": 0.01,
+    "local_next_q_weight": 0.01,
+    "local_acceleration_weight": 0.01,
+    "max_frame_iterations": 300,
+    "max_pair_discovery_passes": 8,
+    "event_merge_gap_frames": 6,
+    "window_deviation_weight": 1.0,
+    "window_velocity_weight": 50.0,
+    "window_acceleration_weight": 500.0,
+    "core_anchor_weight": 100000000.0,
+    "boundary_zero_weight": 10000000000.0,
+    "anchor_candidates_per_iteration": 3,
+    "max_event_iterations": 4,
+    "correction_scale_schedule": [1.0, 0.75, 0.5, 0.25]
+  }
+}

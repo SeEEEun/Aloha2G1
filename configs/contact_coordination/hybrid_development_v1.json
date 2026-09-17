@@ -1,0 +1,38 @@
+{
+  "schema": "hybrid_development_v1",
+  "status": "TRAIN_ONLY_NOT_FROZEN_FOR_DEV35",
+  "source_selection": "lowest lexicographic TRAIN source ID; additional TRAIN at ordered positions 13 and 26",
+  "target": {
+    "position_scale_m": 0.01,
+    "orientation_scale_rad": 0.1,
+    "coupling_weight": 1.0,
+    "pregrasp_retreat_m": 0.018,
+    "phase_position_tolerance_m": 0.003,
+    "phase_orientation_tolerance_rad": 0.05
+  },
+  "planner": {
+    "backend": "existing scipy bounded least_squares with existing named G1 FK",
+    "seeds": ["previous", "common_natural", "joint_midpoint"],
+    "max_nfev_per_seed_per_goal": 120,
+    "position_residual_scale": 100.0,
+    "orientation_residual_scale": 1.0,
+    "joint_prior_scale": 0.0001,
+    "edge_max_joint_step_rad": 0.02,
+    "collision_penetration_tolerance_m": 0.00001
+  },
+  "development_budget": {
+    "max_material_versions": 3,
+    "identical_infrastructure_retries_max": 3,
+    "common_control_timeout_s": 1200,
+    "timeout_basis": "prior standalone ~70 wall seconds for 10 simulated seconds; scripted 110.3 simulated seconds plus checkpoint overhead"
+  },
+  "calibration_notes": {
+    "pregrasp_retreat": "existing P14 scripted_arm_placement.pregrasp_retreat_m",
+    "pose_tolerances": "predeclared TRAIN engineering precision, not measured success thresholds or a certified contact region",
+    "search_budget": "bounded first integration experiment; DEV freeze requires measured TRAIN runtime",
+    "scoring": "existing measured scorer unchanged; no new evaluation thresholds"
+  },
+  "enable_coupling": true,
+  "real_hardware": false,
+  "ACT_VLA_training": false
+}

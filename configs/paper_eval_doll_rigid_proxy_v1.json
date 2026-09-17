@@ -1,0 +1,177 @@
+{
+  "schema_version": "doll_handoff_rigid_proxy_v1",
+  "status": "PRECALIBRATION_CANDIDATE_SET_NOT_FROZEN",
+  "experiment_name": "PHYSICS_BASED_POLICY_TRAJECTORY_TASK_EVALUATION",
+  "policy_evaluation_allowed": false,
+  "freeze_rule": "Select the lowest-friction candidate only after the same fixed policy-independent primitive passes LEFT and RIGHT lift without prohibited artifact.",
+  "source_scene": {
+    "layout": "/home/jbnu/aloha_g1_dataset/isaaclab_doll_handoff_scene/scene_layout.json",
+    "scene_usd": "/home/jbnu/aloha_g1_dataset/isaaclab_doll_handoff_scene/generated/doll_handoff_scene.usda",
+    "g1_preview_usd": "/home/jbnu/aloha_g1_dataset/isaaclab_doll_handoff_scene/generated/doll_handoff_g1_model_preview.usda",
+    "doll_prim": "/World/DollHandoffEnvironment/Doll",
+    "table_prim": "/World/DollHandoffEnvironment/Table",
+    "bin_prim": "/World/DollHandoffEnvironment/TrashBin"
+  },
+  "object": {
+    "visual_geometry": "existing low-poly green doll proxy; nubs and eyes remain visual-only",
+    "collision_shape": "SPHERE",
+    "collision_dimensions_m": {
+      "diameter": 0.075,
+      "radius": 0.0375
+    },
+    "mass_kg": 0.055,
+    "mass_source": "isaaclab_doll_handoff_scene/scene_layout.json doll.mass_kg",
+    "dimensions_source": "isaaclab_doll_handoff_scene/scene_layout.json doll.diameter_m; provisional visual proxy estimate",
+    "initial_center_world_xyz_m": [0.11035161837935448, 0.053192950785160065, 0.8345],
+    "initial_pose_source": "scene_layout doll.center_world_xy_m and table surface + radius + 0.002 m clearance",
+    "restitution": 0.0,
+    "linear_damping": 0.05,
+    "angular_damping": 0.05,
+    "damping_source": "explicit conservative proxy default; fixed across LOW/MEDIUM/HIGH and both hands",
+    "density_override": null,
+    "deformable": false,
+    "magnetic": false,
+    "constraint_attachment": false,
+    "weld_to_hand": false,
+    "teleport_after_simulation_start": false
+  },
+  "material_candidates": [
+    {"name": "LOW", "static_friction": 0.35, "dynamic_friction": 0.25},
+    {"name": "MEDIUM", "static_friction": 0.55, "dynamic_friction": 0.45},
+    {"name": "HIGH", "static_friction": 0.75, "dynamic_friction": 0.6}
+  ],
+  "material_candidate_source": "bounded LOW/MEDIUM/HIGH PhysX family declared before policy-physics results",
+  "selected_material_candidate": null,
+  "material_combine_modes": {"friction": "average", "restitution": "average"},
+  "simulation": {
+    "gravity_m_s2": 9.81,
+    "physics_dt_s": 0.008333333333333333,
+    "control_fps_hz": 30.0,
+    "physics_substeps_per_control_frame": 4,
+    "gravity_source": "scene_layout physics_validation.gravity_m_s2",
+    "timestep_source": "scene_layout physics_validation.dt_s and common policy controller 30 Hz",
+    "contact_settings": {
+      "contact_offset_m": 0.002,
+      "rest_offset_m": 0.0,
+      "max_depenetration_velocity_m_s": 1.0
+    },
+    "contact_settings_policy_independent": true,
+    "deterministic_seed": 20260827,
+    "repeat_count_predeclared": 1,
+    "repeat_count_reason": "Isaac replay uses a fixed seed, fixed timestep, fixed initial state, and one deterministic trajectory; one replay is predeclared unless calibration demonstrates material nondeterminism."
+  },
+  "scene_fairness": {
+    "g1_root_position_world_xyz_m": [0.4175, -0.15, 0.7922728583],
+    "g1_root_orientation_world_wxyz": [0.7071067812, 0.0, 0.0, 0.7071067812],
+    "table_surface_world_z_m": 0.795,
+    "bin_center_world_xy_m": [0.7382120490074158, 0.09978766366839409],
+    "bin_outer_dimensions_xyz_m": [0.19, 0.165, 0.19],
+    "bin_opening_dimensions_xy_m": [0.178, 0.153],
+    "initial_object_pose_same_for_a_and_b": true,
+    "bin_pose_same_for_a_and_b": true,
+    "physics_parameters_same_for_a_and_b": true,
+    "success_thresholds_same_for_a_and_b": true
+  },
+  "calibration": {
+    "policy_independent": true,
+    "learned_policy_used": false,
+    "task_phase_logic_used": false,
+    "object_reset_center_world_xyz_m": [0.4175, 0.28, 0.8345],
+    "object_reset_reason": "one centered symmetric station for identical mirrored left/right tests; task replay retains the scene initial pose",
+    "active_whole_hand_target_offsets_from_object_center_m": {
+      "OPEN_AROUND_DOLL": [0.0, 0.0, 0.0],
+      "GRASP": [0.0, 0.0, 0.0],
+      "LIFT": [0.0, 0.0, 0.08],
+      "LOWER": [0.0, 0.0, 0.0],
+      "RETRACT": [0.0, -0.1, 0.0]
+    },
+    "stage_durations_s": {
+      "OPEN_AROUND_DOLL": 1.5,
+      "CLOSE_GRASP": 0.75,
+      "HOLD_ON_TABLE": 0.5,
+      "LIFT": 1.0,
+      "HOLD_ELEVATED": 0.75,
+      "LOWER": 1.0,
+      "RELEASE": 0.75,
+      "RETRACT": 0.5
+    },
+    "arm_path_interpolation": "reset with the OPEN whole-hand enclosure centered around the doll, then minimum-jerk Cartesian lift/lower keyframes followed once by frozen common natural-arm temporal IK; saved q is replayed unchanged for all materials",
+    "hand_path_interpolation": "minimum-jerk OPEN-to-GRASP and GRASP-to-OPEN using authoritative common Dex3 states",
+    "static_validation_thresholds": {
+      "maximum_whole_hand_target_error_m": 0.011,
+      "minimum_generic_torso_or_cross_arm_clearance_m": -0.00001,
+      "joint_limit_violation_count": 0
+    },
+    "hand_state_source": "/home/jbnu/aloha_g1_dataset/outputs/dataset_a_final50_retargeting/config/tool_frame_report.json",
+    "whole_hand_frame_source": "/home/jbnu/aloha_g1_dataset/configs/doll_handoff_retargeting/dex3_whole_hand.sim.json",
+    "left_and_right_are_exact_mirrored_protocols": true,
+    "prohibited_artifacts": [
+      "penetration_artifact",
+      "magnetic_or_sticky_behavior",
+      "teleportation",
+      "object_constraint_attachment"
+    ]
+  },
+  "timing": {"control_fps_hz": 30.0},
+  "smoke_test": {
+    "duration_s": 3.0,
+    "table_supported_center_height_tolerance_m": 0.006,
+    "settle_window_duration_s": 0.5,
+    "settle_window_center_z_span_max_m": 0.002,
+    "policy_independent": true
+  },
+  "success_definition": "/home/jbnu/aloha_g1_dataset/configs/paper_physical_success_definition_v1.json",
+  "success_thresholds": {
+    "minimum_hand_object_contact_force_n": 0.25,
+    "maximum_force_for_table_unsupported_n": 0.05,
+    "minimum_bin_contact_force_n": 0.05,
+    "contact_stability_duration_s": 0.1,
+    "approach_stability_duration_s": 0.1,
+    "hand_approach_distance_m": 0.1,
+    "lift_height_above_initial_m": 0.03,
+    "lift_hold_duration_s": 0.5,
+    "left_hold_duration_s": 0.5,
+    "minimum_handoff_com_world_z_m": 0.8645,
+    "handoff_hold_duration_s": 0.5,
+    "transport_hold_duration_s": 0.2,
+    "release_hold_duration_s": 0.5,
+    "maximum_allowed_contact_penetration_m": 0.003,
+    "maximum_allowed_object_com_step_m": 0.03,
+    "post_release_nonsticky_duration_s": 0.25,
+    "hand_open_joint_max_abs_error_rad": 0.08,
+    "right_transport_target_volume_world_m": {
+      "lower_xyz_m": [0.6917120490074158, 0.06578766366839409, 1.0225],
+      "upper_xyz_m": [0.7847120490074158, 0.13378766366839409, 1.2],
+      "derivation": "bin opening eroded by doll radius plus 5 mm XY margin; COM fully above rim in Z"
+    },
+    "release_bin_interior_volume_world_m": {
+      "lower_xyz_m": [0.6917120490074158, 0.06578766366839409, 0.8325],
+      "upper_xyz_m": [0.7847120490074158, 0.13378766366839409, 0.9475],
+      "derivation": "bin opening eroded by doll radius plus 5 mm XY margin; sphere COM between bottom-supported and fully below rim"
+    },
+    "threshold_selection_scope": "fixed before any ACT-A/B physical result; never adjusted per policy"
+  },
+  "event_logging": {
+    "schema": "paper_physics_task_event_log_v1",
+    "required": [
+      "object COM",
+      "object orientation",
+      "object linear/angular velocity",
+      "left/right hand-object contacts",
+      "doll-table contact",
+      "robot-table contact",
+      "bin contact",
+      "hand joint q",
+      "arm joint q"
+    ]
+  },
+  "freeze": {
+    "frozen": false,
+    "selected_candidate": null,
+    "left_lift_pass": null,
+    "right_lift_pass": null,
+    "calibration_result_sha256": null,
+    "frozen_at": null
+  },
+  "policy_specific_logic": false
+}

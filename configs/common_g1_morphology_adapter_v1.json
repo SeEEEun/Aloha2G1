@@ -1,0 +1,43 @@
+{
+  "schema_version": "common_g1_morphology_feasibility_adapter_v1",
+  "enabled": true,
+  "scope": "TRAIN_REFERENCE_QUALIFICATION_BEFORE_DATASET_OR_POLICY_WORK",
+  "method_blind": true,
+  "representation_mode_input_allowed": false,
+  "episode_specific_parameters_allowed": false,
+  "phase_specific_parameters_allowed": false,
+  "object_pose_objective_allowed": false,
+  "task_success_input_allowed": false,
+  "physical_outcome_input_allowed": false,
+  "algorithm": "shared_constrained_q_tracking_then_closed_form_nearest_SE3_target_inside_common_IK_tolerance",
+  "position_tolerance_interior_m": 0.0095,
+  "orientation_tolerance_interior_rad": 0.74,
+  "projection_bounds": {
+    "maximum_position_projection_m": 0.1416521625957899,
+    "position_derivation": "ALOHA effective reach 0.5162399651125887 m minus G1 effective reach 0.3845878025167988 m plus unchanged 0.010 m IK tolerance",
+    "maximum_orientation_projection_rad": 2.411257166479525,
+    "orientation_derivation": "ALOHA wrist orientation capacity 7.695300646004677 rad minus G1 capacity 6.034043479525152 rad plus unchanged 0.750 rad IK tolerance",
+    "task_success_used": false
+  },
+  "common_constrained_tracking_config": "configs/doll_handoff_g1_feasibility_resolver.json",
+  "collision_temporal_projection": {
+    "maximum_event_iterations": 20,
+    "window_padding_candidates_frames": [16, 32, 48, 64, 96, 128, 192],
+    "correction_scale_schedule": [1.0, 0.75, 0.5, 0.25, 0.125, 0.0625],
+    "derivation": "common 30 Hz temporal-continuity envelope; longer windows and dyadic scales allow a collision-clearing anchor to remain inside the unchanged velocity/acceleration gates"
+  },
+  "nominal_clearance_projection": {
+    "enabled": true,
+    "alpha_grid_step": 0.01,
+    "bisection_iterations": 12,
+    "alpha_safety_margin": 0.002,
+    "temporal_sigma_candidates_frames": [8, 16, 32, 64, 128, 256, 512],
+    "derivation": "minimum interpolation toward the common task-ready nominal required to clear model self-collision, extended by the smallest method-independent Gaussian temporal envelope passing unchanged joint continuity gates"
+  },
+  "preserve": [
+    "raw representation targets",
+    "temporal frame count and ordering",
+    "common event timing",
+    "method-specific raw target difference"
+  ]
+}

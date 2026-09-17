@@ -1,0 +1,68 @@
+{
+  "schema_version": "common_collision_aware_redundancy_ik_v1",
+  "scope": "TRAIN_REFERENCE_COMMON_EXECUTION_QUALIFICATION",
+  "method_blind": true,
+  "representation_mode_input_allowed": false,
+  "episode_index_input_allowed": false,
+  "object_pose_input_allowed": false,
+  "task_success_input_allowed": false,
+  "physical_outcome_input_allowed": false,
+  "incoming_target_mutation_allowed": false,
+  "position_tolerance_interior_m": 0.0095,
+  "orientation_tolerance_interior_rad": 0.74,
+  "collision_clearance_m": 0.00001,
+  "anchor_search": {
+    "halton_seed_count_per_arm": 16,
+    "maximum_position_iterations": 100,
+    "per_arm_candidate_keep": 16,
+    "bilateral_candidate_keep": 20,
+    "maximum_pair_discovery_passes": 8,
+    "maximum_collision_iterations": 800,
+    "position_scale_per_m": 1000.0,
+    "orientation_scale_per_rad": 4.0,
+    "previous_q_weight": 0.03,
+    "input_q_weight": 0.003,
+    "natural_q_weight": 0.001
+  },
+  "temporal_realization": {
+    "maximum_position_iterations_per_frame": 25,
+    "maximum_pair_discovery_passes": 6,
+    "maximum_collision_iterations": 240,
+    "maximum_joint_step_rad": 0.1499,
+    "maximum_step_norm_rad": 0.179,
+    "maximum_joint_acceleration_step_rad": 0.1440,
+    "acceleration_box_used_during_bidirectional_branch_propagation": false,
+    "unbounded_local_continuation_enabled": false,
+    "deterministic_global_fallback_enabled": false,
+    "position_scale_per_m": 1000.0,
+    "orientation_scale_per_rad": 4.0,
+    "previous_q_weight": 0.04,
+    "predicted_q_weight": 0.015,
+    "input_q_weight": 0.002,
+    "natural_q_weight": 0.0005
+  },
+  "nullspace_window_realization": {
+    "maximum_event_iterations": 16,
+    "gaussian_sigma_candidates_frames": [16, 24, 32, 48, 64, 96, 128, 192],
+    "correction_scale_schedule": [1.0, 0.85, 0.7, 0.5],
+    "minimum_collision_frame_reduction": 1,
+    "maximum_cartesian_residual_m": 0.0095,
+    "derivation": "deterministic smooth temporal envelope for an exact-target collision-free redundancy anchor; no target, method, episode, or outcome input"
+  },
+  "selection_order": [
+    "cartesian_acceptance",
+    "hard_joint_limits",
+    "zero_prohibited_self_contact",
+    "temporal_deviation",
+    "natural_posture_cost",
+    "frame_to_frame_motion"
+  ],
+  "seed_policy": [
+    "previous_collision_free_q",
+    "constant_velocity_prediction",
+    "incoming_common_q",
+    "common_natural_q",
+    "common_stand_q",
+    "deterministic_halton_joint_range_seeds"
+  ]
+}

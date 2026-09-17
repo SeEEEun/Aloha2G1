@@ -71,11 +71,19 @@ def main() -> int:
         default=None,
         help="optional frozen common config; enables an exact source-selection manifest",
     )
+    parser.add_argument(
+        "--episode-registration-manifest",
+        type=Path,
+        default=None,
+        help="common source-derived episode registration bound before the representation switch",
+    )
     args = parser.parse_args()
 
     kwargs = {"output_root": args.output_root.resolve()}
     if args.common_config is not None:
         kwargs["common_path"] = args.common_config.resolve()
+    if args.episode_registration_manifest is not None:
+        kwargs["registration_path"] = args.episode_registration_manifest.resolve()
     pipeline = DollHandoffPipeline(**kwargs)
     count = int(pipeline.source_manifest["enumerated_count"])
     indices = _episode_indices(

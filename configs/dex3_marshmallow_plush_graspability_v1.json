@@ -1,0 +1,228 @@
+{
+  "schema_version": "dex3_marshmallow_plush_graspability_v1",
+  "status": "BOUNDED_LEFT_MATERIAL_CALIBRATION",
+  "purpose": "Policy-free LEFT Dex3 grasp test for one continuous, highly compressible marshmallow-like PhysX volume FEM doll",
+  "supersedes_for_this_test": "dex3_soft_plush_graspability_v1 material family; preserved unchanged as historical evidence",
+  "scope_exclusions": [
+    "RIGHT until LEFT passes",
+    "ALOHA",
+    "Proposed-B",
+    "interaction frames",
+    "handoff",
+    "ACT",
+    "real G1"
+  ],
+  "real_robot_allowed": false,
+  "learned_policy_used": false,
+  "source_scene": "/home/jbnu/aloha_g1_dataset/isaaclab_doll_handoff_scene/generated/doll_handoff_g1_model_preview.usda",
+  "source_arm_primitives": {
+    "left": "/home/jbnu/aloha_g1_dataset/outputs/dex3_measured_doll_graspability_sanity_v1/scripted_primitives/left_sanity_v1_arm_primitive.npz",
+    "right": "/home/jbnu/aloha_g1_dataset/outputs/dex3_measured_doll_graspability_sanity_v1/scripted_primitives/right_sanity_v1_arm_primitive.npz"
+  },
+  "whole_hand_geometry": "/home/jbnu/aloha_g1_dataset/configs/doll_handoff_retargeting/dex3_whole_hand.sim.json",
+  "object": {
+    "method": "ONE_CONTINUOUS_PHYSX_VOLUME_FEM_MARSHMALLOW",
+    "unloaded_dimensions_m": [0.12, 0.09, 0.085],
+    "mass_kg": 0.02,
+    "center_world_xy_m_by_side": {
+      "left": [0.3, 0.15],
+      "right": [0.535, 0.15]
+    },
+    "table_surface_world_z_m": 0.795,
+    "initial_table_clearance_m": 0.002,
+    "orientation_quaternion_xyzw": [0.0, 0.0, 0.0, 1.0],
+    "mesh": {
+      "type": "pre_tetrahedralized_high_resolution_voxel_ellipsoid",
+      "voxel_resolution": 18,
+      "exact_axis_extent_normalization": true,
+      "single_connected_component": true
+    },
+    "local_axis_mapping": {
+      "x": "120 mm major horizontal axis",
+      "y": "90 mm nominal thumb-versus-index/middle compression axis",
+      "z": "85 mm vertical axis"
+    },
+    "no_rigid_collision_shell": true,
+    "no_attachment": true
+  },
+  "deformable_body": {
+    "solver_position_iteration_count": 64,
+    "linear_damping_per_s": 6.0,
+    "settling_damping_per_s": 10.0,
+    "settling_threshold_m_s": 0.05,
+    "sleep_threshold_m_s": 0.001,
+    "max_linear_velocity_m_s": 1.5,
+    "max_depenetration_velocity_m_s": 0.2,
+    "self_collision": true,
+    "self_collision_filter_distance_m": 0.001,
+    "enable_speculative_ccd": true,
+    "contact_offset_m": 0.001,
+    "rest_offset_m": 0.0
+  },
+  "material_candidates": [
+    {
+      "name": "MARSHMALLOW_E600_DAMP06",
+      "selection_order": 1,
+      "youngs_modulus_pa": 600.0,
+      "poissons_ratio": 0.05,
+      "elasticity_damping": 0.6,
+      "linear_damping_per_s": 6.0,
+      "static_friction": 0.7,
+      "dynamic_friction": 0.6,
+      "semantics": "very soft, strongly compressible, highly damped baseline"
+    },
+    {
+      "name": "MARSHMALLOW_E300_DAMP08",
+      "selection_order": 2,
+      "youngs_modulus_pa": 300.0,
+      "poissons_ratio": 0.02,
+      "elasticity_damping": 0.8,
+      "linear_damping_per_s": 8.0,
+      "static_friction": 0.7,
+      "dynamic_friction": 0.6,
+      "semantics": "softest bounded candidate with near-volumetric compressibility"
+    },
+    {
+      "name": "MARSHMALLOW_E1000_DAMP08",
+      "selection_order": 3,
+      "youngs_modulus_pa": 1000.0,
+      "poissons_ratio": 0.08,
+      "elasticity_damping": 0.8,
+      "linear_damping_per_s": 8.0,
+      "static_friction": 0.7,
+      "dynamic_friction": 0.6,
+      "semantics": "gravity-supporting soft candidate with high internal damping"
+    },
+    {
+      "name": "MARSHMALLOW_E600_DAMP10",
+      "selection_order": 4,
+      "youngs_modulus_pa": 600.0,
+      "poissons_ratio": 0.05,
+      "elasticity_damping": 1.0,
+      "linear_damping_per_s": 12.0,
+      "static_friction": 0.7,
+      "dynamic_friction": 0.6,
+      "semantics": "same compressibility as candidate 1 with maximum predeclared damping"
+    },
+    {
+      "name": "MARSHMALLOW_E600_DAMP10_NOSELF",
+      "selection_order": 5,
+      "youngs_modulus_pa": 600.0,
+      "poissons_ratio": 0.05,
+      "elasticity_damping": 1.0,
+      "linear_damping_per_s": 12.0,
+      "self_collision": false,
+      "static_friction": 0.7,
+      "dynamic_friction": 0.6,
+      "semantics": "single numerical audit of whether volume-FEM self-collision caused free-body expansion"
+    },
+    {
+      "name": "MARSHMALLOW_E1800_DAMP10_NOSELF",
+      "selection_order": 6,
+      "youngs_modulus_pa": 1800.0,
+      "poissons_ratio": 0.1,
+      "elasticity_damping": 1.0,
+      "linear_damping_per_s": 12.0,
+      "self_collision": false,
+      "static_friction": 0.7,
+      "dynamic_friction": 0.6,
+      "semantics": "final gravity-support bracket; still softer and more compressible than the retired 2.5 kPa family"
+    }
+  ],
+  "selection_rule": "run all gravity probes; among gravity-stable candidates run LEFT in declared order and accept the first candidate satisfying every fixed gate",
+  "finger_drive": {
+    "kp": 100.0,
+    "kd": 4.0,
+    "effort_limit_sim_nm": 2.5,
+    "velocity_limit_sim_rad_s": 12.0,
+    "source": "/home/jbnu/aloha_g1_dataset/tools/policy_b_isaac_control_contract.py:CONTROLLER_CONTRACT.actuators.dex3",
+    "full_close_target_held_during_squeeze_lift_and_hold": true
+  },
+  "joint_order_7d": [
+    "thumb_0",
+    "thumb_1",
+    "thumb_2",
+    "middle_0",
+    "middle_1",
+    "index_0",
+    "index_1"
+  ],
+  "hand_states": {
+    "left": {
+      "OPEN": [0.0, 1.04719999, 0.00000001, -0.00000001, -0.00000001, -0.00000001, -0.00000001],
+      "PRESHAPE": [0.02, 1.03775999, 0.07000001, -0.01600001, -0.31000001, -0.01600001, -0.31000001],
+      "FULL_CLOSE": [0.1, 1.0, 0.35, -0.08, -1.55, -0.08, -1.55]
+    },
+    "right": {
+      "OPEN": [0.0, -1.04719999, -0.00000001, 0.00000001, 0.00000001, 0.00000001, 0.00000001],
+      "PRESHAPE": [0.02, -1.03775999, -0.07000001, 0.01600001, 0.31000001, 0.01600001, 0.31000001],
+      "FULL_CLOSE": [0.1, -1.0, -0.35, 0.08, 1.55, 0.08, 1.55]
+    }
+  },
+  "grasp_contract": {
+    "placement": "fixed prior ideal-grasp placement; no material-specific repositioning",
+    "same_full_close_for_every_material": true,
+    "same_arm_path_for_every_material": true,
+    "fingertip_target_points": false
+  },
+  "indentation_diagnostics": {
+    "method": "named Dex3 pad OBB proximity plus local inward displacement of the nearest FEM surface nodes after rigid-motion removal",
+    "geometric_contact_tolerance_m": 0.0015,
+    "minimum_indentation_m": 0.002,
+    "minimum_sustained_contact_s": 1.0
+  },
+  "timing": {
+    "control_fps_hz": 30.0,
+    "physics_dt_s": 0.004166666666666667,
+    "physics_substeps_per_control_frame": 8,
+    "gravity_settle_s": 0.75,
+    "open_hold_s": 0.5,
+    "preshape_transition_s": 1.0,
+    "full_close_transition_s": 2.0,
+    "squeeze_s": 1.0,
+    "lift_transition_s": 1.0,
+    "requested_lift_m": 0.05,
+    "elevated_hold_s": 1.0,
+    "release_transition_s": 1.0,
+    "post_release_recovery_s": 1.5
+  },
+  "simulation": {
+    "device": "cuda:0",
+    "gravity_m_s2": 9.81,
+    "solver_type": "TGS",
+    "solve_articulation_contact_last": true,
+    "enable_external_forces_every_iteration": true,
+    "deterministic_seed": 20260830,
+    "use_fabric": true
+  },
+  "gates": {
+    "unloaded_dimension_relative_tolerance": 0.05,
+    "minimum_gravity_settled_short_width_ratio": 0.9,
+    "minimum_gravity_settled_height_ratio": 0.85,
+    "maximum_squeezed_short_width_ratio": 0.8,
+    "minimum_recovered_short_width_ratio": 0.9,
+    "meaningful_digit_force_n": 0.01,
+    "minimum_digit_contact_s": 1.0,
+    "minimum_digit_indentation_m": 0.002,
+    "minimum_com_rise_m": 0.049,
+    "minimum_elevated_retention_s": 1.0,
+    "minimum_table_clearance_m": 0.001,
+    "maximum_horizontal_escape_m": 0.015,
+    "maximum_node_speed_m_s": 2.0,
+    "minimum_noncollapsed_axis_m": 0.02,
+    "maximum_axis_expansion_ratio": 1.8
+  },
+  "prohibited": [
+    "internal spring-lobe construction",
+    "rigid collider shrink",
+    "hand-object attachment",
+    "magnet",
+    "weld",
+    "object-follow logic",
+    "teleportation during execution",
+    "hidden grasp constraint",
+    "fingertip target point solve",
+    "Proposed-B grasp vector",
+    "material-specific Dex3 pose"
+  ]
+}

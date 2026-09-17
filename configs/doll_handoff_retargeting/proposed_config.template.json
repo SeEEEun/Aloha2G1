@@ -1,0 +1,80 @@
+{
+  "schema_version": "doll_handoff_interaction_centric_v2",
+  "method": "proposed",
+  "method_name": "Interaction-Centric Cross-Embodiment Retargeting",
+  "representation": "source interaction frame transferred to a target whole-hand grasp frame with bimanual interaction and source-derived ownership semantics",
+  "source_interaction_frame": "ALOHA model-derived static jaw closing-region frame",
+  "target_interaction_frame": "G1 active-model-derived three-contact whole-hand enclosure frame",
+  "whole_hand_grasp_frame_target_optimized": true,
+  "whole_hand_grasp_position_objective": "ENCODED_AS_G1_WRIST_SE3_BEFORE_COMMON_SOLVER",
+  "whole_hand_grasp_orientation_objective": "ENCODED_AS_G1_WRIST_SE3_BEFORE_COMMON_SOLVER",
+  "orientation_semantics": {
+    "policy": "G1 shoulder-to-grasp bearing with projected model-up and one static mirrored palm twist; source jaw rotation is diagnostic because the provisional doll is approximately spherical",
+    "static_palm_twist_deg": {
+      "left": 15.0,
+      "right": -15.0
+    },
+    "weight_multiplier_relative_to_common_by_ownership": {
+      "NO_OWNER": 0.02,
+      "LEFT_OWNED": 0.02,
+      "HANDOFF_APPROACH": 0.05,
+      "DUAL_CONTACT": 0.08,
+      "RIGHT_OWNED": 0.04,
+      "RIGHT_TRANSPORT": 0.02,
+      "RELEASED": 0.02
+    },
+    "scope": "one common ownership-state weighting table for every episode; no Cartesian correction"
+  },
+  "handoff_cartesian_residual": {
+    "status": "REMOVED_TASK_SPECIFIC_CARTESIAN_RESIDUAL",
+    "active_offset_m": 0.0,
+    "historical_rejected_value_m": 0.0495531958180063,
+    "reason": "twice a thumb-pad tangential half-extent is a clearance scalar, not a rigid wrist-to-grasp transform"
+  },
+  "bimanual_interaction": {
+    "enabled": true,
+    "midpoint_weight_relative_to_common_position_weight_by_ownership": {
+      "NO_OWNER": 0.0,
+      "LEFT_OWNED": 0.0,
+      "HANDOFF_APPROACH": 0.10,
+      "DUAL_CONTACT": 0.20,
+      "RIGHT_OWNED": 0.05,
+      "RIGHT_TRANSPORT": 0.0,
+      "RELEASED": 0.0
+    },
+    "relative_vector_weight_relative_to_common_position_weight_by_ownership": {
+      "NO_OWNER": 0.0,
+      "LEFT_OWNED": 0.0,
+      "HANDOFF_APPROACH": 0.15,
+      "DUAL_CONTACT": 0.30,
+      "RIGHT_OWNED": 0.08,
+      "RIGHT_TRANSPORT": 0.0,
+      "RELEASED": 0.0
+    },
+    "relative_vector_policy": "preserve source-derived interaction-frame relation; weights change by ownership state but Cartesian targets do not",
+    "absolute_spacing_policy": "no spacing clamp and no phase-specific displacement"
+  },
+  "ownership_semantics": {
+    "source": "common pooled gripper/event detector",
+    "states": ["NO_OWNER", "LEFT_OWNED", "HANDOFF_APPROACH", "DUAL_CONTACT", "RIGHT_OWNED", "RIGHT_TRANSPORT", "RELEASED"],
+    "claim_scope": "SOURCE_DERIVED_INTERACTION_SEMANTICS_NOT_MEASURED_OBJECT_CONTACT"
+  },
+  "hand_mapping": "common semantic OPEN/PRESHAPE/GRASP/HOLD/RELEASE mapping shared byte-for-byte with A",
+  "hand_primitive_derivation": {
+    "closure_endpoint_left_by_name": {
+      "left_hand_thumb_0_joint": -0.25,
+      "left_hand_thumb_1_joint": 0.75,
+      "left_hand_thumb_2_joint": 1.0,
+      "left_hand_index_0_joint": -0.1,
+      "left_hand_index_1_joint": -1.7,
+      "left_hand_middle_0_joint": -0.1,
+      "left_hand_middle_1_joint": -1.7
+    },
+    "right_whole_hand": "exact active-model mirror of the left thumb/index/middle synergy",
+    "grasp_circumradius_ratio_of_provisional_doll_radius": 1.0,
+    "preshape_diameter_clearance_m": 0.01,
+    "grasp_frame_center": "circumcenter of the thumb/index/middle distal pad-center triangle at the canonical GRASP synergy",
+    "grasp_frame_axes": "X thumb-to-index-middle closing direction; Z middle-to-index spread direction orthogonalized to X; Y=Z cross X"
+  },
+  "sim_hand_calibration": "SIM_ONLY_NOT_REAL_DEX3_CALIBRATED"
+}

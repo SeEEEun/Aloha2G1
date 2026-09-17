@@ -1,0 +1,135 @@
+{
+  "schema_version": "dex3_rigid_proxy_contact_diagnostic_v1",
+  "status": "DIAGNOSTIC_NOT_FROZEN",
+  "purpose": "Policy-independent Dex3-to-rigid-proxy contact validation before any ACT-A/B physics evaluation.",
+  "policy_evaluation_allowed": false,
+  "learned_policy_used": false,
+  "real_robot_allowed": false,
+  "scene": "/home/jbnu/aloha_g1_dataset/isaaclab_doll_handoff_scene/generated/doll_handoff_g1_model_preview.usda",
+  "whole_hand_geometry": "/home/jbnu/aloha_g1_dataset/configs/doll_handoff_retargeting/dex3_whole_hand.sim.json",
+  "left_primitive": "/home/jbnu/aloha_g1_dataset/outputs/paper_physics_task_eval/environment_calibration/primitives_review1/left_fixed_grasp_primitive.npz",
+  "right_primitive": "/home/jbnu/aloha_g1_dataset/outputs/paper_physics_task_eval/environment_calibration/primitives_review1/right_fixed_grasp_primitive.npz",
+  "object": {
+    "mass_kg": 0.055,
+    "center_world_xy_m": [0.4175, 0.28],
+    "table_surface_world_z_m": 0.795,
+    "spawn_clearance_above_table_m": 0.002,
+    "linear_damping": 0.05,
+    "angular_damping": 0.05,
+    "restitution": 0.0,
+    "contact_offset_m": 0.002,
+    "rest_offset_m": 0.0,
+    "max_depenetration_velocity_m_s": 1.0
+  },
+  "fixed_material": {
+    "name": "MEDIUM_PREDECLARED_NOT_TUNED",
+    "static_friction": 0.55,
+    "dynamic_friction": 0.45,
+    "friction_combine_mode": "average",
+    "restitution_combine_mode": "average",
+    "rationale": "One previously declared middle material is held fixed through collider/contact validation; friction is not a diagnostic variable."
+  },
+  "shape_candidates": [
+    {
+      "name": "sphere_75mm",
+      "type": "sphere",
+      "radius_m": 0.0375,
+      "diameter_m": 0.075,
+      "selection_order": 1,
+      "rationale": "Historical provisional 75 mm rigid proxy."
+    },
+    {
+      "name": "ellipsoid_prolate_v1",
+      "type": "ellipsoid",
+      "major_semi_axis_m": 0.041,
+      "minor_semi_axis_m": 0.0175,
+      "major_axis_world_xyz": [0.0, 0.449, 0.893],
+      "selection_order": 2,
+      "rationale": "One axisymmetric convex proxy derived before physics trials from the bilateral frozen-GRASP collision envelope; its vertical support radius preserves the historical tabletop center height."
+    },
+    {
+      "name": "capsule_v1",
+      "type": "capsule",
+      "radius_m": 0.0175,
+      "cylinder_height_m": 0.0447,
+      "major_axis_world_xyz": [0.0, 0.449, 0.893],
+      "selection_order": 3,
+      "rationale": "One simple convex capsule with the same cross-section and tabletop support envelope as the ellipsoid candidate."
+    },
+    {
+      "name": "ellipsoid_contact_fit_v2",
+      "type": "ellipsoid",
+      "major_semi_axis_m": 0.041,
+      "minor_semi_axis_m": 0.018,
+      "major_axis_world_xyz": [0.0, 0.449, 0.893],
+      "selection_order": 4,
+      "rationale": "Final bounded collision-envelope review: retain the v1 major axis and tabletop support height while adding exactly 0.5 mm transverse radius; declared before either hand is run."
+    },
+    {
+      "name": "capsule_contact_fit_v2",
+      "type": "capsule",
+      "radius_m": 0.018,
+      "cylinder_height_m": 0.0436,
+      "major_axis_world_xyz": [0.0, 0.449, 0.893],
+      "selection_order": 5,
+      "rationale": "Final bounded collision-envelope review: add exactly 0.5 mm capsule radius and shorten the cylinder to preserve the v1 tabletop support height; declared before either hand is run."
+    }
+  ],
+  "stages": [
+    "SINGLE_FINGERTIP_NO_GRAVITY",
+    "SINGLE_FINGERTIP_PUSH_GRAVITY",
+    "FIXED_ARM_THREE_FINGER_CLOSE",
+    "STATIC_HOLD",
+    "VERTICAL_LIFT_5CM"
+  ],
+  "stage_reset_semantics": {
+    "FIXED_ARM_THREE_FINGER_CLOSE": "Reset OPEN with proxy at the declared pose, keep gravity disabled, and execute only the frozen OPEN-to-GRASP hand closure with arms fixed.",
+    "STATIC_HOLD": "Reset directly to the frozen closed GRASP joint state with no attachment, enable gravity, and hold for one second.",
+    "VERTICAL_LIFT_5CM": "Reset directly to the same frozen closed GRASP joint state with no attachment, hold under gravity for 0.5 s, execute a 5 cm vertical arm lift, then hold 0.75 s."
+  },
+  "single_fingertip": {
+    "digit": "index",
+    "left_link": "left_hand_index_1_link",
+    "right_link": "right_hand_index_1_link",
+    "other_robot_colliders_disabled_in_session_layer": true
+  },
+  "simulation": {
+    "physics_dt_s": 0.008333333333333333,
+    "control_fps_hz": 30.0,
+    "physics_substeps_per_control_frame": 4,
+    "gravity_m_s2": 9.81,
+    "device": "cuda:0",
+    "use_fabric": true,
+    "seed": 20260827
+  },
+  "finger_drive": {
+    "kp": 100.0,
+    "kd": 4.0,
+    "effort_limit_sim": 2.5,
+    "velocity_limit_sim": 12.0,
+    "source": "/home/jbnu/aloha_g1_dataset/tools/policy_b_isaac_control_contract.py:CONTROLLER_CONTRACT.actuators.dex3"
+  },
+  "gates": {
+    "maximum_initial_hand_proxy_penetration_m": 0.0001,
+    "minimum_single_contact_duration_s": 0.025,
+    "minimum_gravity_push_contact_duration_s": 0.1,
+    "minimum_gravity_push_displacement_m": 0.003,
+    "minimum_static_hold_duration_s": 0.5,
+    "minimum_lift_m": 0.045,
+    "requested_lift_m": 0.05,
+    "minimum_elevated_hold_duration_s": 0.5,
+    "maximum_contact_penetration_m": 0.003,
+    "maximum_object_linear_speed_m_s": 1.0,
+    "maximum_object_angular_speed_rad_s": 50.0,
+    "maximum_object_com_step_m": 0.03,
+    "minimum_contact_force_n": 0.05
+  },
+  "prohibited": [
+    "magnet",
+    "fixed_joint",
+    "weld",
+    "hidden_attachment",
+    "policy_specific_parameter",
+    "friction_sweep_before_stable_contact"
+  ]
+}

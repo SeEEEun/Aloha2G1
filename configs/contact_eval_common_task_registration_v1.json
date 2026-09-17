@@ -1,0 +1,39 @@
+{
+  "schema_version": "common_task_frame_registration_v1",
+  "status": "REFERENCE_PREFLIGHT",
+  "description": "One common scene/task registration that places the unchanged compressed doll proxy at the authoritative retargeting object position. It is identical for Fair-A, Proposed-B, ACT-A40, ACT-B40, and every EVAL10 episode.",
+  "base_physics_config": "/home/jbnu/aloha_g1_dataset/configs/dex3_simple_graspable_doll_grasp_v2.json",
+  "base_physics_config_sha256": "07f4c1ab715022d63915b4a480ab5af7374a7d10e5867fea6f2910ffe9946b3e",
+  "authoritative_task_scene": "/home/jbnu/aloha_g1_dataset/isaaclab_doll_handoff_scene/scene_layout.json",
+  "authoritative_task_scene_sha256": "8e20689ed6f329aec3e4878c9afa2b28e7860e6927ecc4518467b1fb3a8b6354",
+  "previous_physical_doll_center_world_xy_m": [
+    0.3,
+    0.15
+  ],
+  "registered_doll_center_world_xy_m": [
+    0.11035161837935448,
+    0.053192950785160065
+  ],
+  "common_world_translation_m": [
+    -0.1896483816206455,
+    -0.09680704921483993,
+    0.0
+  ],
+  "registered_doll_orientation_quaternion_xyzw": [
+    0.0,
+    0.0,
+    0.3179165045224807,
+    0.9481187141662206
+  ],
+  "registered_doll_yaw_deg": 37.07394121578218,
+  "orientation_change": true,
+  "orientation_gauge_resolution": "The authoritative retarget object was spherical and explicitly left yaw non-gating. The measured compressed oval requires a yaw. Its short axis is aligned to the axial circular mean of the frozen Proposed-B LEFT_GRASP thumb-to-index/middle closing axes across EVAL10 references; no ACT or physics outcome was used.",
+  "bottom_alignment_and_spawn_z_unchanged": true,
+  "method_independent": true,
+  "episode_independent": true,
+  "changes_object_physics": false,
+  "changes_robot_commands": false,
+  "changes_task_success_definition": false,
+  "per_method_parameters": false,
+  "per_episode_parameters": false
+}

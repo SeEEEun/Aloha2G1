@@ -1,0 +1,204 @@
+{
+  "schema_version": "dex3_simple_graspable_doll_proxy_v1",
+  "status": "BOUNDED_BILATERAL_GRASPABILITY_CALIBRATION",
+  "purpose": "Policy-free ideal Dex3 graspability check using a full-size visual doll and a stable rigid convex collision proxy representing the plush in its compressed grasp state",
+  "policy_independent": true,
+  "learned_policy_used_for_calibration": false,
+  "real_robot_allowed": false,
+  "source_scene": "/home/jbnu/aloha_g1_dataset/isaaclab_doll_handoff_scene/generated/doll_handoff_g1_model_preview.usda",
+  "whole_hand_geometry": "/home/jbnu/aloha_g1_dataset/configs/doll_handoff_retargeting/dex3_whole_hand.sim.json",
+  "scope_exclusions": [
+    "FEM or deformable simulation",
+    "handoff until bilateral single-hand success",
+    "ALOHA",
+    "Proposed-B",
+    "ACT-A/B",
+    "real G1"
+  ],
+  "measurement_contract": {
+    "visible_dimensions_m": [0.12, 0.09, 0.085],
+    "mass_kg": 0.02,
+    "collision_semantics": "compressed grasp state of the measured plush; nonuniform rounded convex proxy",
+    "source": "authoritative user-supplied physical measurement and compressed-state proxy instruction, 2026-08-30"
+  },
+  "object": {
+    "mass_kg": 0.02,
+    "center_world_xy_m_by_side": {
+      "left": [0.3, 0.15],
+      "right": [0.535, 0.15]
+    },
+    "table_surface_world_z_m": 0.795,
+    "spawn_clearance_above_table_m": 0.0,
+    "orientation_quaternion_xyzw": [0.0, 0.0, 0.0, 1.0],
+    "visual_dimensions_m": [0.12, 0.09, 0.085],
+    "local_axis_mapping": {
+      "x": "120 mm visible long horizontal axis; 115 mm collision long axis",
+      "y": "90 mm visible short grasp axis; bounded collision short axis",
+      "z": "85 mm visible height; 70 mm collision height"
+    },
+    "collider": "ROUNDED_CONVEX_OVAL_WITH_SMALL_FLAT_SUPPORT_PATCH",
+    "visual_and_collision_same_prim": false,
+    "linear_damping": 0.35,
+    "angular_damping": 0.35,
+    "restitution": 0.0,
+    "contact_offset_m": 0.0015,
+    "rest_offset_m": 0.0,
+    "max_depenetration_velocity_m_s": 0.5
+  },
+  "geometry_candidates": [
+    {
+      "name": "COMPRESSED_SHORT_65",
+      "dimensions_m": [0.115, 0.065, 0.07],
+      "short_axis_mm": 65,
+      "collision_scale_percent": 72,
+      "nonuniform_scale_percent_xyz": [95.8333333333, 72.2222222222, 82.3529411765],
+      "selection_order": 1,
+      "semantics": "largest permitted compressed-state grasp axis; mandatory first trial"
+    },
+    {
+      "name": "COMPRESSED_SHORT_60",
+      "dimensions_m": [0.115, 0.06, 0.07],
+      "short_axis_mm": 60,
+      "collision_scale_percent": 67,
+      "nonuniform_scale_percent_xyz": [95.8333333333, 66.6666666667, 82.3529411765],
+      "selection_order": 2,
+      "semantics": "second and only if the 65 mm candidate fails"
+    },
+    {
+      "name": "COMPRESSED_SHORT_55",
+      "dimensions_m": [0.115, 0.055, 0.07],
+      "short_axis_mm": 55,
+      "collision_scale_percent": 61,
+      "nonuniform_scale_percent_xyz": [95.8333333333, 61.1111111111, 82.3529411765],
+      "selection_order": 3,
+      "semantics": "smallest permitted short-axis candidate and final bounded trial"
+    }
+  ],
+  "geometry_search_limit": 3,
+  "geometry_selection_rule": "test 65, then 60, then 55 mm; accept the first and therefore largest candidate passing LEFT; verify RIGHT unchanged only for that selected candidate",
+  "material": {
+    "name": "MODERATE_HIGH_FRICTION_COMPRESSED_PLUSH_PROXY_V1",
+    "static_friction": 0.9,
+    "dynamic_friction": 0.75,
+    "friction_combine_mode": "average",
+    "restitution_combine_mode": "average",
+    "contact_damping_source": "rigid-body linear/angular damping and damped Dex3 implicit drive; no compliant-contact geometry trick"
+  },
+  "finger_drive": {
+    "kp": 100.0,
+    "kd": 4.0,
+    "effort_limit_sim": 2.5,
+    "velocity_limit_sim": 12.0,
+    "source": "/home/jbnu/aloha_g1_dataset/tools/policy_b_isaac_control_contract.py:CONTROLLER_CONTRACT.actuators.dex3",
+    "full_close_target_held_during_retention_lift_and_hold": true
+  },
+  "joint_order_7d": [
+    "thumb_0",
+    "thumb_1",
+    "thumb_2",
+    "middle_0",
+    "middle_1",
+    "index_0",
+    "index_1"
+  ],
+  "hand_states": {
+    "left": {
+      "OPEN": [0.0, 1.04719999, 0.00000001, -0.00000001, -0.00000001, -0.00000001, -0.00000001],
+      "PRESHAPE_S0": [0.02, 1.03775999, 0.07000001, -0.01600001, -0.31000001, -0.01600001, -0.31000001],
+      "POWER_GRASP_S0": [0.1, 1.0, 0.35, -0.08, -1.55, -0.08, -1.55]
+    },
+    "right": {
+      "OPEN": [0.0, -1.04719999, -0.00000001, 0.00000001, 0.00000001, 0.00000001, 0.00000001],
+      "PRESHAPE_S0": [0.02, -1.03775999, -0.07000001, 0.01600001, 0.31000001, 0.01600001, 0.31000001],
+      "POWER_GRASP_S0": [0.1, -1.0, -0.35, 0.08, 1.55, 0.08, 1.55]
+    }
+  },
+  "active_calibration_profile": "S0",
+  "full_close_provenance": {
+    "source": "/home/jbnu/aloha_g1_dataset/configs/dex3_marshmallow_plush_graspability_v1.json:hand_states.*.FULL_CLOSE",
+    "changed_for_collision_candidate": false,
+    "mirrored_equivalents": true,
+    "all_three_digits_and_all_seven_joints": true
+  },
+  "scripted_arm_placement": {
+    "whole_hand_center_world_xyz_m_by_side": {
+      "left": [0.31997015480676944, 0.16155939956302762, 0.8673626531433742],
+      "right": [0.5550298451932308, 0.13843619421990094, 0.8673788237562414]
+    },
+    "center_source": "frozen policy-independent ideal large-object Dex3 sanity placement; unchanged across 65/60/55 mm candidates",
+    "desired_whole_hand_rotation_world_by_side": {
+      "left": [[0.20868599827221454, -0.0000000000000000023598443162432216, 0.9779826962299122], [-0.259070863447223, 0.964274976800298, 0.055281613846691634], [-0.9430442417181915, -0.26490332032042246, 0.20123068614248676]],
+      "right": [[0.21087442373976953, -0.000000000000000011302669062205179, 0.9775131597131669], [0.2589358824392664, 0.9642779555119992, -0.05585904849705676], [-0.942594391134287, 0.2648924772687931, 0.20334155819355593]]
+    },
+    "arm_ik_seed_q_rad_by_side": {
+      "left": [-1.3902268783751845, 0.4039223937596219, -1.4394033762851421, 0.8644799374994074, -0.1684611100020645, 0.5289862277207353, -1.320670745602041],
+      "right": [-1.3926146984967793, 0.6743367188189484, -1.7758178529806974, -0.5185638112374982, 0.4017062475300135, 1.1927028059225515, -1.599349826077684]
+    },
+    "lift_offset_world_xyz_m": [0.0, 0.0, 0.05],
+    "arm_placement_reference_hand_profile": "S0",
+    "scripted_ik_position_weight": 3.0,
+    "scripted_ik_orientation_weight": 3.0,
+    "scripted_ik_frame_continuity_weight": 0.01,
+    "pregrasp_retreat_m": 0.0,
+    "candidate_specific_adjustment_allowed": false,
+    "side_specific_adjustment_allowed": false
+  },
+  "historical_clear_open_orientation_sources": {
+    "left": "/home/jbnu/aloha_g1_dataset/outputs/paper_physics_task_eval/environment_calibration/primitives_review1/left_fixed_grasp_primitive.npz",
+    "right": "/home/jbnu/aloha_g1_dataset/outputs/paper_physics_task_eval/environment_calibration/primitives_review1/right_fixed_grasp_primitive.npz",
+    "usage": "IK initialization only; no old doll geometry/contact result is reused"
+  },
+  "source_arm_primitives": {
+    "left": "/home/jbnu/aloha_g1_dataset/outputs/dex3_simple_graspable_doll_proxy_v1/scripted_primitives/left_simple_v1_arm_primitive.npz",
+    "right": "/home/jbnu/aloha_g1_dataset/outputs/dex3_simple_graspable_doll_proxy_v1/scripted_primitives/right_simple_v1_arm_primitive.npz"
+  },
+  "timing": {
+    "control_fps_hz": 30.0,
+    "physics_dt_s": 0.004166666666666667,
+    "physics_substeps_per_control_frame": 8,
+    "open_hold_s": 0.5,
+    "preshape_transition_s": 1.0,
+    "power_close_s": 2.0,
+    "gravity_retention_s": 1.0,
+    "requested_lift_m": 0.05,
+    "lift_transition_s": 1.0,
+    "elevated_hold_s": 1.0,
+    "end_after_elevated_hold": true,
+    "release_transition_s": 0.0,
+    "post_release_s": 0.0
+  },
+  "simulation": {
+    "gravity_m_s2": 9.81,
+    "device": "cuda:0",
+    "use_fabric": true,
+    "deterministic_seed": 20260830
+  },
+  "gates": {
+    "maximum_initial_penetration_m": 0.0001,
+    "maximum_runtime_penetration_m": 0.003,
+    "meaningful_digit_force_n": 0.015,
+    "minimum_meaningful_digit_contact_s": 0.25,
+    "minimum_digit_normal_impulse_ns": 0.01,
+    "maximum_retention_horizontal_displacement_m": 0.015,
+    "minimum_retention_contact_s": 1.0,
+    "minimum_measured_lift_m": 0.049,
+    "minimum_elevated_hold_s": 1.0,
+    "maximum_table_force_for_elevated_n": 0.02,
+    "minimum_release_no_hand_contact_s": 0.0,
+    "minimum_release_table_contact_s": 0.0,
+    "maximum_object_linear_speed_m_s": 1.0,
+    "maximum_object_angular_speed_rad_s": 50.0,
+    "maximum_object_com_step_m": 0.03
+  },
+  "prohibited": [
+    "FEM",
+    "deformable mesh",
+    "attachment",
+    "weld",
+    "magnet",
+    "object-follow logic",
+    "fingertip target solve",
+    "candidate-specific hand target",
+    "candidate-specific arm target"
+  ]
+}

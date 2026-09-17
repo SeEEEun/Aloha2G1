@@ -1,0 +1,22 @@
+{
+  "schema_version": "common_dex3_grasp_realization_v1",
+  "status": "REFERENCE_PREFLIGHT_CANDIDATE",
+  "closure_mode": "COMMON_P14_FULL_CLOSE",
+  "description": "Common target-embodiment Dex3 realization used only after the frozen whole-hand readiness gate. Arms and wrists remain method-specific.",
+  "source_profile": "configs/dex3_simple_graspable_doll_grasp_v2.json:LEFT P14",
+  "open_7d_rad": [0.0, 0.4, 0.00000001, -0.00000001, -0.00000001, -0.00000001, -0.00000001],
+  "preshape_7d_rad": [0.0375, 0.625, 0.1125, -0.03, -0.5625, -0.00375, -0.55875],
+  "full_close_7d_rad": [0.070328, 0.834471, 0.211379, -0.344065, -1.205088, -0.344065, -1.151059],
+  "bounded_change_from_validated_p14": "middle_0 uses the already validated P14 index_0 flexion to bring the vertically separated middle pad into load; all other 6 joints are byte-identical to P14",
+  "transition_frames_at_30hz": 15,
+  "close_sequence": "THUMB_PRELOAD_INDEX_MIDDLE_THEN_FULL_THUMB",
+  "thumb_preload_fraction": 0.5,
+  "thumb_preload_frames_at_30hz": 10,
+  "opposition_side_close_frames_at_30hz": 15,
+  "thumb_close_frames_at_30hz": 15,
+  "arm_or_wrist_override": false,
+  "method_independent": true,
+  "episode_independent": true,
+  "same_for_reference_and_act": true,
+  "changes_task_success_definition": false
+}
